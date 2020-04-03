@@ -1,0 +1,3 @@
+[submodule "R/TransPhylo"]
+	path = R/TransPhylo
+	url = https://github.com/xavierdidelot/TransPhylo.git
