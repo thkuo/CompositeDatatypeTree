@@ -13,7 +13,7 @@ dateStartOutbreak=2005
 ctree<- simulateOutbreak(
     neg=neg,pi=pi,off.r=off.r,w.shape=w.shape,
     w.scale=w.scale,dateStartOutbreak=dateStartOutbreak,dateT=dateT)
-
+plotCTree(ctree)
 source('wtreesFromCTree.R')
 wtrees<- wtreesFromCTree(ctree)
 
