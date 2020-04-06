@@ -38,9 +38,11 @@ tr= Phylo.read(tree_f,'newick')
 next_projects= [str(tip.name) for tip in tr.get_terminals()]
 source_projects= [project_name] * len(tr.get_terminals())
 #travel along the trees
+from datetime import datetime
 while (len(next_projects)>0):
     project_name= next_projects.pop(0)
     source_project= source_projects.pop(0) 
+    print(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
     print('{}->{}'.format(source_project, project_name))
     tree_f=(os.path.join(wtrees_dir, '{}.nwk'.format(project_name)))
     if not os.path.isfile(tree_f):
@@ -63,10 +65,8 @@ while (len(next_projects)>0):
     # run alf
     subprocess.run(['alfsim', '-o', output_dir, alf_config_file])
 
-
     # update the next steps
     tr= Phylo.read(tree_f,'newick')
     next_projects= next_projects + [str(tip.name) for tip in tr.get_terminals()]
     source_projects= source_projects + [project_name] * len(tr.get_terminals())
-
 
