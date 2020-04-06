@@ -19,14 +19,14 @@ phyloFromWTree <- function(wtree_from_ctree) {
     n<- length(internal_ics)
     
     root<-which(wtree[1:(nrow(wtree)-1),1]==min(wtree[1:(nrow(wtree)-1),1]))
-    root.edge.length<- wtree[root,1] - min(wtree[,1])
+    root.edge.length<- wtree[root,1] - min(wtree[nrow(wtree),1])
     
     # if (n==1) return(ape::read.tree(text='(1);'))
     if (length(tip_ics)==1) {
         ori<- wtree[nrow(wtree), 5]
         ori.time<- wtree[nrow(wtree), 1]
-        root.edge.length<- ori.time - wtree[root,1]
-        tr<- ape::read.tree(text=sprintf('(%s:%f);', tip_ics[1] , root.edge.length))
+        root.edge.length<- wtree[root,1]- ori.time
+        tr<- ape::read.tree(text=sprintf('(%s);', tip_ics[1] ))
         tr$root.edge<- root.edge.length
         return(list(phylo= tr, ori= ori, ori.time= ori.time))
     }
