@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+results/genome_evol_sim
+results/intergenic_evol_sim

@@ -26,7 +26,7 @@ phyloFromWTree <- function(wtree_from_ctree) {
         ori<- wtree[nrow(wtree), 5]
         ori.time<- wtree[nrow(wtree), 1]
         root.edge.length<- wtree[root,1]- ori.time
-        tr<- ape::read.tree(text=sprintf('(%s);', wtree[1, 5] ))
+        tr<- ape::read.tree(text=sprintf('(%s:0.0,pseudo:0.0);', wtree[1, 5] ))
         tr$root.edge<- root.edge.length
         return(list(phylo= tr, ori= ori, ori.time= ori.time))
     }
