@@ -38,9 +38,14 @@ w_phylos<-lapply(wtrees, function(wtree) phyloFromWTree(wtree))
 ## don't forget the node indices
 output_d<- 'outbreak_sim'
 dir.create(file.path(output_d), recursive = T)   
+## print the ctree
+ctree_p_f<- sprintf('%s/ctree.pdf', output_d)
+pdf(ctree_p_f)
+plotCTree(ctree)
+dev.off()
 ## the transmission tree
 ttree_f<- sprintf('%s/ttree.mat', output_d)
-write.table(t_w_trees$ttree, file = ttree_f, sep = '\t',  col.names = F)
+write.table(extractTTree(ctree)$ttree, file = ttree_f, sep = '\t',  col.names = F)
 ## save the within-host trees
 output_wtrees_d<- sprintf('%s/wtrees', output_d)
 dir.create(file.path(output_wtrees_d), recursive = T)   
