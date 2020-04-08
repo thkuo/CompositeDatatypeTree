@@ -35,6 +35,7 @@ w_phylos<-lapply(wtrees, function(wtree) phyloFromWTree(wtree))
 # plotCTree(ctree)
 
 ## save the trees
+library(ape)
 ## don't forget the node indices
 output_d<- 'outbreak_sim'
 dir.create(file.path(output_d), recursive = T)   
@@ -46,10 +47,12 @@ dev.off()
 ## the transmission tree
 ttree_f<- sprintf('%s/ttree.mat', output_d)
 write.table(extractTTree(ctree)$ttree, file = ttree_f, sep = '\t',  col.names = F)
-## save the within-host trees
+## the (time-measured) phylogeny
+ptree_f<- sprintf('%s/phyloFromPtree.nwk', output_d)
+write.tree(phy = phyloFromPTree(extractPTree(ctree)), file = ptree_f)
+## the within-host trees
 output_wtrees_d<- sprintf('%s/wtrees', output_d)
 dir.create(file.path(output_wtrees_d), recursive = T)   
-library(ape)
 ## ori index as the tree names
 ## so that the trees are traceable (i.e. tip of one to the origin of another)
 for (i in 1:length(w_phylos)){
