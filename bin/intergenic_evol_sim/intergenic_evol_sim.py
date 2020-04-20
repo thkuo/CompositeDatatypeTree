@@ -3,22 +3,8 @@ import subprocess
 import re 
 from Bio import Phylo
 
-cpu_num= 10
-output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-            'transmission_simulator/results/intergenic_evol_sim/')
-gen_output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-                'transmission_simulator/results/genome_evol_sim')
-wtrees_dir= ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-             'transmission_simulator/results/outbreak_sim/wtrees/')
-config_template= './dawg-input_template.dawg' 
-intergenic_coor_f= './intergenic_coordinates.txt'
-starting_ix= 57
-
-## generation 0
-project_name= str(starting_ix)
-tree_f=(os.path.join(wtrees_dir, '{}.nwk'.format(project_name)))
-
-# make the config file of dawg
+#+++++
+# Core functions
 def make_dawg_config(config_template, project_name, tree_f, output_dir):
     config_file= os.path.join(output_dir, '{}.dawg'.format(project_name))
     # read the tree
@@ -34,6 +20,80 @@ def make_dawg_config(config_template, project_name, tree_f, output_dir):
                     l= re.sub('\$TREE\$', tr_str, l)
                 config_fh.write(l)
     return(config_file)
+
+def exec_func(output_dir, gen_output_dir, project_name,
+              dawg_config_file, intergenic_coor_f, cpu_num):
+    # run dawg
+    try:
+        t= 0
+        success=False
+        while (not success) and (t<3):
+            if os.path.isdir(os.path.join(output_dir, project_name)):
+                shutil.rmtree(os.path.join(output_dir, project_name))
+            subprocess.run(['./run_dawg.sh', output_dir, gen_output_dir, project_name,
+                dawg_config_file, intergenic_coor_f, str(cpu_num)]) 
+            success=os.path.isfile(
+                os.path.join(output_dir, project_name, 'intergenic.fa'))
+            t=t+1
+        if (not success):
+            raise FileExistsError
+    except FileExistsError as fe:
+        print(fe)
+        print('Host {}: evolution of integenic regions failed'.format(
+            project_name))
+
+#+++++
+# arguments
+import argparse 
+
+parser = argparse.ArgumentParser(
+    description='Simulate intergenic regions using dawg')
+parser.add_argument('-o',dest= 'output_dir', type=str,
+                    required= True,
+                    help='output directory')
+parser.add_argument('-gd', dest='genome_dir', type= str,
+                    required= True,
+                    help='the directory of simulated genomes')
+parser.add_argument('-wd', dest='wtrees_dir', type= str,
+                    required= True,
+                    help='the directory of wtrees')
+parser.add_argument('-c', dest='conf',type= str,
+                    required= True,
+                    help='config file template of dawg')
+parser.add_argument('-co', dest='coor',type= str, 
+                    required= True,
+                    help='intergenic region coordinates')
+parser.add_argument('-n', dest='cores',type= int,
+                    default= 1,
+                    help='number of threads')
+
+args = parser.parse_args()
+
+#output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v6/data/intergenic_evol_sim')
+output_dir=args.output_dir 
+if not os.path.exists(output_dir):
+    os.makedirs(output_dir)
+
+cpu_num= args.cores
+#gen_output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
+#            'WhichTree_Sim.v6/data/genome_evol_sim/')
+gen_output_dir=args.genome_dir
+#wtrees_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
+#            'WhichTree_Sim.v6/data/outbreak_sim/wtrees')
+wtrees_dir=args.wtrees_dir 
+#config_template= './dawg-input_template.dawg' 
+config_template= args.conf 
+#intergenic_coor_f= './intergenic_coordinates.txt'
+intergenic_coor_f= args.coor 
+# determine the starting index
+starting_ix= max([int(re.sub('.nwk$', '', f)) for f in os.listdir(wtrees_dir) if
+    re.search('.nwk$', f)])
+
+## generation 0
+project_name= str(starting_ix)
+tree_f=(os.path.join(wtrees_dir, '{}.nwk'.format(project_name)))
+
+# make the config file of dawg
 dawg_config_file= make_dawg_config(config_template, project_name, tree_f,
                                    output_dir)
 

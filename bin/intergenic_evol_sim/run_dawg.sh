@@ -9,7 +9,7 @@ INTERGENIC_COOR_FILE="$5"
 #echo $GEN_SIM_OUT
 #echo $PROJECT
 #echo $DAWG_CONFIG_FILE
-CPU_NUM=${6:1}
+CPU_NUM="$6"
 
 
 WHICH_TREE_HOME=/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/bin/re_simulate/which_tree
