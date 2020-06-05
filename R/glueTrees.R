@@ -1,3 +1,7 @@
+#' For the subsequent simulation that considers LGT, 
+#' the wtrees were expanded and include pseudo-samples.
+#' These nodes won't be connected to any wtree
+
 #Glue together some within-host trees using a transmission tree 
 .glueTrees = function(ttree,wtree)  {
   nsam <- length(which(!is.na(ttree[,2])))
