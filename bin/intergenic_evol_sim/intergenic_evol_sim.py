@@ -30,7 +30,10 @@ def exec_func(output_dir, gen_output_dir, project_name,
         while (not success) and (t<3):
             if os.path.isdir(os.path.join(output_dir, project_name)):
                 shutil.rmtree(os.path.join(output_dir, project_name))
-            subprocess.run(['./run_dawg.sh', output_dir, gen_output_dir, project_name,
+            subprocess.run([
+                os.path.join(os.path.dirname(
+                    os.path.realpath(__file__)),'run_dawg.sh'), 
+                output_dir, gen_output_dir, project_name,
                 dawg_config_file, intergenic_coor_f, str(cpu_num)]) 
             success=os.path.isfile(
                 os.path.join(output_dir, project_name, 'intergenic.fa'))
@@ -45,7 +48,7 @@ def exec_func(output_dir, gen_output_dir, project_name,
 #+++++
 # arguments
 import argparse 
-
+import os
 parser = argparse.ArgumentParser(
     description='Simulate intergenic regions using dawg')
 parser.add_argument('-o',dest= 'output_dir', type=str,
@@ -68,6 +71,8 @@ parser.add_argument('-n', dest='cores',type= int,
                     help='number of threads')
 
 args = parser.parse_args()
+
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 #output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v6/data/intergenic_evol_sim')
 output_dir=args.output_dir 

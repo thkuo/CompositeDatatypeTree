@@ -109,8 +109,8 @@ IndelModel(0)
 #                   motifFreq rate for of invariable sites
 #                   alpha     alpha parameter of gamma function
 rateVarModels := [
-#RateVarModel()
-RateVarModel('Gamma', 5, 0.01, 1)
+RateVarModel()
+#RateVarModel('Gamma', 5, 0.01, 1)
 #NULL
 ]:
 ###
@@ -195,15 +195,15 @@ geneDuplRate := 0;    # rate that gene duplication occurs
 ###
 
 ### parameters for gene loss
-geneLossRate := 4e-5;    # rate that gene loss occurs
+geneLossRate := 1.29e-06;    # rate that gene loss occurs
   numberLoss := 1:    # maximal number of genes involved in one duplication
 ###
 
 ### parameters for lateral gene transfer
-lgtRate := 4e-5;         # rate that single lateral gene transfer occurs
+lgtRate := 1.09e-05;         # rate that single lateral gene transfer occurs
   orthRep := 0.5;       # how much of the transfer will be orthologous
                        # replacement (rest is novel gene acquisition)
-lgtGRate := 1.6e-4;	       # rate that lateral gene transfer of groups occurs
+lgtGRate := 1.09e-05;	       # rate that lateral gene transfer of groups occurs
   lgtGSize := 3;      # number of genes which are transferred in one go
 ###
 

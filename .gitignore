@@ -4,3 +4,5 @@
 .Ruserdata
 results/
 */nohup.out
+bin/*/nohup.out
+R/TransPhylo

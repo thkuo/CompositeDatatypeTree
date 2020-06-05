@@ -20,7 +20,6 @@ source activate whichtree_env
 PERL5LIB=$CONDA_PREFIX/lib/site_perl/5.26.2/:$PERL5LIB
 
 mkdir -p $IN_SIM_OUT/$PROJECT
-cd $IN_SIM_OUT/$PROJECT
 dawg --output $IN_SIM_OUT/$PROJECT/intergenic.fa \
   $DAWG_CONFIG_FILE
 $WHICH_TREE_HOME/dawg_to_alf.pl $GEN_SIM_OUT/$PROJECT/speciesMapping.txt \
