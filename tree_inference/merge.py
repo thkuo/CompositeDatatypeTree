@@ -26,28 +26,6 @@ class ngs_workflow():
             targets= ([] if re.search('\w', self.target_f) is None else
                       [self.target_f]))
 
-class denovo(ngs_workflow):
-    def __init__(self, list_f= '', project_dir= ''):
-        print('Function: computing denovo assemblies and clustering orthologues\n...initiating')
-        config={
-            'list_f':list_f,
-            'adaptor': '-',
-            'new_reads_dir': (
-                '/net/metagenomics/data/from_moni/old.tzuhao/'
-                'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
-                'seq2geno/reads/dna'),
-            'out_prokka_dir': os.path.join(project_dir,'prokka'),
-            'out_roary_dir': os.path.join(project_dir,'roary'),
-            'out_spades_dir': os.path.join(project_dir,'spades')
-        }
-        target_f=os.path.join(project_dir, 'roary', 'gene_presence_absence.csv')
-        super().__init__(config, target_f,
-            './denovo_workflow/denovo.in_one.smk',
-            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
-            'denovo_workflow')
-        print(self.__dict__)
-    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-        super().run_workflow(cpu_num, just_dryrun)
 
 class gpa_aln(ngs_workflow):
     def __init__(self, config_f= '', target_f= ''):
@@ -82,10 +60,44 @@ class nuc_tr(ngs_workflow):
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
 
+class denovo(ngs_workflow):
+    def __init__(self, list_f= '', project_dir= ''):
+        print('Function: computing denovo assemblies and clustering orthologues\n...initiating')
+        config={
+            'list_f':list_f,
+            'adaptor': '-',
+            'new_reads_dir': (
+                '/net/metagenomics/data/from_moni/old.tzuhao/'
+                'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
+                'seq2geno/reads/dna'),
+            'out_prokka_dir': os.path.join(project_dir,'prokka'),
+            'out_roary_dir': os.path.join(project_dir,'roary'),
+            'out_spades_dir': os.path.join(project_dir,'spades')
+        }
+        target_f=os.path.join(project_dir, 'roary', 'gene_presence_absence.csv')
+        super().__init__(config, target_f,
+            './denovo_workflow/denovo.in_one.smk',
+            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
+            'denovo_workflow')
+        print(self.__dict__)
+    def run_workflow(self, cpu_num= 1, just_dryrun= True):
+        super().run_workflow(cpu_num, just_dryrun)
+
 class mapping(ngs_workflow):
-    def __init__(self, config_f= '', target_f= ''):
+    def __init__(self, list_f= '', project_dir= '', ref= ''):
         print('Function: mapping\n...initiating')
-        super().__init__(config_f, target_f,
+        config={
+            'list_f':list_f,
+            'adaptor': '-',
+            'new_reads_dir': (
+                '/net/metagenomics/data/from_moni/old.tzuhao/'
+                'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
+                'seq2geno/reads/dna'),
+            'ref_fasta': ref
+        }
+        target_f=os.path.join(project_dir,
+                              'mapping/merged_vcf/multisample.snp.vcf.gz')
+        super().__init__(config, target_f,
             './snps_workflow/snps.in_one.smk',
             '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'snps_workflow/')
@@ -99,15 +111,17 @@ class mapping(ngs_workflow):
 #    'run_seq2geno/dna_list')
 #project_dir= (
 #    '/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-#    'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
-#    'seq2geno/denovo')
+#    'TreePaper/WhichTree_Sim.v7/results.v5/')
+#ref= ('/net/metagenomics/data/from_moni/old.tzuhao/'
+#      'TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta')
+#
+#obj= mapping(list_f, project_dir, ref)
+#obj.run_workflow(just_dryrun= True)
 
-#denovo_obj= denovo(list_f, project_dir)
-#denovo_obj.run_workflow(just_dryrun= True)
 
 if __name__=='__main__':
     #def determine_workflow(x, config_f, target_f):
-    def determine_workflow(x, list_f, project_dir):
+    def determine_workflow(x, list_f, project_dir, ref):
         import sys
         target_func= ''
         if x == 'denovo':
@@ -123,9 +137,10 @@ if __name__=='__main__':
 #        elif x == 'nuc_tr':
 #            #target_func= nuc_tr
 #            return(nuc_tr(config_f, target_f))
-#        elif x == 'mapping':
-#            #target_func= mapping
-#            return(mapping(config_f, target_f))
+        elif x == 'mapping':
+            #target_func= mapping
+            #return(mapping(config_f, target_f))
+            return(mapping(list_f, project_dir, ref))
         else:
             sys.exit('Unknown function')
         return(target_func)
@@ -143,6 +158,8 @@ if __name__=='__main__':
             help='the directory for project')
     parser.add_argument('--l',dest= 'list_f', type=str, required= True,
             help='the list of sequencing reads')
+    parser.add_argument('--r',dest= 'ref', type=str, required= True,
+            help='the reference genome for mapping sequencing reads')
     parser.add_argument('--cpu',dest= 'cpu', type=str, default= 1,
             help='cpu number')
     parser.add_argument('--dry',dest= 'dryrun', action= 'store_true',
@@ -152,6 +169,7 @@ if __name__=='__main__':
             choices=['mapping', 'nuc_tr', 'cd_tr', 'gpa', 'denovo'])
     args= parser.parse_args()
     #target_func= determine_workflow(args.f, args.config_f, args.target_f)
-    target_func= determine_workflow(args.f, args.list_f, args.project_dir)
+    target_func= determine_workflow(args.f, args.list_f, args.project_dir,
+                                    args.ref)
     target_func.run_workflow(cpu_num= args.cpu, just_dryrun= args.dryrun)
 
