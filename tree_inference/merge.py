@@ -5,10 +5,12 @@ NOTE:
     integrate the config arguments (many -> one config file)
 '''
 import snakemake
-
+import os
 class ngs_workflow():
-    def __init__(self, config_f, target_f, snakefile, conda_prefix, workdir):
-        self.config_f= config_f
+    #def __init__(self, config_f, target_f, snakefile, conda_prefix, workdir):
+    def __init__(self, config_params, target_f, snakefile, conda_prefix, workdir):
+#        self.config_f= config_f
+        self.config_params= config_params
         self.target_f= target_f
         self.snakefile= snakefile
         self.conda_prefix= conda_prefix
@@ -18,7 +20,8 @@ class ngs_workflow():
         snakemake.snakemake(
             dryrun= just_dryrun,
             snakefile=self.snakefile,
-            configfile= self.config_f,
+            config= self.config_params,
+#            configfile= self.config_f,
             conda_prefix=self.conda_prefix,
             use_conda=True,
             workdir=self.workdir,
@@ -27,9 +30,23 @@ class ngs_workflow():
                       [self.target_f]))
 
 class denovo(ngs_workflow):
-    def __init__(self, config_f= '', target_f= ''):
-        print('Function: computing gpa\n...initiating')
-        super().__init__(config_f, target_f,
+    #def __init__(self, config_f= '', target_f= ''):
+    def __init__(self, list_f= '', project_dir= ''):
+        print('Function: computing denovo assemblies and clustering orthologues\n...initiating')
+        #super().__init__(config_f, target_f,
+        config={
+            'list_f':list_f,
+            'adaptor': '-',
+            'new_reads_dir': (
+                '/net/metagenomics/data/from_moni/old.tzuhao/'
+                'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
+                'seq2geno/reads/dna'),
+            'out_prokka_dir': os.path.join(project_dir,'prokka'),
+            'out_roary_dir': os.path.join(project_dir,'roary'),
+            'out_spades_dir': os.path.join(project_dir,'spades')
+        }
+        target_f=os.path.join(project_dir, 'roary', 'gene_presence_absence.csv')
+        super().__init__(config, target_f,
             './denovo_workflow/denovo.in_one.smk',
             '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'denovo_workflow')
@@ -81,6 +98,31 @@ class mapping(ngs_workflow):
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
 
+list_f=(
+    '/net/metagenomics/data/from_moni/'
+    'old.tzuhao/TreePaper/WhichTree_Sim.v7/bin.v5/'
+    'run_seq2geno/dna_list')
+project_dir= (
+    '/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
+    'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
+    'seq2geno/denovo')
+
+#denovo_config={
+#    'list_f':list_f,
+#    'adaptor': '-',
+#    'new_reads_dir': (
+#        '/net/metagenomics/data/from_moni/old.tzuhao/'
+#        'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
+#        'seq2geno/reads/dna'),
+#    'out_prokka_dir': os.path.join(project_dir,'prokka'),
+#    'out_roary_dir': os.path.join(project_dir,'roary'),
+#    'out_spades_dir': os.path.join(project_dir,'spades')
+#}
+#denovo_obj= denovo(denovo_config,
+#                   os.path.join(project_dir, 'roary', 'gene_presence_absence.csv'))
+denovo_obj= denovo(list_f, project_dir)
+denovo_obj.run_workflow(just_dryrun= True)
+"""
 if __name__=='__main__':
     def determine_workflow(x, config_f, target_f):
         import sys
@@ -103,6 +145,7 @@ if __name__=='__main__':
         else:
             sys.exit('Unknown function')
         return(target_func)
+
     ## let the user opt the function
     import argparse
     parser = argparse.ArgumentParser(description=('''
@@ -122,4 +165,4 @@ if __name__=='__main__':
     args= parser.parse_args()
     target_func= determine_workflow(args.f, args.config_f, args.target_f)
     target_func.run_workflow(cpu_num= args.cpu, just_dryrun= args.dryrun)
-
+"""
