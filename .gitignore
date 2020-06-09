@@ -2,3 +2,4 @@
 tree_inference/denovo_workflow/lib/
 */NOTE
 tree_inference/*/.snakemake/
+*/.deprived
