@@ -1,0 +1,121 @@
+==> conc_workflow/conc.config.yml <==
+nuc_aln:
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/alignment/nuc.var.aln
+gpa_aln:
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/gpa/gpa.var.aln
+conc_aln: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/raxml_input/conc.aln
+raxml_prtn: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/raxml_input/conc.prtn
+col_constraint_tr: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/nuc.col.nwk
+best_ml_tree: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/RAxML_bestTree.conc
+bs_trees: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/bootstrap/RAxML_bootstrap.all
+bs_best_ml_tree: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/RAxML_bipartitions.conc.bs
+model:
+  'BINGAMMA '
+max_cores: 28
+
+==> conc_workflow/conc.config.yml <==
+nuc_aln:
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/alignment/nuc.var.aln
+gpa_aln:
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/gpa/gpa.var.aln
+conc_aln: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/raxml_input/conc.aln
+raxml_prtn: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/raxml_input/conc.prtn
+col_constraint_tr: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/nuc.col.nwk
+best_ml_tree: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/RAxML_bestTree.conc
+bs_trees: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/bootstrap/RAxML_bootstrap.all
+bs_best_ml_tree: 
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/Paeru.v4/results/cd/cutoff.v4/RAxML_bipartitions.conc.bs
+model:
+  'BINGAMMA '
+max_cores: 28
+==> denovo_workflow/config.yml <==
+list_f: 'data/samples.10.dna_full.with_ref.tsv'
+out_prokka_dir: 'prokka'
+out_roary_dir: 'roary'
+extracted_proteins_dir: 'extracted_proteins_nt/'
+out_gpa_f: 'annot.mat'
+out_indel_f: 'indel_annot.mat'
+REF_GFF: '/net/metagenomics/data/from_moni/old.tzuhao/seq2geno/dev_versions/v9/.ori_backup/gpa/match_reference_annotation/RefCln_UCBPP-PA14.gff'
+anno_f: '.ori_backup/Pseudomonas_aeruginosa_PA14_annotation_with_ncRNAs_07_2011_12genes.tab'
+
+==> denovo_workflow/config.yml <==
+list_f: 'data/samples.10.dna_full.with_ref.tsv'
+out_prokka_dir: 'prokka'
+out_roary_dir: 'roary'
+extracted_proteins_dir: 'extracted_proteins_nt/'
+out_gpa_f: 'annot.mat'
+out_indel_f: 'indel_annot.mat'
+REF_GFF: '/net/metagenomics/data/from_moni/old.tzuhao/seq2geno/dev_versions/v9/.ori_backup/gpa/match_reference_annotation/RefCln_UCBPP-PA14.gff'
+anno_f: '.ori_backup/Pseudomonas_aeruginosa_PA14_annotation_with_ncRNAs_07_2011_12genes.tab'
+==> gpa_workflow/config.yml <==
+roary_gpa:
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/seq2geno/denovo/roary/gene_presence_absence.csv 
+strains:
+  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200
+
+==> gpa_workflow/config.yml <==
+roary_gpa:
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/seq2geno/denovo/roary/gene_presence_absence.csv 
+strains:
+  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200
+==> nuc_workflow/nuc_config.yml <==
+#raxml_bin: 
+#  raxmlHPC-PTHREADS
+raxml_model:
+  'GTRCAT -V '
+ref_fa:
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta
+multisample_vcf:
+  /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/mapping/merged_vcf/multisample.snp.vcf.gz
+strains: 
+  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200
+
+==> nuc_workflow/nuc_config.yml <==
+#raxml_bin: 
+#  raxmlHPC-PTHREADS
+raxml_model:
+  'GTRCAT -V '
+ref_fa:
+  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta
+multisample_vcf:
+  /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/mapping/merged_vcf/multisample.snp.vcf.gz
+strains: 
+  1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,56,57,58,59,60,61,62,63,64,65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90,91,92,93,94,95,96,97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200
+==> snps_workflow/config.yml <==
+adaptor: '-'
+#annot_tab: annotation.tab
+list_f: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/bin.v5/run_seq2geno/dna_list
+new_reads_dir: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/mapping/reads
+ref_fasta: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta
+#ref_gbk: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/data/reference/ATCC_700669.edit.gb
+#r_annot: 'Pseudomonas_aeruginosa_PA14_12genes_R_annotation'
+#snps_table: 'all_SNPs.tab'
+#snps_aa_table: 'all_SNPs_final.tab'
+#nonsyn_snps_aa_table: 'nonsyn_SNPs_final.tab'
+#snps_aa_bin_mat: 'all_SNPs_final.bin.mat'
+#nonsyn_snps_aa_bin_mat: 'nonsyn_SNPs_final.bin.mat'
+
+==> snps_workflow/config.yml <==
+adaptor: '-'
+#annot_tab: annotation.tab
+list_f: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/bin.v5/run_seq2geno/dna_list
+new_reads_dir: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/mapping/reads
+ref_fasta: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta
+#ref_gbk: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/data/reference/ATCC_700669.edit.gb
+#r_annot: 'Pseudomonas_aeruginosa_PA14_12genes_R_annotation'
+#snps_table: 'all_SNPs.tab'
+#snps_aa_table: 'all_SNPs_final.tab'
+#nonsyn_snps_aa_table: 'nonsyn_SNPs_final.tab'
+#snps_aa_bin_mat: 'all_SNPs_final.bin.mat'
+#nonsyn_snps_aa_bin_mat: 'nonsyn_SNPs_final.bin.mat'

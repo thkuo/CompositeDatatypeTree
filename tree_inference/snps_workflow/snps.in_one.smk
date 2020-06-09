@@ -16,7 +16,6 @@ with open(list_f, 'r') as list_fh:
 
 strains= list(dna_reads.keys())
 ref_fasta=config['ref_fasta']
-ref_gbk=config['ref_gbk']
 snps_table=config['snps_table']
 adaptor_f= config['adaptor']
 new_reads_dir= config['new_reads_dir']

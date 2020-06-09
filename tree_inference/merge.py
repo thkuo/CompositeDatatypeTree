@@ -6,94 +6,6 @@ NOTE:
 '''
 import snakemake
 
-'''
-# reads -> snps
-def mapping():
-    print('Function: mapping...')
-    just_dryrun= True
-    config_f= ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-               'WhichTree_Sim.v7/bin.v5/snps_workflow/config.yml')
-    target_f=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-              'WhichTree_Sim.v7/results.v5/mapping/merged_vcf/multisample.snp.vcf.gz')
-    snakemake.snakemake(
-        dryrun= just_dryrun,
-        snakefile='snps_workflow/snps.in_one.smk',
-        configfile= config_f,
-        conda_prefix=('/net/metagenomics/data/from_moni/old.tzuhao/'
-                      'TreePaper/shared_envs'),
-        use_conda=True,
-        workdir='snps_workflow/',
-        cores=16,
-        targets= [target_f])
-
-def nuc_tr():
-    print('Function: computing nucleotide tree...')
-    just_dryrun= True
-    config_f= ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-               'WhichTree_Sim.v7/bin.v5/nuc_workflow/nuc_config.yml')
-    target_f=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-              'WhichTree_Sim.v7/results.v5/mapping/raxml/RAxML_bipartitions.nuc.bs')
-    snakemake.snakemake(
-        dryrun= just_dryrun,
-        snakefile='nuc_workflow/nuc_tr.smk',
-        configfile= config_f,
-        conda_prefix=('/net/metagenomics/data/from_moni/old.tzuhao/'
-                      'TreePaper/shared_envs'),
-        use_conda=True,
-        workdir='nuc_workflow/',
-        cores=16,
-        targets= [target_f])
-
-def cd_tr():
-    print('Function: computing composite datatype tree...')
-    just_dryrun= True
-    config_f=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-              'TreePaper/WhichTree_Sim.v7/bin.v5/conc_workflow/conc.config.yml')
-    target_f= ''
-    snakemake.snakemake(
-        dryrun= just_dryrun,
-        snakefile='conc_workflow/conc_tree.smk',
-        configfile= config_f,
-        conda_prefix=('/net/metagenomics/data/from_moni/old.tzuhao/'
-                      'TreePaper/shared_envs'),
-        use_conda=True,
-        workdir='conc_workflow/',
-        cores=16,
-        targets= [])
-
-def gpa_aln():
-    print('Function: making gpa alignment...')
-    just_dryrun= True
-    config_f=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/bin.v5/gpa_workflow/config.yml')
-    target_f=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/gpa/gpa.var.aln')
-    snakemake.snakemake(
-        dryrun= just_dryrun,
-        snakefile='gpa_workflow/gpa.smk',
-        configfile= config_f,
-        conda_prefix=('/net/metagenomics/data/from_moni/old.tzuhao/'
-                      'TreePaper/shared_envs'),
-        use_conda=True,
-        workdir='gpa_workflow',
-        cores=16,
-        targets= [target_f])
-
-def denovo():
-    print('Function: computing gpa...')
-    just_dryrun= True
-    config_f=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/seq2geno/denovo/denovo_config.yml')
-    target_f=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/seq2geno/denovo/roary/gene_presence_absence.csv')
-    snakemake.snakemake(
-        dryrun= just_dryrun,
-        snakefile='./denovo_workflow/denovo.in_one.smk',
-        configfile= config_f,
-        conda_prefix=('/net/metagenomics/data/from_moni/old.tzuhao/'
-                      'TreePaper/shared_envs'),
-        use_conda=True,
-        workdir='denovo_workflow',
-        cores=16,
-        targets= [target_f])
-'''
-
 class ngs_workflow():
     def __init__(self, config_f, target_f, snakefile, conda_prefix, workdir):
         self.config_f= config_f
@@ -117,13 +29,7 @@ class ngs_workflow():
 class denovo(ngs_workflow):
     def __init__(self, config_f= '', target_f= ''):
         print('Function: computing gpa\n...initiating')
-        super().__init__(
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-             'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
-             'seq2geno/denovo/denovo_config.yml'), 
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-             'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
-             'seq2geno/denovo/roary/gene_presence_absence.csv'),
+        super().__init__(config_f, target_f,
             './denovo_workflow/denovo.in_one.smk',
             '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'denovo_workflow')
@@ -134,11 +40,7 @@ class denovo(ngs_workflow):
 class gpa_aln(ngs_workflow):
     def __init__(self, config_f= '', target_f= ''):
         print('Function: making gpa alignment\n...initiating')
-        super().__init__(
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-             'TreePaper/WhichTree_Sim.v7/bin.v5/gpa_workflow/config.yml'), 
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-             'TreePaper/WhichTree_Sim.v7/results.v5/gpa/gpa.var.aln'),
+        super().__init__(config_f, target_f,
             './gpa_workflow/gpa.smk',
             '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'gpa_workflow')
@@ -149,10 +51,7 @@ class gpa_aln(ngs_workflow):
 class cd_tr(ngs_workflow):
     def __init__(self, config_f= '', target_f= ''):
         print('Function: making gpa alignment\n...initiating')
-        super().__init__(
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-              'TreePaper/WhichTree_Sim.v7/bin.v5/conc_workflow/conc.config.yml'), 
-            '',
+        super().__init__(config_f, target_f,
             './conc_workflow/conc_tree.smk',
             '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'conc_workflow/')
@@ -163,11 +62,7 @@ class cd_tr(ngs_workflow):
 class nuc_tr(ngs_workflow):
     def __init__(self, config_f= '', target_f= ''):
         print('Function: computing nucleotide tree\n...initiating')
-        super().__init__(
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-               'WhichTree_Sim.v7/bin.v5/nuc_workflow/nuc_config.yml'), 
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-              'WhichTree_Sim.v7/results.v5/mapping/raxml/RAxML_bipartitions.nuc.bs'),
+        super().__init__(config_f, target_f,
             './nuc_workflow/nuc_tr.smk',
             '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'nuc_workflow/')
@@ -178,11 +73,7 @@ class nuc_tr(ngs_workflow):
 class mapping(ngs_workflow):
     def __init__(self, config_f= '', target_f= ''):
         print('Function: mapping\n...initiating')
-        super().__init__(
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-               'WhichTree_Sim.v7/bin.v5/snps_workflow/config.yml'), 
-            ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-              'WhichTree_Sim.v7/results.v5/mapping/merged_vcf/multisample.snp.vcf.gz'),
+        super().__init__(config_f, target_f,
             './snps_workflow/snps.in_one.smk',
             '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'snps_workflow/')
@@ -196,19 +87,19 @@ if __name__=='__main__':
         target_func= ''
         if x == 'denovo':
             #target_func= denovo
-            return(denovo())
+            return(denovo(config_f, target_f))
         elif x == 'gpa':
             #target_func= gpa_aln
-            return(gpa_aln())
+            return(gpa_aln(config_f, target_f))
         elif x == 'cd_tr':
             #target_func= cd_tr 
-            return(cd_tr())
+            return(cd_tr(config_f, target_f))
         elif x == 'nuc_tr':
             #target_func= nuc_tr
-            return(nuc_tr())
+            return(nuc_tr(config_f, target_f))
         elif x == 'mapping':
             #target_func= mapping
-            return(mapping())
+            return(mapping(config_f, target_f))
         else:
             sys.exit('Unknown function')
         return(target_func)
@@ -223,10 +114,12 @@ if __name__=='__main__':
             help='the target file from the workflow')
     parser.add_argument('--cpu',dest= 'cpu', type=str, default= 1,
             help='cpu number')
+    parser.add_argument('--dry',dest= 'dryrun', action= 'store_true',
+            help='cpu number')
     parser.add_argument('f', type=str,
             help='the subworkflow to launch',
             choices=['mapping', 'nuc_tr', 'cd_tr', 'gpa', 'denovo'])
     args= parser.parse_args()
     target_func= determine_workflow(args.f, args.config_f, args.target_f)
-    target_func.run_workflow(cpu_num= args.cpu)
+    target_func.run_workflow(cpu_num= args.cpu, just_dryrun= args.dryrun)
 
