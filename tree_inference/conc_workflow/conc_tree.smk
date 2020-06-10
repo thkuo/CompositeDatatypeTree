@@ -14,7 +14,8 @@ bs_best_ml_tree= config['bs_best_ml_tree']
 #'conc.raxml/RAxML_bestTree.conc')
 #col_cw_withBS_tree= os.path.join(results_dir,
 #    'RAxML_bipartitions.nuc_uw-gpa.withBS.collapse')
-max_core_n= config['max_cores']
+#max_core_n= config['max_cores']
+max_core_n=len(os.sched_getaffinity(0)) 
 max_per_part_core_n= int(max_core_n/5)
 #raxml_bin= config['raxml_bin'] 
 model= config['model']

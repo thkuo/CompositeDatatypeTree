@@ -2,7 +2,7 @@
 Interface to the five workflows 
 
 NOTE:
-    The user determines input: reads, reference, and project directory
+    The user determines: reads, reference, outgroup(???), and project directory
     This software determines output: 
         vcf (mapping)
         nuc tree
@@ -32,65 +32,106 @@ class ngs_workflow():
             targets= ([] if re.search('\w', self.target_f) is None else
                       [self.target_f]))
 
+class cd_tr(ngs_workflow):
+    def __init__(self, proj):
+        print('Function: making gpa alignment\n...initiating')
+        config={
+            'nuc_aln': proj.roary_out,
+            'gpa_aln': proj.gpa_aln,
+            'conc_aln':os.path.join(proj.project_dir, 'cd', 'materials',
+                                    'conc.aln'),
+            'raxml_prtn':os.path.join(proj.project_dir, 'cd', 'materials',
+                                    'conc.prtn'),
+            'col_constraint_tr':os.path.join(proj.project_dir, 'cd', 
+            'best_ml_tree':os.path.join(proj.project_dir, 'cd', 
+            'bs_trees':os.path.join(proj.project_dir, 'cd', 
+            'bs_best_ml_tree':os.path.join(proj.project_dir, 'cd', 
+            'model': 'BINGAMMA'
+        }
+        target_f=proj.cd_tr
+        super().__init__(config, target_f,
+            './conc_workflow/conc_tree.smk',
+            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
+            'conc_workflow/')
+        print(self.__dict__)
+    def run_workflow(self, cpu_num= 1, just_dryrun= True):
+        super().run_workflow(cpu_num, just_dryrun)
+    def collapse_tree(self):
+        tr_f= self.cd_tr_out
+        out_tr_f= self.col_cd_tr_out
+        import subprocess
+        home_dir= os.path.dirname(os.path.realpath(__file__))
+        script_f= os.path.join(home_dir, 'collapse_br', 'collapse_tree.R' )
+        subprocess.run([script_f, '--i', tr_f, '--o', out_tr_f,
+                        '--br', str(self.br_cutoff), '--bs', str(self.bs_cutoff), 
+                        '--og', ' '.join(self.outgroup)])
 
-#class gpa_aln(ngs_workflow):
-#    def __init__(self, config_f= '', target_f= ''):
-#        print('Function: making gpa alignment\n...initiating')
-#        super().__init__(config_f, target_f,
-#            './gpa_workflow/gpa.smk',
-#            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
-#            'gpa_workflow')
-#        print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
-#
-#class cd_tr(ngs_workflow):
-#    def __init__(self, config_f= '', target_f= ''):
-#        print('Function: making gpa alignment\n...initiating')
-#        super().__init__(config_f, target_f,
-#            './conc_workflow/conc_tree.smk',
-#            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
-#            'conc_workflow/')
-#        print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
-#
-#class nuc_tr(ngs_workflow):
-#    def __init__(self, config_f= '', target_f= ''):
-#        print('Function: computing nucleotide tree\n...initiating')
-#        super().__init__(config_f, target_f,
-#            './nuc_workflow/nuc_tr.smk',
-#            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
-#            'nuc_workflow/')
-#        print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
-#
-#class denovo(ngs_workflow):
-#    def __init__(self, list_f= '', project_dir= ''):
-#        print('Function: computing denovo assemblies and clustering orthologues\n...initiating')
-#        config={
-#            'list_f':list_f,
-#            'adaptor': '-',
-#            'new_reads_dir': (
-#                '/net/metagenomics/data/from_moni/old.tzuhao/'
-#                'TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/'
-#                'seq2geno/reads/dna'),
-#            'out_prokka_dir': os.path.join(project_dir,'prokka'),
-#            'out_roary_dir': os.path.join(project_dir,'roary'),
-#            'out_spades_dir': os.path.join(project_dir,'spades')
-#        }
-#        target_f=os.path.join(project_dir, 'roary', 'gene_presence_absence.csv')
-#        super().__init__(config, target_f,
-#            './denovo_workflow/denovo.in_one.smk',
-#            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
-#            'denovo_workflow')
-#        print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
+
+class gpa_aln(ngs_workflow):
+    def __init__(self, proj):
+        print('Function: making gpa alignment\n...initiating')
+        config={
+            'roary_gpa': proj.roary_out,
+            'strains': 
+        }
+        target_f=proj.gpa_aln
+        super().__init__(config, target_f,
+            './gpa_workflow/gpa.smk',
+            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
+            'gpa_workflow')
+        print(self.__dict__)
+    def run_workflow(self, cpu_num= 1, just_dryrun= True):
+        super().run_workflow(cpu_num, just_dryrun)
+
+class denovo(ngs_workflow):
+    def __init__(self, proj):
+        print('Function: computing denovo assemblies and clustering orthologues\n...initiating')
+        config={
+            'list_f':proj.list_f,
+            'adaptor': proj.adaptor,
+            'new_reads_dir': proj.new_reads_dir,
+            'out_prokka_dir': os.path.join(proj.project_dir,'prokka'),
+            'out_roary_dir': os.path.join(proj.project_dir,'roary'),
+            'out_spades_dir': os.path.join(proj.project_dir,'spades')
+        }
+        target_f=proj.roary_out
+        super().__init__(config, target_f,
+            './denovo_workflow/denovo.in_one.smk',
+            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
+            'denovo_workflow')
+        print(self.__dict__)
+    def run_workflow(self, cpu_num= 1, just_dryrun= True):
+        super().run_workflow(cpu_num, just_dryrun)
+
+class nuc_tr(ngs_workflow):
+    def __init__(self, proj):
+        print('Function: computing nucleotide tree\n...initiating')
+        config={
+            'raxml_model':'GTRGAMMA ',
+            'adaptor': proj.adaptor,
+            'multisample_vcf': proj.vcf_out,
+            'ref_fa': proj.ref
+        }
+        target_f=proj.nuc_tr_out
+        super().__init__(config_f, target_f,
+            './nuc_workflow/nuc_tr.smk',
+            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
+            'nuc_workflow/')
+        print(self.__dict__)
+    def run_workflow(self, cpu_num= 1, just_dryrun= True):
+        super().run_workflow(cpu_num, just_dryrun)
+    def collapse_tree(self):
+        tr_f= self.cd_tr_out
+        out_tr_f= self.col_cd_tr_out
+        import subprocess
+        home_dir= os.path.dirname(os.path.realpath(__file__))
+        script_f= os.path.join(home_dir, 'collapse_br', 'collapse_tree.R' )
+        subprocess.run([script_f, '--i', tr_f, '--o', out_tr_f,
+                        '--br', str(self.br_cutoff), '--bs', str(self.bs_cutoff), 
+                        '--og', ' '.join(self.outgroup)])
+
 
 class mapping(ngs_workflow):
-    #def __init__(self, list_f= '', project_dir= '', ref= ''):
     def __init__(self, proj):
         print('Function: mapping\n...initiating')
         config={
@@ -107,6 +148,7 @@ class mapping(ngs_workflow):
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
+
 
 list_f=(
     '/net/metagenomics/data/from_moni/'
