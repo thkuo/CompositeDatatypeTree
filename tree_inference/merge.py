@@ -1,6 +1,14 @@
 '''
 Interface to the five workflows 
 
+Required variables:
+    home: to determine the working directory 
+    env: for the external packages
+        default: ./shared_envs
+        configurable using CDTREE_SHARED_ENV: 
+            export \
+            CDTREE_SHARED_ENV=/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs
+
 NOTE:
     The user determines: reads, reference, outgroup(???), and project directory
     This software determines output: 
@@ -13,19 +21,23 @@ NOTE:
 import snakemake
 import os
 class ngs_workflow():
-    def __init__(self, config_params, target_f, snakefile, conda_prefix, workdir):
+    def __init__(self, config_params, target_f, snakefile, workdir):
         self.config_params= config_params
         self.target_f= target_f
         self.snakefile= snakefile
-        self.conda_prefix= conda_prefix
         self.workdir= workdir
+    def determine_conda_env_dir(self):
+        return(os.environ['CDTREE_SHARED_ENV'] if 
+                'CDTREE_SHARED_ENV' in os.environ else
+                os.path.join(os.path.dirname(os.path.realpath(__file__)),'shared_envs'))
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         import re 
+        print(self.determine_conda_env_dir())
         snakemake.snakemake(
             dryrun= just_dryrun,
             snakefile=self.snakefile,
             config= self.config_params,
-            conda_prefix=self.conda_prefix,
+            conda_prefix=self.determine_conda_env_dir(),
             use_conda=True,
             workdir=self.workdir,
             cores=cpu_num,
@@ -42,16 +54,15 @@ class cd_tr(ngs_workflow):
                                     'conc.aln'),
             'raxml_prtn':os.path.join(proj.project_dir, 'cd', 'materials',
                                     'conc.prtn'),
-            'col_constraint_tr':os.path.join(proj.project_dir, 'cd', 
-            'best_ml_tree':os.path.join(proj.project_dir, 'cd', 
-            'bs_trees':os.path.join(proj.project_dir, 'cd', 
-            'bs_best_ml_tree':os.path.join(proj.project_dir, 'cd', 
+            'col_constraint_tr':proj.col_nuc_tr_out,
+#            'best_ml_tree':os.path.join(proj.project_dir, 'cd', 
+#            'bs_trees':os.path.join(proj.project_dir, 'cd', 
+#            'bs_best_ml_tree':os.path.join(proj.project_dir, 'cd', 
             'model': 'BINGAMMA'
         }
         target_f=proj.cd_tr
         super().__init__(config, target_f,
             './conc_workflow/conc_tree.smk',
-            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'conc_workflow/')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
@@ -66,18 +77,16 @@ class cd_tr(ngs_workflow):
                         '--br', str(self.br_cutoff), '--bs', str(self.bs_cutoff), 
                         '--og', ' '.join(self.outgroup)])
 
-
 class gpa_aln(ngs_workflow):
     def __init__(self, proj):
         print('Function: making gpa alignment\n...initiating')
         config={
             'roary_gpa': proj.roary_out,
-            'strains': 
+            'strains': []
         }
         target_f=proj.gpa_aln
         super().__init__(config, target_f,
             './gpa_workflow/gpa.smk',
-            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'gpa_workflow')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
@@ -97,7 +106,6 @@ class denovo(ngs_workflow):
         target_f=proj.roary_out
         super().__init__(config, target_f,
             './denovo_workflow/denovo.in_one.smk',
-            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'denovo_workflow')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
@@ -115,7 +123,6 @@ class nuc_tr(ngs_workflow):
         target_f=proj.nuc_tr_out
         super().__init__(config_f, target_f,
             './nuc_workflow/nuc_tr.smk',
-            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'nuc_workflow/')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
@@ -130,7 +137,6 @@ class nuc_tr(ngs_workflow):
                         '--br', str(self.br_cutoff), '--bs', str(self.bs_cutoff), 
                         '--og', ' '.join(self.outgroup)])
 
-
 class mapping(ngs_workflow):
     def __init__(self, proj):
         print('Function: mapping\n...initiating')
@@ -143,7 +149,6 @@ class mapping(ngs_workflow):
         target_f=proj.vcf_out
         super().__init__(config, target_f,
             './snps_workflow/snps.in_one.smk',
-            '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs',
             'snps_workflow/')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
