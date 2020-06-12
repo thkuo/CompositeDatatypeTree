@@ -10,7 +10,7 @@ Required variables:
             CDTREE_SHARED_ENV=/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs
 
 NOTE:
-    The user determines: reads, reference, outgroup(???), and project directory
+    The user determines: reads, reference, project directory, full list of strains(???), and outgroup(???) 
     This software determines output: 
         vcf (mapping)
         nuc tree
@@ -26,6 +26,10 @@ class ngs_workflow():
         self.target_f= target_f
         self.snakefile= snakefile
         self.workdir= workdir
+    def determine_smk(self):
+        return(os.path.join(os.path.dirname(os.path.realpath(__file__)),
+                            self.snakefile))
+
     def determine_conda_env_dir(self):
         return(os.environ['CDTREE_SHARED_ENV'] if 
                 'CDTREE_SHARED_ENV' in os.environ else
@@ -35,7 +39,8 @@ class ngs_workflow():
         print(self.determine_conda_env_dir())
         snakemake.snakemake(
             dryrun= just_dryrun,
-            snakefile=self.snakefile,
+            #snakefile=self.snakefile,
+            snakefile=self.determine_smk(),
             config= self.config_params,
             conda_prefix=self.determine_conda_env_dir(),
             use_conda=True,
@@ -55,15 +60,13 @@ class cd_tr(ngs_workflow):
             'raxml_prtn':os.path.join(proj.project_dir, 'cd', 'materials',
                                     'conc.prtn'),
             'col_constraint_tr':proj.col_nuc_tr_out,
-#            'best_ml_tree':os.path.join(proj.project_dir, 'cd', 
-#            'bs_trees':os.path.join(proj.project_dir, 'cd', 
-#            'bs_best_ml_tree':os.path.join(proj.project_dir, 'cd', 
-            'model': 'BINGAMMA'
+            'model': proj.cd_model
         }
-        target_f=proj.cd_tr
+        target_f=proj.cd_tr_out
         super().__init__(config, target_f,
             './conc_workflow/conc_tree.smk',
-            'conc_workflow/')
+            proj.project_dir
+                        )
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
@@ -87,7 +90,8 @@ class gpa_aln(ngs_workflow):
         target_f=proj.gpa_aln
         super().__init__(config, target_f,
             './gpa_workflow/gpa.smk',
-            'gpa_workflow')
+            proj.project_dir
+                        )
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
@@ -106,7 +110,8 @@ class denovo(ngs_workflow):
         target_f=proj.roary_out
         super().__init__(config, target_f,
             './denovo_workflow/denovo.in_one.smk',
-            'denovo_workflow')
+            proj.project_dir
+                        )
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
@@ -115,7 +120,7 @@ class nuc_tr(ngs_workflow):
     def __init__(self, proj):
         print('Function: computing nucleotide tree\n...initiating')
         config={
-            'raxml_model':'GTRGAMMA ',
+            'raxml_model':proj.nuc_model,
             'adaptor': proj.adaptor,
             'multisample_vcf': proj.vcf_out,
             'ref_fa': proj.ref
@@ -123,7 +128,8 @@ class nuc_tr(ngs_workflow):
         target_f=proj.nuc_tr_out
         super().__init__(config_f, target_f,
             './nuc_workflow/nuc_tr.smk',
-            'nuc_workflow/')
+            proj.project_dir
+                        )
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
@@ -149,81 +155,71 @@ class mapping(ngs_workflow):
         target_f=proj.vcf_out
         super().__init__(config, target_f,
             './snps_workflow/snps.in_one.smk',
-            'snps_workflow/')
+            proj.project_dir
+                        )
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
 
 
-list_f=(
-    '/net/metagenomics/data/from_moni/'
-    'old.tzuhao/TreePaper/WhichTree_Sim.v7/bin.v5/'
-    'run_seq2geno/dna_list')
-project_dir= (
-    '/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-    'TreePaper/WhichTree_Sim.v7/results.v5/')
-ref= ('/net/metagenomics/data/from_moni/old.tzuhao/'
-      'TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta')
+#list_f=(
+#    '/net/metagenomics/data/from_moni/'
+#    'old.tzuhao/TreePaper/WhichTree_Sim.v7/bin.v5/'
+#    'run_seq2geno/dna_list')
+#project_dir= (
+#    '/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
+#    'TreePaper/WhichTree_Sim.v7/results.v5/')
+#ref= ('/net/metagenomics/data/from_moni/old.tzuhao/'
+#      'TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta')
 
-from CDTreeProject import CDTreeProject
-cd_proj= CDTreeProject(list_f, project_dir, ref)
-
-## 
-print(cd_proj.__dict__)
-target_func= mapping(cd_proj)
-target_func.run_workflow(cpu_num= 1, just_dryrun= True)
+#from CDTreeProject import CDTreeProject
+#cd_proj= CDTreeProject(list_f, project_dir, ref)
+#
+### 
+#print(cd_proj.__dict__)
+#target_func= mapping(cd_proj)
+#target_func.run_workflow(cpu_num= 1, just_dryrun= True)
 
 #
-#if __name__=='__main__':
-#    #def determine_workflow(x, config_f, target_f):
-#    def determine_workflow(x, list_f, project_dir, ref):
-#        import sys
-#        target_func= ''
-#        if x == 'denovo':
-#            #target_func= denovo
-#            #return(denovo(config_f, target_f))
-#            return(denovo(list_f, project_dir))
-##        elif x == 'gpa':
-##            #target_func= gpa_aln
-##            return(gpa_aln(config_f, target_f))
-##        elif x == 'cd_tr':
-##            #target_func= cd_tr 
-##            return(cd_tr(config_f, target_f))
-##        elif x == 'nuc_tr':
-##            #target_func= nuc_tr
-##            return(nuc_tr(config_f, target_f))
-#        elif x == 'mapping':
-#            #target_func= mapping
-#            #return(mapping(config_f, target_f))
-#            return(mapping(list_f, project_dir, ref))
-#        else:
-#            sys.exit('Unknown function')
-#        return(target_func)
-#
-#    ## let the user opt the function
-#    import argparse
-#    parser = argparse.ArgumentParser(description=('''
-#                         Tree inference using composite datatype of microbial representations
-#                                                 '''))
-#    parser.add_argument('--p',dest= 'project_dir', type=str, required= True,
-#            help='the directory for project')
-#    parser.add_argument('--l',dest= 'list_f', type=str, required= True,
-#            help='the list of sequencing reads')
-#    parser.add_argument('--r',dest= 'ref', type=str, required= True,
-#            help='the reference genome for mapping sequencing reads')
-#    parser.add_argument('--cpu',dest= 'cpu', type=str, default= 1,
-#            help='cpu number')
-#    parser.add_argument('--dry',dest= 'dryrun', action= 'store_true',
-#            help='cpu number')
-#    parser.add_argument('f', type=str,
-#            help='the subworkflow to launch',
-#            choices=['mapping', 'nuc_tr', 'cd_tr', 'gpa', 'denovo'])
-#    args= parser.parse_args()
-#    ## control the output filenames
-#    from CDTreeProject import CDTreeProject
-#    cd_proj= CDTreeProject(args.list_f, args.project_dir, args.ref)
-#
-#    ## 
+if __name__=='__main__':
+    #def determine_workflow(x, config_f, target_f):
+    def determine_workflow(x, list_f, project_dir, ref):
+        import sys
+        target_func= ''
+        if x == 'denovo':
+            #target_func= denovo
+            #return(denovo(config_f, target_f))
+            return(denovo(list_f, project_dir))
+#        elif x == 'gpa':
+#            #target_func= gpa_aln
+#            return(gpa_aln(config_f, target_f))
+#        elif x == 'cd_tr':
+#            #target_func= cd_tr 
+#            return(cd_tr(config_f, target_f))
+#        elif x == 'nuc_tr':
+#            #target_func= nuc_tr
+#            return(nuc_tr(config_f, target_f))
+        elif x == 'mapping':
+            #target_func= mapping
+            #return(mapping(config_f, target_f))
+            return(mapping(list_f, project_dir, ref))
+        else:
+            sys.exit('Unknown function')
+        return(target_func)
+
+    # read arguments
+    from CDTreeArgParser import CDTreeArgParser
+    parser= CDTreeArgParser()
+    args= parser.parse()
+    print(args.__dict__)
+    ## control the output filenames
+    from CDTreeProject import CDTreeProject
+    cd_proj= CDTreeProject(
+        args.list_f, args.project_dir, args.ref,
+        args.adaptor, args.nuc_subs_model, args.rate_model,
+        args.br_cutoff, args.bs_cutoff, args.outgroup)
+
+    ## 
 #    target_func= determine_workflow(args.f, cd_proj)
 #    target_func.run_workflow(cpu_num= args.cpu, just_dryrun= args.dryrun)
 
