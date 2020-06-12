@@ -4,10 +4,10 @@ Interface to the five workflows
 Required variables:
     home: to determine the working directory 
     env: for the external packages
-        default: ./shared_envs
+        default: ./envs
         configurable using CDTREE_SHARED_ENV: 
             export \
-            CDTREE_SHARED_ENV=/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs
+            CDTREE_SHARED_ENV=/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/envs
 
 NOTE:
     The user determines: reads, reference, outgroup(???), and project directory
@@ -26,16 +26,19 @@ class ngs_workflow():
         self.target_f= target_f
         self.snakefile= snakefile
         self.workdir= workdir
+    def determine_smk(self):
+        return(os.path.join(os.path.dirname(os.path.realpath(__file__)),'rules',
+                           self.snakefile))
     def determine_conda_env_dir(self):
         return(os.environ['CDTREE_SHARED_ENV'] if 
                 'CDTREE_SHARED_ENV' in os.environ else
-                os.path.join(os.path.dirname(os.path.realpath(__file__)),'shared_envs'))
+                os.path.join(os.path.dirname(os.path.realpath(__file__)),'envs'))
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         import re 
         print(self.determine_conda_env_dir())
         snakemake.snakemake(
             dryrun= just_dryrun,
-            snakefile=self.snakefile,
+            snakefile=self.determine_smk(),
             config= self.config_params,
             conda_prefix=self.determine_conda_env_dir(),
             use_conda=True,
@@ -62,7 +65,8 @@ class cd_tr(ngs_workflow):
         }
         target_f=proj.cd_tr
         super().__init__(config, target_f,
-            './conc_workflow/conc_tree.smk',
+#            './conc_workflow/conc_tree.smk',
+            'conc_tree.smk',
             'conc_workflow/')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
@@ -86,7 +90,8 @@ class gpa_aln(ngs_workflow):
         }
         target_f=proj.gpa_aln
         super().__init__(config, target_f,
-            './gpa_workflow/gpa.smk',
+            #'./gpa_workflow/gpa.smk',
+            'gpa.smk',
             'gpa_workflow')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
@@ -105,7 +110,8 @@ class denovo(ngs_workflow):
         }
         target_f=proj.roary_out
         super().__init__(config, target_f,
-            './denovo_workflow/denovo.in_one.smk',
+            #'./denovo_workflow/denovo.in_one.smk',
+            'denovo.in_one.smk',
             'denovo_workflow')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
@@ -122,7 +128,8 @@ class nuc_tr(ngs_workflow):
         }
         target_f=proj.nuc_tr_out
         super().__init__(config_f, target_f,
-            './nuc_workflow/nuc_tr.smk',
+            #'./nuc_workflow/nuc_tr.smk',
+            'nuc_tr.smk',
             'nuc_workflow/')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
@@ -148,7 +155,8 @@ class mapping(ngs_workflow):
         }
         target_f=proj.vcf_out
         super().__init__(config, target_f,
-            './snps_workflow/snps.in_one.smk',
+            #'./snps_workflow/snps.in_one.smk',
+            'snps.in_one.smk',
             'snps_workflow/')
         print(self.__dict__)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
