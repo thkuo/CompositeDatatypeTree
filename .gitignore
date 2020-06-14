@@ -3,3 +3,5 @@ tree_inference/denovo_workflow/lib/
 */NOTE
 tree_inference/*/.snakemake/
 */.deprived
+tree_inference/test
+tree_inference/__pycache__

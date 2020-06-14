@@ -135,15 +135,6 @@ rule compute_conc_tree:
   -n {wildcards.suffix}
         """
 
-#rule collapse_constraint_tree:
-#    input: constraint_tr
-#    output: col_constraint_tr
-#    shell:
-#        '''
-#        ./collapse_short.interface.R \
-# {input} {output}
-#        '''
-
 rule prepare_concatenated_data:
     input:
         nuc_aln= nuc_aln,

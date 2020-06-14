@@ -8,7 +8,7 @@ from multiprocessing import cpu_count
 ref_fa=config['ref_fa']
 multisample_vcf=config['multisample_vcf']
 raxml_model= config['raxml_model']
-#strains= config['strains'].strip().split(',')
+strains= config['strains'].strip().split(',')
 bootstrap_cores=5
 rule bs_values_mapped_to_tree:
     input:  
@@ -118,50 +118,19 @@ rule mapping_trim_invariant:
     output:
         one_big_var_aln= '{result_dir}/alignment/{suffix}.var.aln'
     threads: 1
-    params:
-        cutoff_num= 2
-    run:
-        from Bio import SeqIO
-        from Bio import AlignIO
-        aln_f= input['one_big_aln']
-        out_f= output['one_big_var_aln']
-        cutoff= int(params['cutoff_num'])
-        case= False
-        aln= AlignIO.read(aln_f, 'fasta')
-        sample_num= len(aln)
-        col_num= aln.get_alignment_length()
-
-        new_aln= aln[:, 0:1] ## removed afterward
-        new_aln.sort()
-        print([s.id for s in new_aln])
-        for n in range(col_num):
-            col_str= aln[:, n]
-            if not case:
-                col_str= col_str.lower()
-            dominant_char_num= max(
-                [col_str.count(uc) for uc in set(col_str)])
-            if (sample_num-dominant_char_num) >= cutoff:
-                col_aln= aln[:, n:n+1]
-                col_aln.sort()
-                new_aln=new_aln+col_aln
-        new_aln= new_aln[:, 1:]
-
-        with open(out_f, 'w') as out_fh:
-            AlignIO.write(new_aln, out_fh, "fasta")
-#    shell:
-#        '''
-#        ./removeInvariant.py --in {input} \
-#--out {output} --cn 2
-#        '''
+    shell:
+        '''
+        ./removeInvariant.py --in {input} \
+--out {output} --cn 2
+        '''
 
 rule cons_seqs_to_aln:
     '''
     Create the nucleotide alignment 
     '''
     input:
-        per_sample_seq= dynamic('{result_dir}/alignment/strains/{sample}.fa')
-#        per_sample_seq= expand('{result_dir}/alignment/strains/{sample}.fa', 
-#            result_dir= '{result_dir}', sample= strains)
+        per_sample_seq= expand('{result_dir}/alignment/strains/{sample}.fa', 
+            result_dir= '{result_dir}', sample= strains)
     output:
         one_big_aln= '{result_dir}/alignment/{suffix}.full.aln'
     threads: 1
