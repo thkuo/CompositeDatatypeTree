@@ -1,0 +1,42 @@
+name: py37
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+  - conda-forge/label/broken
+dependencies:
+  - _libgcc_mutex=0.1=main
+  - biopython=1.73=py37h14c3975_0
+  - bzip2=1.0.6=h14c3975_1002
+  - ca-certificates=2019.11.28=hecc5488_0
+  - certifi=2019.11.28=py37_0
+  - libblas=3.8.0=10_openblas
+  - libcblas=3.8.0=10_openblas
+  - libffi=3.2.1=he1b5a44_1006
+  - libgcc=7.2.0=h69d50b8_2
+  - libgcc-ng=8.2.0=hdf63c60_1
+  - libgfortran-ng=7.3.0=hdf63c60_0
+  - liblapack=3.8.0=10_openblas
+  - libstdcxx-ng=8.2.0=hdf63c60_1
+  - ncurses=6.1=hf484d3e_1002
+  - numpy=1.16.3=py37he5ce36f_0
+  - openblas=0.3.6=h6e990d7_2
+  - openssl=1.1.1d=h516909a_0
+  - pandas=0.25.0=py37hb3f55d8_0
+  - pip=19.1=py37_0
+  - python=3.7.3=h5b0a415_0
+  - python-dateutil=2.8.0=py_0
+  - pytz=2019.1=py_0
+  - readline=7.0=hf8c457e_1001
+  - scipy=1.4.1=py37h921218d_0
+  - setuptools=41.0.1=py37_0
+  - six=1.12.0=py37_1000
+  - sqlite=3.28.0=h8b20d00_0
+  - tk=8.6.9=h84994c4_1001
+  - tqdm=4.32.1=py_0
+  - trimal=1.4.1=h6bb024c_3
+  - vim=8.1.1343=py37hf8497d5_2
+  - wheel=0.33.4=py37_0
+  - xz=5.2.4=h14c3975_1001
+  - zlib=1.2.11=h14c3975_1004
+
