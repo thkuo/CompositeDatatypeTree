@@ -10,202 +10,202 @@ with open(list_f, 'r') as list_fh:
 out_prokka_dir=config['out_prokka_dir']
 out_roary_dir=config['out_roary_dir']
 out_spades_dir= config['out_spades_dir']
-extracted_proteins_dir=config['extracted_proteins_dir']
-out_gpa_f=config['out_gpa_f']
-out_indel_f=config['out_indel_f']
-REF_GFF=config['REF_GFF']
-ref_gbk= config['ref_gbk']
-annot_tab=config['annot_tab']
-awk_script_f=os.path.join(os.environ['TOOL_HOME'], 'lib', 'filter.awk') 
+#extracted_proteins_dir=config['extracted_proteins_dir']
+#out_gpa_f=config['out_gpa_f']
+#out_indel_f=config['out_indel_f']
+#REF_GFF=config['REF_GFF']
+#ref_gbk= config['ref_gbk']
+#annot_tab=config['annot_tab']
+#awk_script_f=os.path.join(os.environ['TOOL_HOME'], 'lib', 'filter.awk') 
 adaptor_f= config['adaptor']
 new_reads_dir= config['new_reads_dir']
 
-rule all:
-    input:
-        indel_bin_mat= out_indel_f,
-        gpa_bin_mat=out_gpa_f,
-        non_redundant= expand('{in_tab}_{info}', 
-            in_tab= [out_indel_f, out_gpa_f], 
-            info= ['GROUPS', 'NONRDNT'])
+#rule all:
+#    input:
+#        indel_bin_mat= out_indel_f,
+#        gpa_bin_mat=out_gpa_f,
+#        non_redundant= expand('{in_tab}_{info}', 
+#            in_tab= [out_indel_f, out_gpa_f], 
+#            info= ['GROUPS', 'NONRDNT'])
 
-rule remove_redundant_feat:
-    input: 
-        F='{in_tab}'
-    output: 
-        GROUPS='{in_tab}_GROUPS',
-        NONRDNT='{in_tab}_NONRDNT'
-    conda: 'cmpr_env.yaml'
-    script: 'featCompress.py'
+#rule remove_redundant_feat:
+#    input: 
+#        F='{in_tab}'
+#    output: 
+#        GROUPS='{in_tab}_GROUPS',
+#        NONRDNT='{in_tab}_NONRDNT'
+#    conda: 'cmpr_env.yaml'
+#    script: 'featCompress.py'
+#
+#rule abricate_dict:
+#    input:
+#        roary_clustered_proteins= os.path.join(out_roary_dir,
+#"clustered_proteins"),
+#        ref_gff=REF_GFF,
+#        anno_f=annot_tab
+#    output:
+#        rename_dict='{roary_dir}/roary_abricate.txt',
+#        tmp_annotation_map= '{roary_dir}/annotation_mapped.txt',
+#        tmp_refined_map= '{roary_dir}/refined_mapping.txt',
+#        tmp_gff='{roary_dir}/tmp.gff'
+#    conda:'indel_env.yml'
+#    shell:
+#        '''
+#        cat {input.ref_gff} | sed '/^>/,$d' | tail -n+2 | \
+#grep -v '#' |grep -v '^\s*$' > {output.tmp_gff}
+#        field_map_wrapper.edit < <(grep -v @ {input.anno_f}) -s <(cat \
+#{output.tmp_gff}) -f 6 -m 4 -i| cut -f4,9,19 > {output.tmp_annotation_map}
+#        refine_mapping.py {output.tmp_annotation_map} \
+#> {output.tmp_refined_map}
+#        match_clusters.py {output.tmp_refined_map} \
+#{input.roary_clustered_proteins} > {output.rename_dict}
+#        '''
 
-rule abricate_dict:
-    input:
-        roary_clustered_proteins= os.path.join(out_roary_dir,
-"clustered_proteins"),
-        ref_gff=REF_GFF,
-        anno_f=annot_tab
-    output:
-        rename_dict='{roary_dir}/roary_abricate.txt',
-        tmp_annotation_map= '{roary_dir}/annotation_mapped.txt',
-        tmp_refined_map= '{roary_dir}/refined_mapping.txt',
-        tmp_gff='{roary_dir}/tmp.gff'
-    conda:'indel_env.yml'
-    shell:
-        '''
-        cat {input.ref_gff} | sed '/^>/,$d' | tail -n+2 | \
-grep -v '#' |grep -v '^\s*$' > {output.tmp_gff}
-        field_map_wrapper.edit < <(grep -v @ {input.anno_f}) -s <(cat \
-{output.tmp_gff}) -f 6 -m 4 -i| cut -f4,9,19 > {output.tmp_annotation_map}
-        refine_mapping.py {output.tmp_annotation_map} \
-> {output.tmp_refined_map}
-        match_clusters.py {output.tmp_refined_map} \
-{input.roary_clustered_proteins} > {output.rename_dict}
-        '''
-
-rule gpa_bin_mat:
-    input:
-        rename_dict_f=os.path.join(out_roary_dir, 'roary_abricate.txt'),
-        gpa_csv=os.path.join(out_roary_dir, 'gene_presence_absence.csv')
-    output:
-        gpa_bin_mat=out_gpa_f
-    params:
-        strains= list(dna_reads.keys())
-    run:
-        import pandas as pd
-        import textwrap
-
-        strains=params['strains']
-        gpa_f=input['gpa_csv']
-        output_f=output['gpa_bin_mat']
-
-        ## new name
-        name_dict= {}
-        in_fh= open(input.rename_dict_f, 'r')
-        for l in in_fh:
-            d=l.strip().split('\t')
-            name_dict[d[0]]= d[1]
-
-        ## read roary result and identify single-copy genes
-        df=pd.read_csv(gpa_f, sep= ',',
-                header= 0, index_col= 0, quotechar= '"', low_memory=False)
-
-        ## filter and convert the states
-        bin_df= df.loc[:, strains].applymap(lambda x: '0' if pd.isna(x) else '1')
-        bin_df= bin_df.transpose() # strains in rows
-        bin_df.rename(columns=name_dict, inplace= True)
-        bin_df.to_csv(output_f, sep= '\t', header= True, index= True,
-index_label= 'Gene')
+#rule gpa_bin_mat:
+#    input:
+#        rename_dict_f=os.path.join(out_roary_dir, 'roary_abricate.txt'),
+#        gpa_csv=os.path.join(out_roary_dir, 'gene_presence_absence.csv')
+#    output:
+#        gpa_bin_mat=out_gpa_f
+#    params:
+#        strains= list(dna_reads.keys())
+#    run:
+#        import pandas as pd
+#        import textwrap
+#
+#        strains=params['strains']
+#        gpa_f=input['gpa_csv']
+#        output_f=output['gpa_bin_mat']
+#
+#        ## new name
+#        name_dict= {}
+#        in_fh= open(input.rename_dict_f, 'r')
+#        for l in in_fh:
+#            d=l.strip().split('\t')
+#            name_dict[d[0]]= d[1]
+#
+#        ## read roary result and identify single-copy genes
+#        df=pd.read_csv(gpa_f, sep= ',',
+#                header= 0, index_col= 0, quotechar= '"', low_memory=False)
+#
+#        ## filter and convert the states
+#        bin_df= df.loc[:, strains].applymap(lambda x: '0' if pd.isna(x) else '1')
+#        bin_df= bin_df.transpose() # strains in rows
+#        bin_df.rename(columns=name_dict, inplace= True)
+#        bin_df.to_csv(output_f, sep= '\t', header= True, index= True,
+#index_label= 'Gene')
  
 
-rule indel_select_core_genes:
-    ## needs shadow
-    input:
-        gpa_csv=os.path.join('{roary_dir}', 'gene_presence_absence.csv'),
-        prot_tab=os.path.join('{roary_dir}', 'clustered_proteins')
-    output:
-        core_gene_list='{roary_dir}/core_genes_50.txt'
-    params:
-        min_num_strains= 2, 
-        #min_num_strains= 50, 
-        filter_awk_script=awk_script_f 
-    conda:'indel_env.yml'
-    threads:20
-    shell:
-        '''
-        awk -v threshold="{params.min_num_strains}" \
--f {params.filter_awk_script} < {input.gpa_csv} \
-| sed 's/\W/_/' \
-> {output.core_gene_list} 
-        '''
+#rule indel_select_core_genes:
+#    ## needs shadow
+#    input:
+#        gpa_csv=os.path.join('{roary_dir}', 'gene_presence_absence.csv'),
+#        prot_tab=os.path.join('{roary_dir}', 'clustered_proteins')
+#    output:
+#        core_gene_list='{roary_dir}/core_genes_50.txt'
+#    params:
+#        min_num_strains= 2, 
+#        #min_num_strains= 50, 
+#        filter_awk_script=awk_script_f 
+#    conda:'indel_env.yml'
+#    threads:20
+#    shell:
+#        '''
+#        awk -v threshold="{params.min_num_strains}" \
+#-f {params.filter_awk_script} < {input.gpa_csv} \
+#| sed 's/\W/_/' \
+#> {output.core_gene_list} 
+#        '''
 
-rule indel_align_families:
-    input:
-        ffn_files=expand(os.path.join(
-            out_prokka_dir, '{strain}', '{strain}.ffn'),
-            strain=list(dna_reads.keys())),
-        core_gene_list=os.path.join(out_roary_dir,'core_genes_50.txt'),
-        prot_tab=os.path.join(out_roary_dir, 'clustered_proteins')
-    output:
-        fam_aln_files=dynamic(os.path.join(
-            extracted_proteins_dir, '{fam}.aln'))
-    params:
-        gene_cluster2multi_script='gene_clusters2multi_fasta.py',
-        extracted_proteins_dir=extracted_proteins_dir,
-        parallel_log= 'mafft.log'
-    threads: 20 
-    conda: 'indel_cluster_env.yml'
-    shell:
-        '''
-        core_genes={input.core_gene_list}
-        #number of core genes
-        core_genes_wc=$(wc -l $core_genes | cut -f1 -d" ")
-        #extract fasta sequences for each gene family
-        {params.gene_cluster2multi_script} \
-{params.extracted_proteins_dir} \
-<(head -n $core_genes_wc {input.prot_tab}) \
-{input.ffn_files}
-        # align
-        cd {params.extracted_proteins_dir}
-        parallel --joblog {params.parallel_log} -j {threads} \
-'mafft {{}}.fasta > {{}}.aln' ::: `ls| grep 'fasta'| sed 's/\.fasta//'`
-        '''
+#rule indel_align_families:
+#    input:
+#        ffn_files=expand(os.path.join(
+#            out_prokka_dir, '{strain}', '{strain}.ffn'),
+#            strain=list(dna_reads.keys())),
+#        core_gene_list=os.path.join(out_roary_dir,'core_genes_50.txt'),
+#        prot_tab=os.path.join(out_roary_dir, 'clustered_proteins')
+#    output:
+#        fam_aln_files=dynamic(os.path.join(
+#            extracted_proteins_dir, '{fam}.aln'))
+#    params:
+#        gene_cluster2multi_script='gene_clusters2multi_fasta.py',
+#        extracted_proteins_dir=extracted_proteins_dir,
+#        parallel_log= 'mafft.log'
+#    threads: 20 
+#    conda: 'indel_cluster_env.yml'
+#    shell:
+#        '''
+#        core_genes={input.core_gene_list}
+#        #number of core genes
+#        core_genes_wc=$(wc -l $core_genes | cut -f1 -d" ")
+#        #extract fasta sequences for each gene family
+#        {params.gene_cluster2multi_script} \
+#{params.extracted_proteins_dir} \
+#<(head -n $core_genes_wc {input.prot_tab}) \
+#{input.ffn_files}
+#        # align
+#        cd {params.extracted_proteins_dir}
+#        parallel --joblog {params.parallel_log} -j {threads} \
+#'mafft {{}}.fasta > {{}}.aln' ::: `ls| grep 'fasta'| sed 's/\.fasta//'`
+#        '''
 #for i in `ls|grep \.fasta`; do i=`echo $i | cut -f1 -d "."` ; echo "mafft $i.fasta \
 #> $i.aln"; done | parallel --joblog {params.parallel_log} -j {threads}
 
-rule indel_msa2vcf:
-    input:
-        indel_msa=os.path.join(
-            extracted_proteins_dir, '{fam}.aln')
-    output:
-        indel_vcf='indels/{fam}.vcf'
-    conda: 'indel_env.yml'
-    shell:
-        '''
-        msa2vcf < {input.indel_msa} > {output.indel_vcf}
-        '''
+#rule indel_msa2vcf:
+#    input:
+#        indel_msa=os.path.join(
+#            extracted_proteins_dir, '{fam}.aln')
+#    output:
+#        indel_vcf='indels/{fam}.vcf'
+#    conda: 'indel_env.yml'
+#    shell:
+#        '''
+#        msa2vcf < {input.indel_msa} > {output.indel_vcf}
+#        '''
        
-rule indel_vcf2bin:
-    input:
-        indel_vcf='indels/{fam}.vcf'
-    output:
-        indel_indels= 'indels/{fam}_indels.txt',
-        indel_gff= 'indels/{fam}_indels.gff',
-        indel_stats= 'indels/{fam}_indel_stats.txt'
-    conda: 'indel_env.yml'
-    params:
-        vcf2indel_script= 'vcf2indel.py',
-        prefix= lambda wildcards: 'indel/{}'.format(wildcards.fam) 
-    shell:
-        '''
-        {params.vcf2indel_script} {input.indel_vcf} \
- {params.prefix} {output.indel_indels} {output.indel_gff} {output.indel_stats}
-        '''
+#rule indel_vcf2bin:
+#    input:
+#        indel_vcf='indels/{fam}.vcf'
+#    output:
+#        indel_indels= 'indels/{fam}_indels.txt',
+#        indel_gff= 'indels/{fam}_indels.gff',
+#        indel_stats= 'indels/{fam}_indel_stats.txt'
+#    conda: 'indel_env.yml'
+#    params:
+#        vcf2indel_script= 'vcf2indel.py',
+#        prefix= lambda wildcards: 'indel/{}'.format(wildcards.fam) 
+#    shell:
+#        '''
+#        {params.vcf2indel_script} {input.indel_vcf} \
+# {params.prefix} {output.indel_indels} {output.indel_gff} {output.indel_stats}
+#        '''
 
-rule indel_integrate_indels:
-    input:
-        indel_all_indels=dynamic('indels/{fam}_indels.txt'),
-        core_gene_list=os.path.join(out_roary_dir,'core_genes_50.txt'),
-        gpa_rtab=os.path.join(out_roary_dir, 'gene_presence_absence.Rtab'),
-        annot=out_gpa_f,
-        roary_abricate= os.path.join(out_roary_dir, 'roary_abricate.txt')
-    output:
-        indel_annot= out_indel_f,
-        indel_annot_stats= out_indel_f+'.stats'
-    params:
-        generate_feature_script='generate_indel_features.py',
-        w_dir= 'indels'
-    conda: 'indel_env.yml'
-    shell:
-        '''
-        cd {params.w_dir}
-        # In 'clustered_proteins', roary never quotes gene names; 
-        # in the .Rtab, space-included names are quoted
-        {params.generate_feature_script} \
-<(cut -f1 ../{input.gpa_rtab} | tail -n+2 | sed 's/"//g') \
-../{input.annot} \
-../{output.indel_annot} \
-../{output.indel_annot}.stats \
-../{input.roary_abricate}
-        '''
+#rule indel_integrate_indels:
+#    input:
+#        indel_all_indels=dynamic('indels/{fam}_indels.txt'),
+#        core_gene_list=os.path.join(out_roary_dir,'core_genes_50.txt'),
+#        gpa_rtab=os.path.join(out_roary_dir, 'gene_presence_absence.Rtab'),
+#        annot=out_gpa_f,
+#        roary_abricate= os.path.join(out_roary_dir, 'roary_abricate.txt')
+#    output:
+#        indel_annot= out_indel_f,
+#        indel_annot_stats= out_indel_f+'.stats'
+#    params:
+#        generate_feature_script='generate_indel_features.py',
+#        w_dir= 'indels'
+#    conda: 'indel_env.yml'
+#    shell:
+#        '''
+#        cd {params.w_dir}
+#        # In 'clustered_proteins', roary never quotes gene names; 
+#        # in the .Rtab, space-included names are quoted
+#        {params.generate_feature_script} \
+#<(cut -f1 ../{input.gpa_rtab} | tail -n+2 | sed 's/"//g') \
+#../{input.annot} \
+#../{output.indel_annot} \
+#../{output.indel_annot}.stats \
+#../{input.roary_abricate}
+#        '''
 
 ##rule indel_identify_indels:
 ##    input:
@@ -319,17 +319,17 @@ rule create_gff:
 --force  --cpus {threads} --metagenome --compliant \
 --outdir prokka/{wildcards.strain} {input}
         '''
-rule create_annot:
-    input:
-        ref_gbk=ref_gbk
-    output:
-        anno_f=annot_tab
-    params:
-        ref_name='reference'
-    shell:
-        '''
-        create_anno.py -r {input.ref_gbk} -n {params.ref_name} -o {output.anno_f}
-        '''
+#rule create_annot:
+#    input:
+#        ref_gbk=ref_gbk
+#    output:
+#        anno_f=annot_tab
+#    params:
+#        ref_name='reference'
+#    shell:
+#        '''
+#        create_anno.py -r {input.ref_gbk} -n {params.ref_name} -o {output.anno_f}
+#        '''
 
 rule spades_create_assembly:
     input: 
