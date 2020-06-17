@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 '''
 Interface to the five workflows 
 
@@ -31,12 +32,12 @@ class ngs_workflow():
                             self.snakefile))
 
     def determine_conda_env_dir(self):
-        return(os.environ['CDTREE_SHARED_ENV'] if 
-                'CDTREE_SHARED_ENV' in os.environ else
-                os.path.join(os.path.dirname(os.path.realpath(__file__)),'shared_envs'))
+        env_dir= os.path.join(os.path.dirname(os.path.realpath(__file__)),'shared_envs')
+        if 'CDTREE_SHARED_ENV' in os.environ:
+            env_dir=os.environ['CDTREE_SHARED_ENV'] 
+        return(env_dir)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         import re 
-        print(self.determine_conda_env_dir())
         snakemake.snakemake(
             dryrun= just_dryrun,
             #snakefile=self.snakefile,
@@ -50,18 +51,21 @@ class ngs_workflow():
                       [self.target_f]))
 
 class tr_inf_workflow(ngs_workflow):
-    def collapse_tree(self):
-        tr_f= str(self.cd_tr_out)
-        out_tr_f= str(self.col_cd_tr_out)
+    def collapse_tree(self, tr_f, out_tr_f):
         br_cutoff= str(self.br_cutoff)
         bs_cutoff= str(self.bs_cutoff)
-        outgroup= ' '.join(self.outgroup)
+        outgroup= self.outgroup
         import subprocess
+        import re
         home_dir= os.path.dirname(os.path.realpath(__file__))
         script_f= os.path.join(home_dir, 'collapse_br', 'collapse_tree.R' )
-        subprocess.run([script_f, '--i', tr_f, '--o', out_tr_f,
-                        '--br', br_cutoff, '--bs', bs_cutoff, 
-                        '--og', outgroup])
+        cmd= [script_f, '--i', tr_f, '--o', out_tr_f,
+                        '--br', br_cutoff, '--bs', bs_cutoff]
+        if re.search('\w', outgroup[0]):
+            cmd= cmd+['--og']+outgroup
+        subprocess.run(cmd)
+    def run_workflow(self, cpu_num= 1, just_dryrun= True):
+        super().run_workflow(cpu_num, just_dryrun)
 
 #class cd_tr(ngs_workflow):
 class cd_tr(tr_inf_workflow):
@@ -77,6 +81,9 @@ class cd_tr(tr_inf_workflow):
         }
         target_f= str(proj.cd_tr_out)
         workdir= str(proj.project_dir)
+        self.br_cutoff= proj.br_cutoff
+        self.bs_cutoff= proj.bs_cutoff
+        self.outgroup= proj.outgroup
         super().__init__(config, target_f,
             './conc_workflow/conc_tree.smk',
             workdir
@@ -98,8 +105,6 @@ class gpa_aln(ngs_workflow):
             workdir
                         )
         print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
 
 class denovo(ngs_workflow):
     def __init__(self, proj):
@@ -118,11 +123,7 @@ class denovo(ngs_workflow):
             './denovo_workflow/denovo.in_one.smk',
             workdir
                         )
-        print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
 
-#class nuc_tr(ngs_workflow):
 class nuc_tr(tr_inf_workflow):
     def __init__(self, proj):
         print('Function: computing nucleotide tree\n...initiating')
@@ -132,23 +133,14 @@ class nuc_tr(tr_inf_workflow):
             'ref_fa': str(proj.ref)
         }
         target_f=str(proj.nuc_tr_out)
-        workdir= str(proj.project_dir)
+        workdir=str(proj.project_dir)
+        self.br_cutoff= proj.br_cutoff
+        self.bs_cutoff= proj.bs_cutoff
+        self.outgroup= proj.outgroup
         super().__init__(config, target_f,
             './nuc_workflow/nuc_tr.smk',
             workdir
                         )
-        print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
-#    def collapse_tree(self):
-#        tr_f= self.cd_tr_out
-#        out_tr_f= self.col_cd_tr_out
-#        import subprocess
-#        home_dir= os.path.dirname(os.path.realpath(__file__))
-#        script_f= os.path.join(home_dir, 'collapse_br', 'collapse_tree.R' )
-#        subprocess.run([script_f, '--i', tr_f, '--o', out_tr_f,
-#                        '--br', str(self.br_cutoff), '--bs', str(self.bs_cutoff), 
-#                        '--og', ' '.join(self.outgroup)])
 
 class mapping(ngs_workflow):
     def __init__(self, proj):
@@ -166,61 +158,51 @@ class mapping(ngs_workflow):
             workdir
                         )
         print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
-
-
-#list_f=(
-#    '/net/metagenomics/data/from_moni/'
-#    'old.tzuhao/TreePaper/WhichTree_Sim.v7/bin.v5/'
-#    'run_seq2geno/dna_list')
-#project_dir= (
-#    '/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-#    'TreePaper/WhichTree_Sim.v7/results.v5/')
-#ref= ('/net/metagenomics/data/from_moni/old.tzuhao/'
-#      'TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta')
-
-#from CDTreeProject import CDTreeProject
-#cd_proj= CDTreeProject(list_f, project_dir, ref)
-#
-### 
-#print(cd_proj.__dict__)
-#target_func= mapping(cd_proj)
-#target_func.run_workflow(cpu_num= 1, just_dryrun= True)
-
 #
 if __name__=='__main__':
     def determine_workflow(x, p):
         import sys
-        target_func= ''
+        target_funcs= []
         if x == 'denovo':
-            return(denovo(p))
+            target_funcs.append(denovo(p))
         elif x == 'gpa':
-            return(gpa_aln(p))
+            target_funcs.append(gpa_aln(p))
         elif x == 'cd_tr':
-            return(cd_tr(p))
+            target_funcs.append(cd_tr(p))
         elif x == 'nuc_tr':
-            return(nuc_tr(p))
+            target_funcs.append(nuc_tr(p))
         elif x == 'mapping':
-            return(mapping(p))
+            target_funcs.append(mapping(p))
+        elif x == 'all':
+            target_funcs= [mapping(p), nuc_tr(p), denovo(p), gpa_aln(p),
+                           cd_tr(p)]
         else:
             sys.exit('Unknown function')
-        return(target_func)
+        return(target_funcs)
 
     # read arguments
     from CDTreeArgParser import CDTreeArgParser
     parser= CDTreeArgParser()
     args= parser.parse()
     #print(args.__dict__)
-    ## control the output filenames
+    ## determine parameters
     from CDTreeProject import CDTreeProject
     cd_proj= CDTreeProject(
         args.list_f, args.project_dir, args.ref)
-    cd_proj.user_define(args.config_f)
+    if (not args.config_f is None):
+        cd_proj.user_define(args.config_f)
 
     from pprint import pprint
+    print('==parameters==')
     pprint(cd_proj.__dict__)
+
     ## 
-    target_func= determine_workflow(args.f, cd_proj)
-    target_func.run_workflow(cpu_num= args.cpu, just_dryrun= args.dryrun)
+    target_funcs= determine_workflow(args.f, cd_proj)
+    for target_func in target_funcs:
+        target_func.run_workflow(cpu_num= args.cpu, just_dryrun= args.dryrun)
+        if (type(target_func) is nuc_tr) & (not args.dryrun):
+            target_func.collapse_tree(cd_proj.nuc_tr_out, cd_proj.col_nuc_tr_out)
+        elif (type(target_func) is cd_tr) & (not args.dryrun):
+            target_func.collapse_tree(cd_proj.cd_tr_out, cd_proj.col_cd_tr_out)
+
 

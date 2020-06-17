@@ -1,12 +1,7 @@
-#list_f: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/bin.v5/run_seq2geno/dna_list'
-#project_dir: '/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/'
-#ref: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta'
-nuc_aln:
-  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/mapping/alignment/nuc.var.aln 
 roary_out:
-        /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/seq2geno/denovo/roary/gene_presence_absence.csv
-  #gpa_aln:
-  #  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/gpa/gpa.var.aln 
-br_cutoff: 0.1
+    /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/seq2geno/denovo/roary/gene_presence_absence.csv
+br_cutoff: 5e-5
+bs_cutoff: 90
 multisample_vcf: 
     /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/mapping/merged_vcf/multisample.snp.vcf.gz
+outgroup: 22 15 47 46 48 103

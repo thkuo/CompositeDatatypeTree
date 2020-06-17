@@ -30,6 +30,8 @@ find_short_branches<- function(tr, br_cutoff){
 }
 
 find_low_branches<- function(tr, bs_cutoff){
+#    bs<- as.integer(tr$node.label)
+#    bad_nodes<- tr$edge[which(is.na(bs) | (bs <= bs_cutoff)) + Ntip(tr) +1 , 2]
     library(ggtree)
     tr_info<- fortify(tr)
     sub_tr_info<- tr_info[!tr_info$isTip & (tr_info$parent!=tr_info$node), ]
@@ -49,37 +51,42 @@ write.cutoff<-function(cutoff, cutoff_f){
 
 library(phytools)
 library(argparse)
-w_dir<- getwd()
-print(w_dir)
-parser <- ArgumentParser(description='Collapse branches with cutoffs of length and bootstrap support')
-parser$add_argument('--i', type="character", dest= 'tr_f',
-                    help='input tree')
-parser$add_argument('--o', type="character", dest= 'output_tr_f', 
-                    help='output tree')
-parser$add_argument('--br', dest='cutoff.br', default= 1e-4,
-		    type= 'double',
-                    help='the cutoff for branch length')
-parser$add_argument('--bs', dest='cutoff.bs', default= 60,
-		    type= 'integer',
-                    help='the cutoff for bootstrap support')
-parser$add_argument('--og', type="character", nargs= '+', 
-		    dest= 'outgroup',
-                    help='outgroup for rooting')
-
-args <- parser$parse_args()
-tr_f<- args$tr_f
-cutoff<-list(br=args$cutoff.br , bs= args$cutoff.bs)
-outgroup<- args$outgroup
-output_tr_f<- args$output_tr_f
+#w_dir<- getwd()
+#print(w_dir)
+#parser <- ArgumentParser(description='Collapse branches with cutoffs of length and bootstrap support')
+#parser$add_argument('--i', type="character", dest= 'tr_f',
+#                    help='input tree')
+#parser$add_argument('--o', type="character", dest= 'output_tr_f', 
+#                    help='output tree')
+#parser$add_argument('--br', dest='cutoff.br', default= 1e-4,
+#		    type= 'double',
+#                    help='the cutoff for branch length')
+#parser$add_argument('--bs', dest='cutoff.bs', default= 60,
+#		    type= 'integer',
+#                    help='the cutoff for bootstrap support')
+#parser$add_argument('--og', type="character", nargs= '+', 
+#		    dest= 'outgroup',
+#                    help='outgroup for rooting')
+#
+#args <- parser$parse_args()
+tr_f<- '../test/mapping/raxml/RAxML_bipartitions.nuc.bs'
+cutoff<-list(br=5e-05 , bs= 90)
+outgroup<-c("22", "15", "47", "46", "48", "103" )
+output_tr_f<- paste0(tr_f, '_col') 
 cutoff_f<- sprintf('%s_CUTOFF', output_tr_f)
 
 # nucleotide tree
 tr<- unroot(read.newick(tr_f))
-# to avoid the root becomes the mrca
-tr<- phytools::reroot(tr, which(! tr$tip.label %in% outgroup)[1])
-tr<- phytools::reroot(tr, 
+print(tr)
+tr$tip.label<- as.character(sapply(tr$tip.label, function(x) sprintf('SE%s', x)))
+print(tr)
+outgroup<- as.character(sapply(outgroup, function(x) sprintf('SE%s', x)))
+tr<- midpoint.root(tr)
+print(tr)
+tr<- phytools::reroot(tree= tr, 
 		      node.number = ifelse(length(outgroup)>1, getMRCA(tr, outgroup), which(tr$tip.label == outgroup[1])),
 		      position = 1e-6)
+print(tr)
 print('line 81')
 #source('collapse_branches.R')
 short_ix<- find_short_branches(tr, br_cutoff = cutoff$br)
@@ -88,6 +95,7 @@ col_tr<- collapse_branches(tr= tr, target_nodes = union(short_ix, low_ix))
 col_tr<- phytools::reroot(col_tr, 
 		 node.number = ifelse(length(outgroup)>1, getMRCA(col_tr, outgroup), which(col_tr$tip.label == outgroup[1])),
 		 position = 1e-6)
+print(col_tr)
 
 # write results
 dir.create(dirname(output_tr_f), recursive = T)

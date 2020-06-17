@@ -31,27 +31,27 @@ class CDTreeProject:
 
         ##=== Default intermediate files/params
         ## shared data
-        self.new_reads_dir= Path(os.path.join(project_dir,
+        self.new_reads_dir= Path(os.path.join(self.project_dir,
                                               'dna_reads_processed'))
         ## mapping
-        self.multisample_vcf= Path(os.path.join(project_dir,
+        self.multisample_vcf= Path(os.path.join(self.project_dir,
                                   'mapping', 'merged_vcf',
                                   'multisample.snp.vcf.gz'))
         ## denovo
-        self.prokka_dir= Path(os.path.join(project_dir,'prokka'))
-        self.roary_dir= Path(os.path.join(project_dir,'roary'))
-        self.spades_dir= Path(os.path.join(project_dir,'spades'))
+        self.prokka_dir= Path(os.path.join(self.project_dir,'prokka'))
+        self.roary_dir= Path(os.path.join(self.project_dir,'roary'))
+        self.spades_dir= Path(os.path.join(self.project_dir,'spades'))
         self.roary_out=Path(os.path.join(self.roary_dir,
                                     'gene_presence_absence.csv'))
         ## gpa aln
-        self.gpa_aln=Path(os.path.join(project_dir, 'gpa', 'gpa.var.aln'))
+        self.gpa_aln=Path(os.path.join(self.project_dir, 'gpa', 'gpa.var.aln'))
         ## nuc tree
-        self.nuc_aln= Path(os.path.join(project_dir,
+        self.nuc_aln= Path(os.path.join(self.project_dir,
                                      'mapping', 'alignment', 'nuc.var.aln'))
         self.nuc_subs_model= str('GTR')
         self.rate_model= str('GAMMA')
         self.nuc_model=str(''.join([self.nuc_subs_model, self.rate_model]))
-        self.nuc_tr_out= Path(os.path.join(project_dir,
+        self.nuc_tr_out= Path(os.path.join(self.project_dir,
                                      'mapping','raxml',
                                      'RAxML_bipartitions.nuc.bs'))
         self.col_nuc_tr_out=Path('{}_col'.format(self.nuc_tr_out))
@@ -60,7 +60,7 @@ class CDTreeProject:
                       'conc.aln'))
         self.raxml_prtn= Path(os.path.join(self.project_dir, 'cd', 'materials',
                                'conc.prtn'))
-        self.cd_tr_out= Path(os.path.join(project_dir,
+        self.cd_tr_out= Path(os.path.join(self.project_dir,
                                      'cd','RAxML_bipartitions.conc.bs'))
         self.col_constraint_tr= Path(self.col_nuc_tr_out)
         self.cd_model= str(''.join(['BIN', self.rate_model]))
@@ -82,7 +82,7 @@ class CDTreeProject:
         args_dict= self.__dict__
         poss_user_files= ['multisample_vcf','roary_out' ]
         for k in [k for k in args_dict if k in config_dict]:
-            if isinstance(args_dict[k], PosixPath) & k in poss_user_files:
+            if isinstance(args_dict[k], PosixPath) & (k in poss_user_files):
                 print('{} --> {}'.format(args_dict[k], config_dict[k]))
                 args_dict[k]= Path(config_dict[k])
 #                d= os.path.dirname(str(args_dict[k]))
@@ -92,11 +92,14 @@ class CDTreeProject:
 #                    os.symlink(config_dict[k], args_dict[k])
 #                except FileExistsError as fe:
 #                    os
-            elif isinstance(args_dict[k], PosixPath) & not k in poss_user_files:
+            elif (isinstance(args_dict[k], PosixPath) & 
+                  (not k in poss_user_files)):
                 print('required filename {} cannot not replaced by {}'.format(
                     args_dict[k], config_dict[k]))
             elif isinstance(args_dict[k], str):
                 args_dict[k]= str(config_dict[k])
+            elif isinstance(args_dict[k], list):
+                args_dict[k]= config_dict[k].split(' ')
             elif isinstance(args_dict[k], int):
                 args_dict[k]= int(config_dict[k])
             elif isinstance(args_dict[k], float):

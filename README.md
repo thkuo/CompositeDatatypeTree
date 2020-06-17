@@ -1,10 +1,5 @@
 ## Improved tree inference and transmission reconstruction from composite datatype representations of microbial genomes
 
----
-To-include:
-- jmodeltest (for determing the model of RAxML)
-- outbreak simulation
----
 `tree_inference` includes workflows that are involved in the composite datatype method. Those methods were applied to both the clinical and benchmark datasets. `Klebsiella`, `Pseudomonas`, and `outbreak_simulation` include the other relevant analysis also stated in the paper.
 
 For tree inference, the composite datatype method includes:
@@ -17,6 +12,29 @@ For tree inference, the composite datatype method includes:
    alignment
 5. conc_workflow: concatenate nucleotide and gpa alignments and conduct
    composite datatype inference
+
+# User-defined parameters:
+- Non-path parameters
+
+The parameters (correct datatype needed) below can be specified in the config yaml file:
+```
+nuc_subs_model (string)
+rate_model (string)
+outgroup (list of strings)
+br_cutoff (float)
+bs_cutoff (integer)
+```
+
+The two parameters `nuc_subs_model` (default: GTR) and `rate_model` (default: GAMMA) are substition and rate variation models for RAxML. They can be tested using external software jmodeltest.
+
+- Path parameters
+
+The workflows are based on snakemake, which determines the dependency between computational processes using filenames. Despite the limited space for customized filenames, thisenables precomputed files from reads mapping and de novo assembly results; precisely, the multi-sample .vcf.gz file and gene presence/absence table from Roary. They can be specied in the config yaml file:
+```
+roary_out (string; existing filename)
+multisample_vcf (string; existing filename)
+```
+
 
 The substitution models for RAxML (step 2 and 5) are determined the alignments (precisely, the non-redundant alignment) by jmodeltest:
 ```shell

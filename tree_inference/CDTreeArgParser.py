@@ -13,16 +13,16 @@ class CDTreeArgParser:
             help='the reference genome for mapping sequencing reads')
         parser.add_argument('f', type=str,
             help='the function to launch',
-            choices=['mapping', 'nuc_tr', 'cd_tr', 'gpa', 'denovo'])
+            choices=['mapping', 'nuc_tr', 'cd_tr', 'gpa', 'denovo', 'all'])
         parser.add_argument('--config',dest= 'config_f', type=str, 
-            default= '',
             help='''
                 yaml file to overwrite default parameter settings
                 (visit the documentaion for more details)
             ''')
-        parser.add_argument('--cpu',dest= 'cpu', type=str, default= 1,
+        parser.add_argument('--cpu',dest= 'cpu', type=int, default= 1,
                 help='cpu number; default: %(default)s')
         parser.add_argument('--dry',dest= 'dryrun', action= 'store_true',
+                            default= False, 
                 help='display the processes and exit')
         self.parser= parser
     def parse(self):

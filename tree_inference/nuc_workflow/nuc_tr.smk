@@ -5,10 +5,21 @@ __description__=from vcf file of multiple samples to nucleotide tree
 '''
 import re
 from multiprocessing import cpu_count
+def parse_strains(vcf_gz):
+    import gzip
+    vcf= gzip.open(vcf_gz)
+    current= '' 
+    next_l= vcf.readline().decode('ascii')
+    while re.search('^#', next_l):
+        current= next_l
+        next_l= vcf.readline().decode('ascii')
+    strains= [x.strip() for x in current.split('\t')[9:]]
+    return(strains)
+    
 ref_fa=config['ref_fa']
 multisample_vcf=config['multisample_vcf']
+strains= parse_strains(multisample_vcf)
 raxml_model= config['raxml_model']
-#strains= config['strains'].strip().split(',')
 bootstrap_cores=5
 rule bs_values_mapped_to_tree:
     input:  
@@ -21,7 +32,7 @@ rule bs_values_mapped_to_tree:
         tree_full_suffix='{suffix}.bs',
         raxml_model= raxml_model
     threads:1
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/raxml_env.yml'
+    conda: 'raxml_env.yml'
     shell:
         """
         export RAXML_BIN='raxmlHPC-PTHREADS'
@@ -60,7 +71,7 @@ rule bootstrap:
         tree_id= '{suffix}.{part_num}.{per_part_tr_num}',
         raxml_model= raxml_model,
         raxml_starting_num= 1,
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/raxml_env.yml'
+    conda: 'raxml_env.yml'
     threads: bootstrap_cores 
     shell:
         """
@@ -89,7 +100,7 @@ rule nuc_best_tree:
         raxml_starting_num= 1,
         raxml_model= raxml_model,
         raxml_wd=lambda wildcards: os.path.join(wildcards.result_dir, 'raxml')
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/raxml_env.yml'
+    conda: 'raxml_env.yml'
     threads:
         lambda cores: max(1, cpu_count() - 1)
     shell:
@@ -159,9 +170,8 @@ rule cons_seqs_to_aln:
     Create the nucleotide alignment 
     '''
     input:
-        per_sample_seq= dynamic('{result_dir}/alignment/strains/{sample}.fa')
-#        per_sample_seq= expand('{result_dir}/alignment/strains/{sample}.fa', 
-#            result_dir= '{result_dir}', sample= strains)
+        per_sample_seq= expand('{result_dir}/alignment/strains/{sample}.fa', 
+            result_dir= '{result_dir}', sample= strains)
     output:
         one_big_aln= '{result_dir}/alignment/{suffix}.full.aln'
     threads: 1
@@ -179,14 +189,14 @@ rule vcf_to_seq:
         multisample_snps_vcf_ix= multisample_vcf+'.tbi',
         ref_fa=ref_fa
     output:
-        strain_cons_seq= temp('{result_dir}/alignment/strains/{sample}.fa')
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/bcftools_env.yml'
+        per_sample_seq= '{result_dir}/alignment/strains/{sample}.fa'
+    conda: 'bcftools_env.yml'
     threads: 1
     shell:
         '''
         bcftools consensus \
   --fasta-ref {input.ref_fa} \
   --sample {wildcards.sample}  {input.multisample_snps_vcf}| 
-  sed -e "/^>/s/^>.\+/>{wildcards.sample}/" > {output.strain_cons_seq}
+  sed -e "/^>/s/^>.\+/>{wildcards.sample}/" > {output.per_sample_seq}
         '''
     
