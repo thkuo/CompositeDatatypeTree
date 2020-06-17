@@ -17,7 +17,6 @@ class CDTreeArgParser:
         parser.add_argument('--config',dest= 'config_f', type=str, 
             help='''
                 yaml file to overwrite default parameter settings
-                (visit the documentaion for more details)
             ''')
         parser.add_argument('--cpu',dest= 'cpu', type=int, default= 1,
                 help='cpu number; default: %(default)s')
