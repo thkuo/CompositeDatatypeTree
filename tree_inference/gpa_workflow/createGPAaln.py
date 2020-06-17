@@ -1,7 +1,7 @@
 import pandas as pd
 import textwrap
 
-strains=snakemake.params['strains']
+#strains=snakemake.params['strains']
 gpa_f= snakemake.input['roary_raw_gpa']
 output_aln_f= snakemake.output['gpa_aln']
 
@@ -10,7 +10,8 @@ df=pd.read_csv(gpa_f, sep= ',',
         header= 0, index_col= 0, quotechar= '"', low_memory=False)
 
 ## filter and convert the states
-sub_df=df.loc[:, strains]
+#sub_df=df.loc[:, strains]
+sub_df=df.iloc[:, 13:df.shape[1]]
 sub_df= sub_df.applymap(lambda x: '1' if (not pd.isna(x)) else '0')
 #sub_df[~sub_df.isnull()]='1'
 #sub_df[sub_df.isnull()]='0'

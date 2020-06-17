@@ -7,19 +7,16 @@ import pandas as pd
 from snakemake.utils import validate
 from multiprocessing import cpu_count
 
-def parse_strains_list(list_f):
-    dna_reads= {}
-    with open(list_f, 'r') as list_fh:
-        for l in list_fh:
-            d=l.strip().split('\t')
-            dna_reads[d[0]]= d[1].split(',')
-    strains= list(dna_reads.keys())
-    return(strains)
+list_f= config['list_f']
+dna_reads= {}
+with open(list_f, 'r') as list_fh:
+    for l in list_fh:
+        d=l.strip().split('\t')
+        dna_reads[d[0]]= d[1].split(',')
 
-strains= parse_strains_list(config['list_f'])
+strains= list(dna_reads.keys())
 ref_fasta=config['ref_fasta']
-ref_gbk=config['ref_gbk']
-snps_table=config['snps_table']
+#snps_table=config['snps_table']
 adaptor_f= config['adaptor']
 new_reads_dir= config['new_reads_dir']
 

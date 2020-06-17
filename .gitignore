@@ -1,3 +1,12 @@
 .deprived
 tree_inference/denovo_workflow/lib/
 */NOTE
+tree_inference/*/.snakemake/
+*/.deprived
+tree_inference/test
+tree_inference/__pycache__/
+tree_inference/.RData
+tree_inference/.Rhistory
+tree_inference/collapse_br/.RData
+tree_inference/collapse_br/.Rhistory
+shared_envs/

@@ -5,23 +5,24 @@ nuc_aln= config['nuc_aln']
 conc_aln= config['conc_aln']
 raxml_prtn= config['raxml_prtn']
 col_constraint_tr= config['col_constraint_tr']
-best_ml_tree= config['best_ml_tree'] 
-bs_trees= config['bs_trees']
-bs_best_ml_tree= config['bs_best_ml_tree']
+#best_ml_tree= config['best_ml_tree'] 
+#bs_trees= config['bs_trees']
+#bs_best_ml_tree= config['bs_best_ml_tree']
 
 #cw_withBS_tree= ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
 #'TreePaper/nuc_tree_comparison.v2/results/mapping/'
 #'conc.raxml/RAxML_bestTree.conc')
 #col_cw_withBS_tree= os.path.join(results_dir,
 #    'RAxML_bipartitions.nuc_uw-gpa.withBS.collapse')
-max_core_n= config['max_cores']
+#max_core_n= config['max_cores']
+max_core_n=len(os.sched_getaffinity(0)) 
 max_per_part_core_n= int(max_core_n/5)
 #raxml_bin= config['raxml_bin'] 
 model= config['model']
-rule all:
-    input:
-        bs_best_ml_tree,
-        best_ml_tree
+#rule all:
+#    input:
+#        bs_best_ml_tree,
+#        best_ml_tree
 
 #rule collapse_conc_tree:
 #    input: cw_withBS_tree
@@ -133,15 +134,6 @@ rule compute_conc_tree:
   -w {wildcards.result_dir} \
   -n {wildcards.suffix}
         """
-
-#rule collapse_constraint_tree:
-#    input: constraint_tr
-#    output: col_constraint_tr
-#    shell:
-#        '''
-#        ./collapse_short.interface.R \
-# {input} {output}
-#        '''
 
 rule prepare_concatenated_data:
     input:
