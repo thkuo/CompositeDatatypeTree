@@ -11,6 +11,8 @@ For tree inference, the composite datatype method includes:
 5. conc\_workflow: concatenate nucleotide and gpa alignments and conduct
    composite datatype inference
 
+This package is mainly written in snakemake, the filename-based workflow tool. The sub-processes (ie. rules) may need to install, for the first-time, and activate the required computational environment using conda (details in the Installation section below). The required input data include (1) a list of sequencing reads corresponding to each sample and (2) the reference genome sequence; optionally, the pipeline can use precomputed vcf file or orthologous clustering results (details in the Utility section below).
+
 ### Installation
 1. Clone this package to proper locations
 
