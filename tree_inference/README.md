@@ -21,7 +21,13 @@ This package is mainly written in snakemake, the filename-based workflow tool. T
 conda env create -f installation/cdtree_env.yml
 ```
 
-3. Set up the environmental variable `CDTREE_SHARED_ENV`, which determines where the process-specific environment should be built. This will avoid repetive installation of same environment in the future. For quick and temporary utility, we recommend to try:
+3. Some external tools still need to be installed additionally:
+
+- stampy: downloadable via the [ofiicial site](https://www.well.ox.ac.uk/research/research-groups/lunter-group/lunter-group/stampy)
+- prokka: it's dependency _tblasn_ regularly expire, so please ensure the [latest version](https://github.com/tseemann/prokka)
+- roary: tested version [here](https://github.com/hzi-bifo/Roary)
+
+Except for them, the other process-specific software and environments will be installed (once for the first time) and activated when the process is used. Set up the environmental variable `CDTREE_SHARED_ENV`, which determines where the process-specific environment should be built. This will avoid repetive installation of same environment in the future. For quick and temporary utility, we recommend to try:
 
 ```sh
 export CDTREE_SHARED_ENV=~/bin/cdtree_sharedEnv/

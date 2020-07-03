@@ -5,8 +5,6 @@ nuc_aln= config['nuc_aln']
 conc_aln= config['conc_aln']
 raxml_prtn= config['raxml_prtn']
 col_constraint_tr= config['col_constraint_tr']
-max_core_n=len(os.sched_getaffinity(0)) 
-max_per_part_core_n= int(max_core_n/5)
 model= config['model']
 
 rule for_cw_map_bs_values_to_tree:
@@ -125,5 +123,3 @@ rule prepare_concatenated_data:
  --gpa_aln {input.gpa_aln} --out_aln {output.raxml_input_aln} \
  --out_prtn {output.raxml_input_partitions}
         '''
-        
-    
