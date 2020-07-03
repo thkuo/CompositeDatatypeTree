@@ -262,7 +262,7 @@ strain= list(dna_reads.keys()))
         gpa_csv=os.path.join('{roary_dir}', 'gene_presence_absence.csv'),
         gpa_rtab=os.path.join('{roary_dir}', 'gene_presence_absence.Rtab'),
         prot_tab=os.path.join('{roary_dir}', 'clustered_proteins')
-    conda: 'perl5_22_env.yml'
+    conda: '../shared_envs_yaml/perl5_22_env.yml'
     params:
         check_add_perl_env_script= 'install_perl_mods.sh',
         check_add_software_script= 'set_roary_env.sh',
@@ -309,7 +309,7 @@ rule create_gff:
         os.path.join(out_prokka_dir, '{strain}', '{strain}.ffn')
     threads: 1
     #conda: 'perl_for_prokka.yml'
-    conda: 'prokka_env.yml'
+    conda: '../shared_envs_yaml/prokka_env.yml'
     shell:
         '''
 #        echo $PERL5LIB
@@ -344,7 +344,7 @@ rule spades_create_assembly:
         spades_outdir= os.path.join(out_spades_dir, '{strain}'),
         SPADES_OPT='--careful',
         SPADES_BIN='spades.py'
-    conda: 'spades_3_10_env.yml'
+    conda: '../shared_envs_yaml/spades_3_10_env.yml'
     script:'run_spades.py'
 
 #rule clean_reads:

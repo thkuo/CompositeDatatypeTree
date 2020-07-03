@@ -44,7 +44,7 @@ rule for_cw_map_bs_values_to_tree:
         tree_full_suffix='{suffix}.bs',
         raxml_model= model
     threads:1
-    conda:'/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/raxml_env.yml'
+    conda:'../shared_envs_yaml/raxml_env.yml'
     shell:
         """
         export RAXML_BIN='raxmlHPC-PTHREADS'
@@ -84,7 +84,7 @@ rule bootstrap:
 #        raxml_bin=raxml_bin,
         raxml_model= model,
         raxml_starting_num= 1,
-    conda:'/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/raxml_env.yml'
+    conda:'../shared_envs_yaml/raxml_env.yml'
     threads: max_per_part_core_n
     shell:
         """
@@ -116,7 +116,7 @@ rule compute_conc_tree:
         raxml_model= model,
         raxml_starting_num= 1
     threads: max_core_n
-    conda:'/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/raxml_env.yml'
+    conda:'../shared_envs_yaml/raxml_env.yml'
     shell:
         """
         export RAXML_BIN='raxmlHPC-PTHREADS'

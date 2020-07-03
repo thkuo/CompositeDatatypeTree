@@ -32,7 +32,7 @@ rule bs_values_mapped_to_tree:
         tree_full_suffix='{suffix}.bs',
         raxml_model= raxml_model
     threads:1
-    conda: 'raxml_env.yml'
+    conda: '../shared_envs_yaml/raxml_env.yml'
     shell:
         """
         export RAXML_BIN='raxmlHPC-PTHREADS'
@@ -71,7 +71,7 @@ rule bootstrap:
         tree_id= '{suffix}.{part_num}.{per_part_tr_num}',
         raxml_model= raxml_model,
         raxml_starting_num= 1,
-    conda: 'raxml_env.yml'
+    conda: '../shared_envs_yaml/raxml_env.yml'
     threads: bootstrap_cores 
     shell:
         """
@@ -100,7 +100,7 @@ rule nuc_best_tree:
         raxml_starting_num= 1,
         raxml_model= raxml_model,
         raxml_wd=lambda wildcards: os.path.join(wildcards.result_dir, 'raxml')
-    conda: 'raxml_env.yml'
+    conda: '../shared_envs_yaml/raxml_env.yml'
     threads:
         lambda cores: max(1, cpu_count() - 1)
     shell:
@@ -190,7 +190,7 @@ rule vcf_to_seq:
         ref_fa=ref_fa
     output:
         per_sample_seq= '{result_dir}/alignment/strains/{sample}.fa'
-    conda: 'bcftools_env.yml'
+    conda: '../shared_envs_yaml/bcftools_env.yml'
     threads: 1
     shell:
         '''

@@ -31,9 +31,9 @@ rule filter_vcf:
         multisample_snp_vcf= temp('{results_d}/merged_vcf/multisample.snp.vcf'),
         multisample_snp_vcfgz= '{results_d}/merged_vcf/multisample.snp.vcf.gz',
         multisample_snp_vcfgz_index= '{results_d}/merged_vcf/multisample.snp.vcf.gz.tbi'
-    threads:
-        lambda cores: max(1, cpu_count() - 2) 
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/bcftools_env.yml'
+    threads: 1
+#   threads: lambda cores: max(1, cpu_count() - 2) 
+    conda: '../shared_envs_yaml/bcftools_env.yml'
     params:
         tabix_bin= 'tabix',
         bgzip_bin= 'bgzip'
@@ -65,7 +65,7 @@ rule merge_vcf:
         multisample_raw_vcf_gz_index= '{results_d}/merged_vcf/multisample.vcf.gz.tbi'
     threads:
         lambda cores: max(1, cpu_count() - 2) 
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/bcftools_env.yml'
+    conda: '../shared_envs_yaml/bcftools_env.yml'
     params:
         tabix_bin= 'tabix',
         bgzip_bin= 'bgzip'
@@ -91,7 +91,7 @@ rule var_calling:
         frbayes_params= '-p 1 --min-alternate-fraction 0.5',
         frbayes_bin= 'freebayes'
     threads: 1
-    conda:'/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/freebayes_1_3_env.yml'
+    conda:'../shared_envs_yaml/freebayes_1_3_env.yml'
     shell:
         '''
         freebayes {params.frbayes_params} -f {input.reffile} \
@@ -106,8 +106,8 @@ rule sam2bam:
         bam=temp('{results_d}/{strain}.bam'),
         sorted_bam='{results_d}/{strain}.sorted.bam',
         sorted_bam_index='{results_d}/{strain}.sorted.bam.bai'
-    threads:2
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/snps_tab_mapping.yml'
+    threads: 1
+    conda: '../shared_envs_yaml/snps_tab_mapping.yml'
     shell:
         """
         # sam to bam 
@@ -136,11 +136,11 @@ rule mapping:
         bwa_sam= temp('{results_d}/{strain}.bwa.sai'),
         bwa_bam= temp('{results_d}/{strain}.pre_bwa.bam'),
         sam=temp('{results_d}/{strain}.sam')
-    threads:2
+    threads:1
     params:
         REF_PREFIX=ref_fasta,
         BWA_OPT='-q10'
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/snps_tab_mapping.yml'
+    conda: '../shared_envs_yaml/snps_tab_mapping.yml'
     shell:
         """
         ## ng_paired_read_bwa_mapping:
@@ -203,7 +203,7 @@ rule stampy_index_ref:
         ref_fasta+'.bwt',
         ref_fasta+'.stidx',
         ref_fasta+'.sthash'
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/snps_tab_mapping.yml'
+    conda: '../shared_envs_yaml/snps_tab_mapping.yml'
     shell:
         '''
         stampy.py -G {input.reffile} {input.reffile}
