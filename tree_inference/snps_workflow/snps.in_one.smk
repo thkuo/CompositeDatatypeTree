@@ -31,8 +31,7 @@ rule filter_vcf:
         multisample_snp_vcf= temp('{results_d}/merged_vcf/multisample.snp.vcf'),
         multisample_snp_vcfgz= '{results_d}/merged_vcf/multisample.snp.vcf.gz',
         multisample_snp_vcfgz_index= '{results_d}/merged_vcf/multisample.snp.vcf.gz.tbi'
-    threads: 1
-#   threads: lambda cores: max(1, cpu_count() - 2) 
+    threads: 8
     conda: '../shared_envs_yaml/bcftools_env.yml'
     params:
         tabix_bin= 'tabix',
@@ -63,8 +62,7 @@ rule merge_vcf:
     output:
         multisample_raw_vcf_gz= '{results_d}/merged_vcf/multisample.vcf.gz',
         multisample_raw_vcf_gz_index= '{results_d}/merged_vcf/multisample.vcf.gz.tbi'
-    threads:
-        lambda cores: max(1, cpu_count() - 2) 
+    threads: 8
     conda: '../shared_envs_yaml/bcftools_env.yml'
     params:
         tabix_bin= 'tabix',
@@ -143,7 +141,6 @@ rule mapping:
     conda: '../shared_envs_yaml/snps_tab_mapping.yml'
     shell:
         """
-        ## ng_paired_read_bwa_mapping:
         bwa aln {params.BWA_OPT} -t{threads} {input.reffile} {input.infile1} \
   > {output.p_bwa_sai1}
 
@@ -177,6 +174,7 @@ rule redirect_and_preprocess_reads:
             new_reads_dir, '{}.cleaned.1.fq'.format(wildcards.strain)),
         tmp_f2= lambda wildcards: os.path.join(
             new_reads_dir, '{}.cleaned.2.fq'.format(wildcards.strain))
+    threads: 1
     shell:
         '''
         if [ -e "{params.adaptor_f}" ]
@@ -204,6 +202,7 @@ rule stampy_index_ref:
         ref_fasta+'.stidx',
         ref_fasta+'.sthash'
     conda: '../shared_envs_yaml/snps_tab_mapping.yml'
+    threads: 1
     shell:
         '''
         stampy.py -G {input.reffile} {input.reffile}

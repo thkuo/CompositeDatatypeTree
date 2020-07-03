@@ -20,7 +20,6 @@ ref_fa=config['ref_fa']
 multisample_vcf=config['multisample_vcf']
 strains= parse_strains(multisample_vcf)
 raxml_model= config['raxml_model']
-bootstrap_cores=5
 rule bs_values_mapped_to_tree:
     input:  
         cw_all_bs_trees='{result_dir}/raxml/bootstrap/RAxML_bootstrap.{suffix}.all',
@@ -72,7 +71,7 @@ rule bootstrap:
         raxml_model= raxml_model,
         raxml_starting_num= 1,
     conda: '../shared_envs_yaml/raxml_env.yml'
-    threads: bootstrap_cores 
+    threads: 8 
     shell:
         """
         export RAXML_BIN='raxmlHPC-PTHREADS'
@@ -101,8 +100,7 @@ rule nuc_best_tree:
         raxml_model= raxml_model,
         raxml_wd=lambda wildcards: os.path.join(wildcards.result_dir, 'raxml')
     conda: '../shared_envs_yaml/raxml_env.yml'
-    threads:
-        lambda cores: max(1, cpu_count() - 1)
+    threads: 16 
     shell:
         """
         export RAXML_BIN='raxmlHPC-PTHREADS'
@@ -159,11 +157,6 @@ rule mapping_trim_invariant:
 
         with open(out_f, 'w') as out_fh:
             AlignIO.write(new_aln, out_fh, "fasta")
-#    shell:
-#        '''
-#        ./removeInvariant.py --in {input} \
-#--out {output} --cn 2
-#        '''
 
 rule cons_seqs_to_aln:
     '''

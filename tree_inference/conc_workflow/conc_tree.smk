@@ -5,33 +5,9 @@ nuc_aln= config['nuc_aln']
 conc_aln= config['conc_aln']
 raxml_prtn= config['raxml_prtn']
 col_constraint_tr= config['col_constraint_tr']
-#best_ml_tree= config['best_ml_tree'] 
-#bs_trees= config['bs_trees']
-#bs_best_ml_tree= config['bs_best_ml_tree']
-
-#cw_withBS_tree= ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-#'TreePaper/nuc_tree_comparison.v2/results/mapping/'
-#'conc.raxml/RAxML_bestTree.conc')
-#col_cw_withBS_tree= os.path.join(results_dir,
-#    'RAxML_bipartitions.nuc_uw-gpa.withBS.collapse')
-#max_core_n= config['max_cores']
 max_core_n=len(os.sched_getaffinity(0)) 
 max_per_part_core_n= int(max_core_n/5)
-#raxml_bin= config['raxml_bin'] 
 model= config['model']
-#rule all:
-#    input:
-#        bs_best_ml_tree,
-#        best_ml_tree
-
-#rule collapse_conc_tree:
-#    input: cw_withBS_tree
-#    output: col_cw_withBS_tree
-#    shell:
-#        '''
-#        ./collapse_short.interface.R \
-# {input} {output}
-#        '''
 
 rule for_cw_map_bs_values_to_tree:
     input:  
@@ -40,7 +16,6 @@ rule for_cw_map_bs_values_to_tree:
     output:
         cw_withBS_tree= '{result_dir}/RAxML_bipartitions.{suffix}.bs'
     params:
-#        raxml_bin=raxml_bin,
         tree_full_suffix='{suffix}.bs',
         raxml_model= model
     threads:1
@@ -85,7 +60,7 @@ rule bootstrap:
         raxml_model= model,
         raxml_starting_num= 1,
     conda:'../shared_envs_yaml/raxml_env.yml'
-    threads: max_per_part_core_n
+    threads: 8
     shell:
         """
         export RAXML_BIN='raxmlHPC-PTHREADS'
@@ -115,7 +90,7 @@ rule compute_conc_tree:
 #        raxml_bin=raxml_bin,
         raxml_model= model,
         raxml_starting_num= 1
-    threads: max_core_n
+    threads: 16 
     conda:'../shared_envs_yaml/raxml_env.yml'
     shell:
         """

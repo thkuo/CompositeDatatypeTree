@@ -13,7 +13,6 @@ rule trim_invariant:
     threads: 1
     params:
         cutoff_num= 2
-#        script_path= lambda x: os.path.join(workflow_home, 'removeInvariant.py' )
     run:
         
         from Bio import SeqIO
@@ -43,17 +42,10 @@ rule trim_invariant:
 
         with open(out_f, 'w') as out_fh:
             AlignIO.write(new_aln, out_fh, "fasta")
-#    shell:
-#        '''
-#        {params.script_path} --in {input} \
-#--out {output} --cn 2
-#        '''
 
 rule create_gpa_aln:
     input:
         roary_raw_gpa=roary_gpa_csv
     output:
         gpa_aln='{results_dir}/gpa/gpa.aln'
-#    params: 
-#        strains= strains
     script:  'createGPAaln.py'
