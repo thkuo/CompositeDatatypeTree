@@ -14,6 +14,6 @@ cd /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/MM_for_paper/tree_infer
   ./test \
   ../../WhichTree_Sim.v7/bin.v5/run_seq2geno/dna_list \
   /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/data/reference/ATCC_700669.fasta \
-  denovo 
+  fast_mapping
 
 rm -r $CONDA_PREFIX/tmp
