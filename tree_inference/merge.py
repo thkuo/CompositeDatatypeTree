@@ -1,23 +1,6 @@
 #!/usr/bin/env python3
 '''
-Interface to the five workflows 
-
-Required variables:
-    home: to determine the working directory 
-    env: for the external packages
-        default: ./shared_envs
-        configurable using CDTREE_SHARED_ENV: 
-            export \
-            CDTREE_SHARED_ENV=/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs
-
-NOTE:
-    The user determines: reads, reference, project directory, full list of strains(???), and outgroup(???) 
-    This software determines output: 
-        vcf (mapping)
-        nuc tree
-        gpa matrix (roary)
-        gpa alignment
-        cd tree
+Interface to each workflow
 '''
 import snakemake
 import os
@@ -40,7 +23,7 @@ class ngs_workflow():
         import re 
         snakemake.snakemake(
             dryrun= just_dryrun,
-            #snakefile=self.snakefile,
+            printshellcmds= True, 
             snakefile=self.determine_smk(),
             config= self.config_params,
             conda_prefix=self.determine_conda_env_dir(),
@@ -143,7 +126,7 @@ class nuc_tr(tr_inf_workflow):
                         )
 
 class mapping(ngs_workflow):
-    def __init__(self, proj):
+    def __init__(self, proj, sub_func):
         print('Function: mapping\n...initiating')
         config={
             'list_f':str(proj.list_f),
@@ -153,10 +136,13 @@ class mapping(ngs_workflow):
         }
         target_f=str(proj.multisample_vcf)
         workdir= str(proj.project_dir)
+        smk_file= '' 
+        if sub_func == 'mapping':
+            smk_file= './snps_workflow/snps.in_one.smk' 
+        elif sub_func == 'fast_mapping':
+            smk_file= './snps_workflow/snps_bwa_mem.in_one.smk'
         super().__init__(config, target_f,
-            './snps_workflow/snps.in_one.smk',
-            workdir
-                        )
+            smk_file, workdir )
         print(self.__dict__)
 #
 if __name__=='__main__':
@@ -171,8 +157,8 @@ if __name__=='__main__':
             target_funcs.append(cd_tr(p))
         elif x == 'nuc_tr':
             target_funcs.append(nuc_tr(p))
-        elif x == 'mapping':
-            target_funcs.append(mapping(p))
+        elif x in ['mapping', 'fast_mapping']:
+            target_funcs.append(mapping(p, x))
         elif x == 'all':
             target_funcs= [mapping(p), nuc_tr(p), denovo(p), gpa_aln(p),
                            cd_tr(p)]
