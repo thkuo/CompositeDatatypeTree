@@ -34,6 +34,7 @@ rule filter_vcf:
     threads: 8
     conda: '../shared_envs_yaml/bcftools_env.yml'
     params:
+        filter_pat= 'TYPE="snp" && FORMAT/DP>=10 && FORMAT/AO > FORMAT/RO',
         tabix_bin= 'tabix',
         bgzip_bin= 'bgzip'
     shell:
@@ -41,7 +42,7 @@ rule filter_vcf:
         ## retain only the snps
         bcftools norm --multiallelics=-any --check-ref=x --threads={threads} \
   {input.multisample_raw_vcf_gz}| \
-  bcftools filter --include='TYPE="snp" && MIN(FORMAT/DP)>=10' \
+  bcftools filter --include='{params.filter_pat}' \
   --threads={threads} -O v \
   -o  {output.multisample_snp_vcf}
         {params.bgzip_bin} -c {output.multisample_snp_vcf} > {output.multisample_snp_vcfgz}
