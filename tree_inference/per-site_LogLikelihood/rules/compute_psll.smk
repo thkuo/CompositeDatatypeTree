@@ -1,3 +1,5 @@
+import re
+
 nuc_tr= config['nuc_tr']
 nuc_aln= config['nuc_aln']
 gpa_aln= config['gpa_aln'] if 'gpa_aln' in config else '-'
@@ -14,6 +16,9 @@ if 'raxml_freq' in config :
     assert config['raxml_freq'] in ['', 'X'] 
     raxml_i_model= config['raxml_freq'] 
 raxml_model= raxml_s_model+raxml_d_model+raxml_i_model+raxml_f_model
+#' asc correction
+if not (re.search('ASC_', raxml_model) is None) :
+    raxml_model= raxml_model+ ' --asc-corr lewis'
 col_nuc_tr= config['col_nuc_tr']
 
 #' external rules

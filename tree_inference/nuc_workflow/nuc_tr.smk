@@ -20,6 +20,10 @@ ref_fa=config['ref_fa']
 multisample_vcf=config['multisample_vcf']
 strains= parse_strains(multisample_vcf)
 raxml_model= config['raxml_model']
+#' asc correction
+if not (re.search('ASC_', raxml_model) is None) :
+    raxml_model= raxml_model+ ' --asc-corr lewis'
+
 rule bs_values_mapped_to_tree:
     input:  
         cw_all_bs_trees='{result_dir}/raxml/bootstrap/RAxML_bootstrap.{suffix}.all',
