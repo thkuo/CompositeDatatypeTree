@@ -1,6 +1,6 @@
 import os
 
-nuc_pslls= config['nuc_pslls']
+#nuc_pslls= config['nuc_pslls']
 rear_nuc_tr=config['rear_nuc_trs']
 gpa_aln= config['gpa_aln']
 nuc_aln= config['nuc_aln']
@@ -240,13 +240,13 @@ rule prepare_concatenated_weight:
         with open(output.raxml_input_weights, 'w') as out_fh:
             out_fh.write(' '.join([str(w) for w in all_weights]))
 
-rule col_tree:
-    input:
-        nuc_pslls= nuc_pslls,
-        rear_trs=rear_nuc_tr
-    output:
-        col_nuc_tr='{result_dir}/{psll_perc}/raxml_input/nuc_col.nwk'
-    threads: 8
-    params: 
-        ll_perc='{psll_perc}'
-    script:'./scripts/col_tree_diff_cutoffs.R'
+#rule col_tree:
+#    input:
+#        nuc_pslls= nuc_pslls,
+#        rear_trs=rear_nuc_tr
+#    output:
+#        col_nuc_tr='{result_dir}/{psll_perc}/raxml_input/nuc_col.nwk'
+#    threads: 8
+#    params: 
+#        ll_perc='{psll_perc}'
+#    script:'./scripts/col_tree_diff_cutoffs.R'
