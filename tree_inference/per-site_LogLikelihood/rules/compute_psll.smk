@@ -20,6 +20,11 @@ raxml_model= raxml_s_model+raxml_d_model+raxml_i_model+raxml_f_model
 if not (re.search('ASC_', raxml_model) is None) :
     raxml_model= raxml_model+ ' --asc-corr lewis'
 col_nuc_tr= config['col_nuc_tr']
+#' the cutoff of log-likelihood score
+col_cutoff_pr= 0.75
+if 'col_cutoff_pr' in config:
+    assert config['col_cutoff_pr'] > 0 & config['col_cutoff_pr'] < 1
+    col_cutoff_pr= config['col_cutoff_pr']
 
 #' external rules
 include: 'compute_psll_gpa.smk'
@@ -35,6 +40,8 @@ rule collapse_nuc_tr_with_psll_sums:
     output:
         nuc_psll_sum_per_br='{result_dir}/psll/nuc_psllChangeSumPerBranch.tsv',
         col_nuc_tr='{result_dir}/nuc_col_by_psll.nwk' 
+    params: 
+        col_cutoff_pr= col_cutoff_pr
     threads: 16
     script: '../scripts/psll_analysis.R'
 
