@@ -1,5 +1,6 @@
 nuc_tr:  /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5.6/raxml/RAxML_bipartitions.nuc.bs
 nuc_aln: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5.6/alignment/nuc.var.aln
 # the computation accepts only GAMMA model
-raxml_model: GTRGAMMA
+raxml_substitution_model: GTR
+raxml_distribution_model: GAMMA
 col_nuc_tr: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5.7/per-site_LogLikelihood/nuc_col_by_psll.nwk
