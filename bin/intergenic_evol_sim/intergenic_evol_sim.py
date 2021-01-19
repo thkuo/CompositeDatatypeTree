@@ -73,22 +73,17 @@ parser.add_argument('-n', dest='cores',type= int,
 args = parser.parse_args()
 
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
-
-#output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v6/data/intergenic_evol_sim')
 output_dir=args.output_dir 
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 cpu_num= args.cores
-#gen_output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-#            'WhichTree_Sim.v6/data/genome_evol_sim/')
 gen_output_dir=args.genome_dir
-#wtrees_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-#            'WhichTree_Sim.v6/data/outbreak_sim/wtrees')
+assert os.path.isdir(gen_output_dir)
 wtrees_dir=args.wtrees_dir 
-#config_template= './dawg-input_template.dawg' 
+assert os.path.isdir(wtrees_dir)
 config_template= args.conf 
-#intergenic_coor_f= './intergenic_coordinates.txt'
+assert os.path.isfile(config_template)
 intergenic_coor_f= args.coor 
 # determine the starting index
 starting_ix= max([int(re.sub('.nwk$', '', f)) for f in os.listdir(wtrees_dir) if

@@ -71,9 +71,11 @@ if not os.path.exists(output_dir):
 #genome_db_f= ('/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
 #              'WhichTree_Sim/bin/re_simulate/which_tree/Streptococcus_pneumoniae_ATCC_700669_v1.db')
 genome_db_f= args.genome_db 
+assert os.path.isfile(genome_db_f)
 #wtrees_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
 #            'WhichTree_Sim.v6/data/outbreak_sim/wtrees')
 wtrees_dir=args.wtrees_dir 
+assert os.path.isdir(wtrees_dir)
 # determine the starting index
 starting_ix= max([int(re.sub('.nwk$', '', f)) for f in os.listdir(wtrees_dir) if
     re.search('.nwk$', f)])
@@ -82,6 +84,7 @@ tree_f=(os.path.join(wtrees_dir, '{}.nwk'.format(project_name)))
 #config_template= ('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
 #            'WhichTree_Sim.v6/data/genome_evol_sim/alf-input_template.drw' )
 config_template=args.conf
+assert os.path.isfile(config_template)
 
 #+++++
 # Simulation starts from the fist generation

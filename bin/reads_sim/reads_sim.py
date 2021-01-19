@@ -10,6 +10,9 @@ import argparse
 
 parser = argparse.ArgumentParser(
     description='Simulate sequencing reads using PIRS')
+parser.add_argument('-p',dest= 'sim_params', type=str,
+                    default='-l 100 -x 100 -m 250 -v 80', 
+                    help='output directory')
 parser.add_argument('-o',dest= 'output_dir', type=str,
                     required= True,
                     help='output directory')
@@ -24,20 +27,18 @@ parser.add_argument('-n', dest='cores',type= int,
                     help='number of threads')
 args = parser.parse_args()
 
-#output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/'
-#            'TreePaper/WhichTree_Sim.v6/data/reads_sim')
 output_dir=args.output_dir
 if not os.path.exists(output_dir):
     os.makedirs(output_dir)
 
 #cpu_num=10
 cpu_num= args.cores
-#gen_output_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-#            'WhichTree_Sim.v6/data/genome_evol_sim/')
+# pirs parameters
+pirs_options=args.sim_params
 gen_output_dir=args.genome_dir
-#wtrees_dir=('/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/'
-#            'WhichTree_Sim.v6/data/outbreak_sim/wtrees')
+assert os.path.isdir(gen_output_dir)
 wtrees_dir=args.wtrees_dir 
+assert os.path.isdir(wtrees_dir)
 genome_files_mat_f= os.path.join(output_dir, 'genome_paths.tsv')
 reads_dir= os.path.join(output_dir, 'fastq')
 # determine the starting index
@@ -93,7 +94,7 @@ with open(genome_files_mat_f, 'w') as genome_files_mat_fh:
         if not os.path.exists(reads_dir):
             os.mkdir(reads_dir)
         subprocess.run(['pirs', 'simulate', '-t', str(cpu_num), 
-                        '-l', '100', '-x', '100', '-m', '250', 
+                        pirs_options,
                         '-z', '-o', os.path.join(reads_dir, ix),
                         genome_files_dict[ix]])
 
