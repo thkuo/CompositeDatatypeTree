@@ -7,6 +7,7 @@ rm(list=ls())
 library(argparse)
 library(TransPhylo)
 library(yaml)
+library(ape)
 set.seed(0)
 parser <- ArgumentParser()
 parser$add_argument("-v", "--verbose", action="store_true", default=TRUE,
@@ -15,6 +16,9 @@ parser$add_argument("-q", "--quietly", action="store_false",
     dest="verbose", help="Print little output")
 parser$add_argument("-s", "--simulation_parameters", dest= 'yaml', nargs= 1,
     help="yaml file describing parameters for simulation using TransPhylo")
+parser$add_argument("-r", "--substitution_rate", dest= 'rate', nargs= 1,
+		    type="double",
+		    default= 1.0, help="the substitution rate for rescaling the tree")
 parser$add_argument("-o", "--output_dir", dest= 'out',
     help="output directory for the output trees")
 args <- parser$parse_args()
@@ -25,7 +29,7 @@ if (!file.exists(args$yaml)){
 }else{
     transphylo_params<- read_yaml(args$yaml)
 }
-ctree<- simulateOutbreak(transphylo_params)
+ctree<- do.call(simulateOutbreak, transphylo_params)
 # extract the within-host subtrees
 source('wtreesFromCTree.R')
 wtrees<- wtreesFromCTree(ctree)
@@ -33,9 +37,22 @@ wtrees<- wtreesFromCTree(ctree)
 source('phyloFromWTree_v2.R')
 w_phylos<-lapply(wtrees, function(wtree) phyloFromWTree(wtree))
 
+# convert the unit of trees
+convert_unit<- function(tr, substi_rate){
+  brs<- tr$edge.length 
+  new_brs<- brs*substi_rate
+  new_tr<- compute.brlen(tr, new_brs)
+  return(new_tr)
+}
+for (i in 1:length(w_phylos)){
+  new_tr<- convert_unit(w_phylos[[i]]$phylo, args$rate)
+  print(quantile(w_phylos[[i]]$phylo$edge.length))
+  print(quantile(new_tr$edge.length))
+  w_phylos[[i]]$phylo<- new_tr
+}
+
 ## save the trees
 dir.create(file.path(output_d), recursive = T)   
-library(ape)
 ## don't forget the node indices
 ## save the parameters
 params_f<- sprintf('%s/transphylo_params', output_d)
