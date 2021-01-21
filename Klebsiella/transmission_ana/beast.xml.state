@@ -1,0 +1,42 @@
+<itsabeastystatewerein version='2.0' sample='40000000'>
+<statenode id='Tree.t:nuc'>(((((((((0:1.8928200191192461,7:1.6441861393378092)24:0.12826217132753204,(11:1.6634640644514105,23:1.4749394742876587)25:0.3740115686181247)26:0.7243314434407688,((((((1:1.8688382281205267,20:1.7185650040767686)27:0.5367723991793731,2:2.408342867737026)28:0.13099502657891193,8:2.402725872458038)29:0.03517308233330363,4:2.4215055121683573)30:0.1289683653683822,(3:2.279174225902916,((9:1.8489944201420756,17:1.441890595005502)31:0.4984021848020226,(15:2.06128465904145,19:1.8345087027572498)32:0.07572943224143236)33:0.07658636412809638)34:0.2549062090110663)35:0.05256918962412538,5:2.3079610999478284)36:0.005758544868554871)37:0.041495801955377054,(6:1.3834725792526272,22:1.459975311492842)38:1.1903221024919548)39:0.06623027692365424,14:2.8695331553893353)40:0.19518680503703667,(18:2.472143928178953,21:2.652471797031326)41:0.25924269891416163)42:0.1453140612312911,10:3.1963728194720322)43:0.003536676243516723,12:3.273679987518865)44:4.002342606357271,(13:4.363321842458132,16:4.652939328796916)45:2.8990395492321452)46:0.0</statenode>
+<statenode id='clockRate.c:gpa'>clockRate.c:gpa[1 1] (0.0,Infinity): 24.817613863828296 </statenode>
+<statenode id='clockRate.c:nuc'>clockRate.c:nuc[1 1] (0.0,Infinity): 4.492815357915747E-6 </statenode>
+<statenode id='BMT_ModelIndicator.s:nuc'>BMT_ModelIndicator.s:nuc[1 1] (0,5): 1 </statenode>
+<statenode id='BMT_Rates.s:nuc'>BMT_Rates.s:nuc[6 1] (0.01,100.0): 0.6102254171034407 1.7795491657931173 1.9845785465490366 2.2309486826592795 0.5940589997793314 0.5555722178580111 </statenode>
+<statenode id='BMT_gammaShape.s:nuc'>BMT_gammaShape.s:nuc[1 1] (0.001,1000.0): 0.4855208724618279 </statenode>
+<statenode id='BMT_ProportionInvariable.s:nuc'>BMT_ProportionInvariable.s:nuc[1 1] (0.0,1.0): 0.9997736979462536 </statenode>
+<statenode id='hasInvariableSites.s:nuc'>hasInvariableSites.s:nuc[1 1] (-2147483647,2147483646): 1 </statenode>
+<statenode id='hasGammaRates.s:nuc'>hasGammaRates.s:nuc[1 1] (-2147483647,2147483646): 1 </statenode>
+<statenode id='hasEqualFreqs.s:nuc'>hasEqualFreqs.s:nuc[1 1] (null,true): false </statenode>
+<statenode id='BMT_frequencies.s:nuc'>BMT_frequencies.s:nuc[4 1] (-Infinity,Infinity): 0.2124887686722694 0.287696103053533 0.2875661625510145 0.21224896572318436 </statenode>
+<statenode id='gammaShape.s:gpa'>gammaShape.s:gpa[1 1] (0.001,1000.0): 0.49074481053204894 </statenode>
+<statenode id='ePopSize.t:nuc'>ePopSize.t:nuc[1 1] (0.0,Infinity): 35.83700004207331 </statenode>
+<statenode id='growthRate.t:nuc'>growthRate.t:nuc[1 1] (-Infinity,Infinity): 0.40774951666871073 </statenode>
+</itsabeastystatewerein>
+<!--
+{"operators":[
+{"id":"StrictClockRateScaler.c:gpa","p":0.864025736258315,"accept":471370,"reject":1610848,"acceptFC":471243,"rejectFC":1609825,"rejectIv":0,"rejectOp":0},
+{"id":"strictClockUpDownOperator.c:gpa","p":0.7795044507770785,"accept":456332,"reject":1630095,"acceptFC":456102,"rejectFC":1629175,"rejectIv":0,"rejectOp":0},
+{"id":"StrictClockRateScaler.c:nuc","p":0.7298958200844933,"accept":483411,"reject":1598357,"acceptFC":483112,"rejectFC":1597514,"rejectIv":0,"rejectOp":0},
+{"id":"strictClockUpDownOperator.c:nuc","p":0.8769858147250794,"accept":452816,"reject":1633170,"acceptFC":452697,"rejectFC":1632146,"rejectIv":0,"rejectOp":0},
+{"id":"BMT_ModelTestOperator.s:nuc","p":"NaN","accept":64317,"reject":629617,"acceptFC":64264,"rejectFC":629292,"rejectIv":4483,"rejectOp":4483},
+{"id":"BMT_Ratescaler.s:nuc","p":0.21605676309018326,"accept":167705,"reject":526592,"acceptFC":167562,"rejectFC":526381,"rejectIv":0,"rejectOp":0},
+{"id":"BMT_gammaShapeScaler.s:nuc","p":0.5832355529529386,"accept":87900,"reject":258631,"acceptFC":87872,"rejectFC":258470,"rejectIv":0,"rejectOp":0},
+{"id":"BMT_ProportionInvariableScaler.s:nuc","p":0.7743065788867582,"accept":15,"reject":346647,"acceptFC":15,"rejectFC":346466,"rejectIv":196945,"rejectOp":196945},
+{"id":"BMT_hasGammaRatesFlipper.s:nuc","p":"NaN","accept":0,"reject":68967,"acceptFC":0,"rejectFC":68936,"rejectIv":34484,"rejectOp":34484},
+{"id":"BMT_hasInvariableSitesFlipper.s:nuc","p":"NaN","accept":0,"reject":69556,"acceptFC":0,"rejectFC":69518,"rejectIv":34717,"rejectOp":34717},
+{"id":"BMT_FreqsFlipOperator.s:nuc","p":"NaN","accept":0,"reject":69045,"acceptFC":0,"rejectFC":69016,"rejectIv":0,"rejectOp":0},
+{"id":"BMT_FrequenciesExchanger.s:nuc","p":0.001773895235810243,"accept":16756,"reject":123077,"acceptFC":16752,"rejectFC":123000,"rejectIv":0,"rejectOp":0},
+{"id":"gammaShapeScaler.s:gpa","p":0.8704097592110946,"accept":6376,"reject":63422,"acceptFC":6375,"rejectFC":63377,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentExponentialTreeScaler.t:nuc","p":0.8488797619253413,"accept":311777,"reject":1773326,"acceptFC":311731,"rejectFC":1772253,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentExponentialTreeRootScaler.t:nuc","p":0.8534492590638517,"accept":357037,"reject":1725787,"acceptFC":356989,"rejectFC":1724655,"rejectIv":71,"rejectOp":71},
+{"id":"CoalescentExponentialUniformOperator.t:nuc","p":"NaN","accept":6389184,"reject":14439742,"acceptFC":6385721,"rejectFC":14431685,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentExponentialSubtreeSlide.t:nuc","p":1,"accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentExponentialNarrow.t:nuc","p":"NaN","accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentExponentialWide.t:nuc","p":"NaN","accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"CoalescentExponentialWilsonBalding.t:nuc","p":"NaN","accept":0,"reject":0,"acceptFC":0,"rejectFC":0,"rejectIv":0,"rejectOp":0},
+{"id":"ePopSizeScaler.t:nuc","p":0.4645184365483035,"accept":506813,"reject":1577944,"acceptFC":506152,"rejectFC":1577468,"rejectIv":0,"rejectOp":0},
+{"id":"GrowthRateRandomWalk.t:nuc","p":0.5208068503148798,"accept":482235,"reject":1601134,"acceptFC":482097,"rejectFC":1600143,"rejectIv":0,"rejectOp":0}
+]}
+-->
