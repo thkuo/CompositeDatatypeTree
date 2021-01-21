@@ -14,12 +14,22 @@ if 'raxml_invariant' in config :
 raxml_f_model= ''
 if 'raxml_freq' in config :
     assert config['raxml_freq'] in ['', 'X'] 
-    raxml_i_model= config['raxml_freq'] 
+    raxml_f_model= config['raxml_freq'] 
 raxml_model= raxml_s_model+raxml_d_model+raxml_i_model+raxml_f_model
+#' JC69 and K80 are not specified using the -m flag
+raxml_simple_model= ''
+if 'raxml_simple_model' in config:
+    assert config['raxml_simple_model'] in ['JC69', 'K80', 'HKY85']
+    raxml_model= raxml_model+ ' --{}'.format(config['raxml_simple_model'])
+#' rate heterogeneity
+if 'rate_heterogeneity' in config:
+    raxml_model= raxml_model+ ' {}'.format(config['rate_heterogeneity'])
+col_nuc_tr= config['col_nuc_tr']
 #' asc correction
 if not (re.search('ASC_', raxml_model) is None) :
     raxml_model= raxml_model+ ' --asc-corr lewis'
 col_nuc_tr= config['col_nuc_tr']
+
 #' the cutoff of log-likelihood score
 col_cutoff_pr= 0.75
 if 'col_cutoff_pr' in config:

@@ -6,11 +6,11 @@ nuc_aln= config['nuc_aln']
 conc_aln= config['conc_aln']
 raxml_prtn= config['raxml_prtn']
 col_constraint_tr= config['col_constraint_tr']
-best_ml_tree= config['best_ml_tree'] 
-bs_trees= config['bs_trees']
-bs_best_ml_tree= config['bs_best_ml_tree']
+#best_ml_tree= config['best_ml_tree'] 
+#bs_trees= config['bs_trees']
+#bs_best_ml_tree= config['bs_best_ml_tree']
 
-max_core_n= config['max_cores']
+max_core_n= (config['max_cores'] if 'max_cores' in config else 1)
 max_per_part_core_n= int(max_core_n/5)
 if 'max_per_part_core_n' in config:
     max_per_part_core_n= config['max_per_part_core_n']
@@ -134,13 +134,15 @@ rule prepare_concatenated_data:
     output:
         raxml_input_aln=conc_aln,
         raxml_input_partitions=raxml_prtn
-    params:
-        conc_data_script= './create_raxml_conc_inputs.py'
-    shell:
-        '''
-        {params.conc_data_script} --nuc_aln {input.nuc_aln} \
- --gpa_aln {input.gpa_aln} --out_aln {output.raxml_input_aln} \
- --out_prtn {output.raxml_input_partitions}
-        '''
-        
-    
+    script: 'scripts/create_raxml_conc_inputs.py'
+#
+#    params:
+#        conc_data_script= './create_raxml_conc_inputs.py'
+#    shell:
+#        '''
+#        {params.conc_data_script} --nuc_aln {input.nuc_aln} \
+# --gpa_aln {input.gpa_aln} --out_aln {output.raxml_input_aln} \
+# --out_prtn {output.raxml_input_partitions}
+#        '''
+#        
+#    
