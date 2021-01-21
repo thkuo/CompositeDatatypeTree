@@ -20,50 +20,22 @@ ref_fasta=config['ref_fasta']
 adaptor_f= config['adaptor']
 new_reads_dir= config['new_reads_dir']
 
-rule filter_vcf:
-    '''
-    This rule (1) filters for the snps and (2) turn the subset of vcf into snp table
-    '''
-    input:
-        multisample_raw_vcf_gz= '{results_d}/merged_vcf/multisample.vcf.gz',
-        multisample_raw_vcf_gz_index= '{results_d}/merged_vcf/multisample.vcf.gz.tbi'
-    output:
-        multisample_snp_vcf= temp('{results_d}/merged_vcf/multisample.snp.vcf'),
-        multisample_snp_vcfgz= '{results_d}/merged_vcf/multisample.snp.vcf.gz',
-        multisample_snp_vcfgz_index= '{results_d}/merged_vcf/multisample.snp.vcf.gz.tbi'
-    threads: 8
-    conda: '../shared_envs_yaml/bcftools_env.yml'
-    params:
-        filter_pat= 'TYPE="snp" && FORMAT/DP>=10 && FORMAT/AO > FORMAT/RO',
-        tabix_bin= 'tabix',
-        bgzip_bin= 'bgzip'
-    shell:
-        """
-        ## retain only the snps
-        bcftools norm --multiallelics=-any --check-ref=x --threads={threads} \
-  {input.multisample_raw_vcf_gz}| \
-  bcftools filter --include='{params.filter_pat}' \
-  --threads={threads} -O v \
-  -o  {output.multisample_snp_vcf}
-        {params.bgzip_bin} -c {output.multisample_snp_vcf} > {output.multisample_snp_vcfgz}
-        {params.tabix_bin} -p vcf {output.multisample_snp_vcfgz}
-        """
-
-rule merge_vcf:
+rule merge_filtered_vcf:
     '''
     Merge the per-strain vcf files 
     '''
     input:
-        all_raw_vcf_gz= lambda wildcards: [
-            ('{}/single_strain_vcf/{}.vcf.gz'
+        all_filtered_vcf_gz= lambda wildcards: [
+            ('{}/filtered.single_strain_vcf/{}.vcf.gz'
             ).format(wildcards.results_d, strain) for strain in strains],
-        all_raw_vcf_gz_index=lambda wildcards: [
-            ('{}/single_strain_vcf/{}.vcf.gz.tbi'
+        all_filtered_vcf_gz_index=lambda wildcards: [
+            ('{}/filtered.single_strain_vcf/{}.vcf.gz.tbi'
             ).format(wildcards.results_d, strain) for strain in strains]
     output:
-        multisample_raw_vcf_gz= '{results_d}/merged_vcf/multisample.vcf.gz',
-        multisample_raw_vcf_gz_index= '{results_d}/merged_vcf/multisample.vcf.gz.tbi'
-    threads: 8
+        multisample_filtered_vcf_gz= '{results_d}/merged_vcf/multisample.snp.vcf.gz',
+        multisample_filtered_vcf_gz_index= '{results_d}/merged_vcf/multisample.snp.vcf.gz.tbi'
+    threads:
+        lambda cores: max(1, cpu_count() - 2) 
     conda: '../shared_envs_yaml/bcftools_env.yml'
     params:
         tabix_bin= 'tabix',
@@ -71,8 +43,34 @@ rule merge_vcf:
     shell:
         """
         bcftools merge --threads {threads} -m none -O z -o \
-{output.multisample_raw_vcf_gz} {input.all_raw_vcf_gz}
-        {params.tabix_bin} -p vcf {output.multisample_raw_vcf_gz}
+{output.multisample_filtered_vcf_gz} {input.all_filtered_vcf_gz}
+        {params.tabix_bin} -p vcf {output.multisample_filtered_vcf_gz}
+        """
+
+rule filter_each_vcf:
+    '''
+    This block (1) filters for the snps and (2) turn the subset of vcf into snp table
+    '''
+    input:
+        sample_vcf_gz='{results_d}/single_strain_vcf/{strain}.vcf.gz',
+        sample_vcf_gz_index='{results_d}/single_strain_vcf/{strain}.vcf.gz.tbi'
+    output:
+        filtered_sample_vcf_gz='{results_d}/filtered.single_strain_vcf/{strain}.vcf.gz',
+        filtered_sample_vcf_gz_index='{results_d}/filtered.single_strain_vcf/{strain}.vcf.gz.tbi'
+    threads: 4
+    conda: '../shared_envs_yaml/bcftools_env.yml'
+    params:
+        tabix_bin= 'tabix',
+        bgzip_bin= 'bgzip'
+    shell:
+        """
+        ## retain only the snps
+        bcftools filter \
+  --threads={threads} \
+  --include='TYPE="snp" && MIN(FORMAT/DP)>=10 && FORMAT/AO > FORMAT/RO' \
+  -O z -o {output.filtered_sample_vcf_gz} {input.sample_vcf_gz}
+        {params.tabix_bin} -p vcf {output.filtered_sample_vcf_gz}
+
         """
 
 rule var_calling:

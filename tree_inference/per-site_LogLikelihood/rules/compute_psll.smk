@@ -1,3 +1,5 @@
+import re
+
 nuc_tr= config['nuc_tr']
 nuc_aln= config['nuc_aln']
 gpa_aln= config['gpa_aln'] if 'gpa_aln' in config else '-'
@@ -12,9 +14,27 @@ if 'raxml_invariant' in config :
 raxml_f_model= ''
 if 'raxml_freq' in config :
     assert config['raxml_freq'] in ['', 'X'] 
-    raxml_i_model= config['raxml_freq'] 
+    raxml_f_model= config['raxml_freq'] 
 raxml_model= raxml_s_model+raxml_d_model+raxml_i_model+raxml_f_model
+#' JC69 and K80 are not specified using the -m flag
+raxml_simple_model= ''
+if 'raxml_simple_model' in config:
+    assert config['raxml_simple_model'] in ['JC69', 'K80', 'HKY85']
+    raxml_model= raxml_model+ ' --{}'.format(config['raxml_simple_model'])
+#' rate heterogeneity
+if 'rate_heterogeneity' in config:
+    raxml_model= raxml_model+ ' {}'.format(config['rate_heterogeneity'])
 col_nuc_tr= config['col_nuc_tr']
+#' asc correction
+if not (re.search('ASC_', raxml_model) is None) :
+    raxml_model= raxml_model+ ' --asc-corr lewis'
+col_nuc_tr= config['col_nuc_tr']
+
+#' the cutoff of log-likelihood score
+col_cutoff_pr= 0.75
+if 'col_cutoff_pr' in config:
+    assert config['col_cutoff_pr'] > 0 & config['col_cutoff_pr'] < 1
+    col_cutoff_pr= config['col_cutoff_pr']
 
 #' external rules
 include: 'compute_psll_gpa.smk'
@@ -30,6 +50,8 @@ rule collapse_nuc_tr_with_psll_sums:
     output:
         nuc_psll_sum_per_br='{result_dir}/psll/nuc_psllChangeSumPerBranch.tsv',
         col_nuc_tr='{result_dir}/nuc_col_by_psll.nwk' 
+    params: 
+        col_cutoff_pr= col_cutoff_pr
     threads: 16
     script: '../scripts/psll_analysis.R'
 
