@@ -10,9 +10,18 @@ import argparse
 
 parser = argparse.ArgumentParser(
     description='Simulate sequencing reads using PIRS')
-parser.add_argument('-p',dest= 'sim_params', type=str,
-                    default='-l 100 -x 100 -m 250 -v 80', 
-                    help='output directory')
+parser.add_argument('-sl',dest= 'sim_len', type=int,
+                    default= 100,
+                    help='simulated read length')
+parser.add_argument('-sd',dest= 'sim_dep', type=int,
+                    default= 50,
+                    help='simulated coverage')
+parser.add_argument('-sim',dest= 'sim_in_mean', type=int,
+                    default= 250,
+                    help='mean of simulated insert lengths')
+parser.add_argument('-sis',dest= 'sim_in_std', type=int,
+                    default= 80,
+                    help='standard deviation of simulated insert lengths')
 parser.add_argument('-o',dest= 'output_dir', type=str,
                     required= True,
                     help='output directory')
@@ -34,11 +43,15 @@ if not os.path.exists(output_dir):
 #cpu_num=10
 cpu_num= args.cores
 # pirs parameters
-pirs_options=args.sim_params
+pirs_options=['-l', str(args.sim_len), 
+              '-x', str(args.sim_dep), 
+              '-m', str(args.sim_in_mean),
+              '-v', str(args.sim_in_std)]
+
 gen_output_dir=args.genome_dir
-assert os.path.isdir(gen_output_dir)
+assert os.path.isdir(gen_output_dir), '{} not found'.format(gen_output_dir)
 wtrees_dir=args.wtrees_dir 
-assert os.path.isdir(wtrees_dir)
+assert os.path.isdir(wtrees_dir), '{} not found'.format(wtrees_dir)
 genome_files_mat_f= os.path.join(output_dir, 'genome_paths.tsv')
 reads_dir= os.path.join(output_dir, 'fastq')
 # determine the starting index
@@ -93,8 +106,9 @@ with open(genome_files_mat_f, 'w') as genome_files_mat_fh:
         genome_files_mat_fh.write('{}\t{}\n'.format(ix, genome_files_dict[ix]))
         if not os.path.exists(reads_dir):
             os.mkdir(reads_dir)
-        subprocess.run(['pirs', 'simulate', '-t', str(cpu_num), 
-                        pirs_options,
-                        '-z', '-o', os.path.join(reads_dir, ix),
-                        genome_files_dict[ix]])
+        pirs_cmd= (['pirs', 'simulate', '-t', str(cpu_num)]+ 
+                   pirs_options +
+                   ['-z', '-o', os.path.join(reads_dir, ix),
+                    genome_files_dict[ix]])
+        subprocess.run(pirs_cmd)
 
