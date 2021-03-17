@@ -54,7 +54,12 @@ class CDTreeProject:
         self.nuc_tr_out= Path(os.path.join(self.project_dir,
                                      'mapping','raxml',
                                      'RAxML_bipartitions.nuc.bs'))
-        self.col_nuc_tr_out=Path('{}_col'.format(self.nuc_tr_out))
+        ## collapsed nuc tree
+        self.col_nuc_tr_out=Path(os.path.join(self.project_dir,
+                                              'per-site_LogLikelihood',
+                                              'col_nuc.nwk'))
+        self.cutoff_perc= 0.75
+
         ## cd tree
         self.conc_aln= Path(os.path.join(self.project_dir, 'cd', 'materials',
                       'conc.aln'))
@@ -68,11 +73,8 @@ class CDTreeProject:
         # only the rate model will be extracted by RAxML
         self.cd_model=str('BIN{}'.format(self.rate_model))
         self.col_cd_tr_out= Path('{}_col'.format(self.cd_tr_out))
-
         ## tree post processing
         self.outgroup= [] 
-        self.br_cutoff= float(5e-4)
-        self.bs_cutoff= int(60)
     def user_define(self, config_f):
         import yaml
         import os
@@ -94,7 +96,7 @@ class CDTreeProject:
 #                    os
             elif (isinstance(args_dict[k], PosixPath) & 
                   (not k in poss_user_files)):
-                print('required filename {} cannot not replaced by {}'.format(
+                print('required filename {} cannot not be replaced with {}'.format(
                     args_dict[k], config_dict[k]))
             elif isinstance(args_dict[k], str):
                 args_dict[k]= str(config_dict[k])
