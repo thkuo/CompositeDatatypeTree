@@ -34,8 +34,7 @@ rule merge_filtered_vcf:
     output:
         multisample_filtered_vcf_gz= '{results_d}/merged_vcf/multisample.snp.vcf.gz',
         multisample_filtered_vcf_gz_index= '{results_d}/merged_vcf/multisample.snp.vcf.gz.tbi'
-    threads:
-        lambda cores: max(1, cpu_count() - 2) 
+    threads: 8 
     conda: '../shared_envs_yaml/bcftools_env.yml'
     params:
         tabix_bin= 'tabix',
