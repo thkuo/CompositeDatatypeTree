@@ -110,8 +110,8 @@ collapse_branches<- function(tr, target_nodes){
 nuc_psll_f<-snakemake@input[['nuc_pslls']]
 rear_trs_f<-snakemake@input[['rear_trs']]
 psll_sums_out_f<- snakemake@output[['nuc_psll_sum_per_br']]
-col_cutoff_pr<- snakemake@params[['col_cutoff_pr']]
 col_tr_out_f<- snakemake@output[['col_nuc_tr']]
+cutoff_perc<- snakemake@params[['cutoff_perc']]
 
 #' compute the sums 
 nuc_psll<- read.ll_mat(ll_mat_f = nuc_psll_f, 
@@ -122,7 +122,7 @@ write.table(as.data.frame(nuc_psll_sum_per_branch),
 	    psll_sums_out_f, sep= '\t')
 
 #' determine the branches to collapse
-nuc_psll_cutoff<- quantile(nuc_psll_sum_per_branch, probs = col_cutoff_pr)
+nuc_psll_cutoff<- quantile(nuc_psll_sum_per_branch, probs = cutoff_perc)
 br.ix_to_col<- names(nuc_psll_sum_per_branch[which(nuc_psll_sum_per_branch >= nuc_psll_cutoff)])
 br.ix_to_col<- as.numeric(br.ix_to_col)
 
