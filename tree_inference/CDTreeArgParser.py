@@ -20,6 +20,9 @@ class CDTreeArgParser:
     and computing the phylogenetic tree with raxml (main
     output: nucleotide tree)
 
+    col_tr: collapsing the nucleotide tree with log-likelihood method
+    (main output: multifurcating nucleotide tree)
+
     denovo: computing de novo assemblies with spades.py;
     coding regions detection with prokka; orthologous
     clustering with roary (main output: orthologous families
@@ -41,7 +44,7 @@ class CDTreeArgParser:
             help='the reference genome for mapping sequencing reads')
         parser.add_argument('f', type=str,
             help='the workflow to launch',
-            choices=['mapping', 'fast_mapping', 'nuc_tr', 'denovo', 'gpa', 'cd_tr', 'all'])
+            choices=['mapping', 'fast_mapping', 'nuc_tr', 'col_tr', 'denovo', 'gpa', 'cd_tr', 'all'])
         parser.add_argument('--config',dest= 'config_f', type=str, 
             help='yaml file to overwrite default parameter settings')
         parser.add_argument('--cpu',dest= 'cpu', type=int, default= 1,

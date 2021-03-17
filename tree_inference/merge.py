@@ -107,6 +107,25 @@ class denovo(ngs_workflow):
             workdir
                         )
 
+class col_tr(tr_inf_workflow):
+    def __init__(self, proj):
+        print('Function: collapsing the nucleotide tree using log-likelihood '
+              'score\n...initiating')
+        config={
+            'nuc_tr': proj.nuc_tr_out,
+            'nuc_aln': proj.nuc_aln,
+            'raxml_model':str(proj.nuc_model),
+            'col_nuc_tr': proj.col_nuc_tr_out,
+            'cutoff_perc': proj.cutoff_perc
+        }
+        target_f=str(proj.col_nuc_tr_out)
+        workdir=str(proj.project_dir)
+        super().__init__(config, target_f,
+            './per-site_LogLikelihood/compute_psll.smk',
+            workdir
+                        )
+
+
 class nuc_tr(tr_inf_workflow):
     def __init__(self, proj):
         print('Function: computing nucleotide tree\n...initiating')
