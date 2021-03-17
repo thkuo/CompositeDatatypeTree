@@ -1,3 +1,15 @@
+#' Purpose:
+#' - De novo procedures of assemblies, annotation and orthologous clustering
+#' Materials:
+#' - DNA-seq reads
+#' - adaptor file (optional)
+#' Methods:
+#' - De novo assemblies with SPAdes 
+#' - Annotation with Prokka
+#' - Orthologous clustering with Roary
+#' Output:
+#' - de novo assemblies
+
 import os
 import pandas as pd
 
@@ -7,6 +19,12 @@ with open(list_f, 'r') as list_fh:
     for l in list_fh:
         d=l.strip().split('\t')
         dna_reads[d[0]]= d[1].split(',')
+        try:
+            assert ((len(d)==2) and (len(d[1].split(','))==2))
+        except AssertionError:
+            print('ERROR: Incorrect format detected in "{}"'.format(l.strip()))
+            raise AssertionError
+
 out_prokka_dir=config['out_prokka_dir']
 out_roary_dir=config['out_roary_dir']
 out_spades_dir= config['out_spades_dir']
@@ -14,6 +32,7 @@ adaptor_f= config['adaptor']
 new_reads_dir= config['new_reads_dir']
 
 rule roary:
+    #' Run Roary to compute orthologous groups
     input:
         gff_files= expand(os.path.join(out_prokka_dir, '{strain}', '{strain}.gff'),
 strain= list(dna_reads.keys()))
@@ -30,33 +49,26 @@ strain= list(dna_reads.keys()))
     shell:
         '''
         set +u
-#        {params.check_add_software_script}
         ROARY_HOME=$(dirname $(dirname $(which roary)))
         # required perl modules
         {params.check_add_perl_env_script}
 
-	export PATH=\
-$ROARY_HOME/build/fasttree:\
+        export PATH=$ROARY_HOME/build/fasttree:\
 $ROARY_HOME/build/mcl-14-137/src/alien/oxygen/src:\
 $ROARY_HOME/build/mcl-14-137/src/shmcl:\
 $ROARY_HOME/build/ncbi-blast-2.4.0+/bin:\
 $ROARY_HOME/build/prank-msa-master/src:\
 $ROARY_HOME/build/cd-hit-v4.6.6-2016-0711:\
 $ROARY_HOME/build/bedtools2/bin:\
-$ROARY_HOME/build/parallel-20160722/src:\
-$PATH
-	export PERL5LIB=$ROARY_HOME/lib:\
+$ROARY_HOME/build/parallel-20160722/src:$PATH
+        export PERL5LIB=$ROARY_HOME/lib:\
 $ROARY_HOME/build/bedtools2/lib:$PERL5LIB
-#        PERL5LIB=$ROARY_HOME/lib:\
-#$ROARY_HOME/build/bedtools2/lib:\
-#$PERL5LIB
-#	ln -rsf $ROARY_HOME/lib/Bio $CONDA_PREFIX/lib/perl5/5.22.0/
-	which perl
+        which perl
         echo $PERL5LIB
         echo $PERLLIB
         rm -r {wildcards.roary_dir}
         {params.roary_bin} -f {wildcards.roary_dir} \
--v {input.gff_files} -p 30 -g 100000 -z
+-v {input.gff_files} -p {threads} -g 100000 -z
         set -u
         ''' 
 #        {params.roary_bin} -f {wildcards.roary_dir} \
@@ -80,6 +92,9 @@ rule create_gff:
         '''
 
 rule spades_create_assembly:
+    #' Compute de novo assemlies with sapdes
+    #' The computational resources is increased when 
+    #' the process is crashed and rerun
     input: 
         READS= lambda wildcards: [
             os.path.join(new_reads_dir,'{}.cleaned.{}.fq.gz'.format(
@@ -87,13 +102,22 @@ rule spades_create_assembly:
     output: os.path.join(out_spades_dir,'{strain}', 'contigs.fasta')
     threads:1
     resources:
-        mem_mb=lambda wildcards, attempt: (2**attempt) * 10000
+        mem_mb=lambda wildcards, attempt: (2**attempt) * 1000
     params:
         spades_outdir= os.path.join(out_spades_dir, '{strain}'),
         SPADES_OPT='--careful',
         SPADES_BIN='spades.py'
     conda: '../shared_envs_yaml/spades_3_10_env.yml'
-    script:'run_spades.py'
+#    script:'run_spades.py'
+    shell:
+        '''
+        spades.py \
+{params.SPADES_OPT} \
+--threads {threads} \
+--memory $( expr {resources.mem_mb} / 1000 ) \
+-o {params.spades_outdir} \
+-1 {input.READS[0]} -2 {input.READS[1]}
+        '''
 
 rule redirect_and_preprocess_reads:
     input: 
