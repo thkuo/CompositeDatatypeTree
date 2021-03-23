@@ -34,19 +34,6 @@ class ngs_workflow():
                       [self.target_f]))
 
 class tr_inf_workflow(ngs_workflow):
-    def collapse_tree(self, tr_f, out_tr_f):
-        br_cutoff= str(self.br_cutoff)
-        bs_cutoff= str(self.bs_cutoff)
-        outgroup= self.outgroup
-        import subprocess
-        import re
-        home_dir= os.path.dirname(os.path.realpath(__file__))
-        script_f= os.path.join(home_dir, 'collapse_br', 'collapse_tree.R' )
-        cmd= [script_f, '--i', tr_f, '--o', out_tr_f,
-                        '--br', br_cutoff, '--bs', bs_cutoff]
-        if re.search('\w', outgroup[0]):
-            cmd= cmd+['--og']+outgroup
-        subprocess.run(cmd)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
         super().run_workflow(cpu_num, just_dryrun)
 
@@ -64,8 +51,8 @@ class cd_tr(tr_inf_workflow):
         }
         target_f= str(proj.cd_tr_out)
         workdir= str(proj.project_dir)
-        self.br_cutoff= proj.br_cutoff
-        self.bs_cutoff= proj.bs_cutoff
+#        self.br_cutoff= proj.br_cutoff
+#        self.bs_cutoff= proj.bs_cutoff
         self.outgroup= proj.outgroup
         super().__init__(config, target_f,
             './conc_workflow/conc_tree.smk',
@@ -112,10 +99,10 @@ class col_tr(tr_inf_workflow):
         print('Function: collapsing the nucleotide tree using log-likelihood '
               'score\n...initiating')
         config={
-            'nuc_tr': proj.nuc_tr_out,
-            'nuc_aln': proj.nuc_aln,
+            'nuc_tr': str(proj.nuc_tr_out),
+            'nuc_aln': str(proj.nuc_aln),
             'raxml_model':str(proj.nuc_model),
-            'col_nuc_tr': proj.col_nuc_tr_out,
+            'col_nuc_tr': str(proj.col_nuc_tr_out),
             'cutoff_perc': proj.cutoff_perc
         }
         target_f=str(proj.col_nuc_tr_out)
@@ -136,8 +123,8 @@ class nuc_tr(tr_inf_workflow):
         }
         target_f=str(proj.nuc_tr_out)
         workdir=str(proj.project_dir)
-        self.br_cutoff= proj.br_cutoff
-        self.bs_cutoff= proj.bs_cutoff
+#        self.br_cutoff= proj.br_cutoff
+#        self.bs_cutoff= proj.bs_cutoff
         self.outgroup= proj.outgroup
         super().__init__(config, target_f,
             './nuc_workflow/nuc_tr.smk',
@@ -176,6 +163,8 @@ if __name__=='__main__':
             target_funcs.append(cd_tr(p))
         elif x == 'nuc_tr':
             target_funcs.append(nuc_tr(p))
+        elif x == 'col_tr':
+            target_funcs.append(col_tr(p))
         elif x in ['mapping', 'fast_mapping']:
             target_funcs.append(mapping(p, x))
         elif x == 'all':
@@ -205,9 +194,5 @@ if __name__=='__main__':
     target_funcs= determine_workflow(args.f, cd_proj)
     for target_func in target_funcs:
         target_func.run_workflow(cpu_num= args.cpu, just_dryrun= args.dryrun)
-        if (type(target_func) is nuc_tr) & (not args.dryrun):
-            target_func.collapse_tree(cd_proj.nuc_tr_out, cd_proj.col_nuc_tr_out)
-        elif (type(target_func) is cd_tr) & (not args.dryrun):
-            target_func.collapse_tree(cd_proj.cd_tr_out, cd_proj.col_cd_tr_out)
 
 

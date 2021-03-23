@@ -13,7 +13,7 @@ rule collapse_nuc_tr_with_psll_sums:
         rear_trs= '{result_dir}/psll/rear_trs.nwk'
     output:
         nuc_psll_sum_per_br='{result_dir}/psll/nuc_psllChangeSumPerBranch.tsv',
-        col_nuc_tr='{result_dir}/nuc_col_by_psll.nwk' 
+        col_nuc_tr='{result_dir}/col_nuc.nwk' 
     params:
         cutoff_perc= cutoff_perc
     threads: 16
