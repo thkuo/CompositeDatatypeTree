@@ -1,10 +1,9 @@
 library(phytools)
 library(phangorn)
 
-args<- list('in'= snakemake@input[['nuc_tr']], 'out'= snakemake@output[['rear_trs']])
-print(args)
-main_tr_f<- args[['in']]
+main_tr_f<- snakemake@input[['nuc_tr']]
+print(sprintf('input tree %s', main_tr_f))
 main_tr<- read.newick(main_tr_f) 
-out_f<- args[['out']]
+out_f<-snakemake@output[['rear_trs']]
 rear_trs<- nni(main_tr)
 write.tree(c(main_tr, rear_trs), out_f)
