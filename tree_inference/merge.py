@@ -24,6 +24,7 @@ class ngs_workflow():
         snakemake.snakemake(
             dryrun= just_dryrun,
             printshellcmds= True, 
+            restart_times=3,
             snakefile=self.determine_smk(),
             config= self.config_params,
             conda_prefix=self.determine_conda_env_dir(),
@@ -40,14 +41,14 @@ class tr_inf_workflow(ngs_workflow):
 #class cd_tr(ngs_workflow):
 class cd_tr(tr_inf_workflow):
     def __init__(self, proj):
-        print('Function: making gpa alignment\n...initiating')
+        print('Function: making composite datatype tree\n...initiating')
         config={
             'nuc_aln': str(proj.nuc_aln),
             'gpa_aln': str(proj.gpa_aln),
             'conc_aln': str(proj.conc_aln),
             'raxml_prtn': str(proj.raxml_prtn),
-            'col_constraint_tr': str(proj.col_nuc_tr_out),
-            'model': str(proj.cd_model)
+            'col_constraint_tr': str(proj.col_constraint_tr),
+            'raxml_model': str(proj.cd_model)
         }
         target_f= str(proj.cd_tr_out)
         workdir= str(proj.project_dir)
@@ -168,8 +169,8 @@ if __name__=='__main__':
         elif x in ['mapping', 'fast_mapping']:
             target_funcs.append(mapping(p, x))
         elif x == 'all':
-            target_funcs= [mapping(p), nuc_tr(p), denovo(p), gpa_aln(p),
-                           cd_tr(p)]
+            target_funcs= [mapping(p, 'mapping'), nuc_tr(p), col_tr(p), 
+                           denovo(p),  gpa_aln(p), cd_tr(p)]
         else:
             sys.exit('Unknown function')
         return(target_funcs)

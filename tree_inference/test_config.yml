@@ -1,7 +1,1 @@
-roary_out:
-    /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/seq2geno/seq2geno/denovo/roary/gene_presence_absence.csv
-br_cutoff: 5e-5
-bs_cutoff: 90
-multisample_vcf: 
-    /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim.v7/results.v5/mapping/merged_vcf/multisample.snp.vcf.gz
-outgroup: 22 15 47 46 48 103
+col_constraint_tr: /net/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/per-site_LogLikelihood/nuc_col_by_psll.nwk

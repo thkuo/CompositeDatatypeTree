@@ -42,8 +42,9 @@ strain= list(dna_reads.keys()))
         prot_tab=os.path.join('{roary_dir}', 'clustered_proteins')
     conda: '../shared_envs_yaml/perl5_22_env.yml'
     params:
-        check_add_perl_env_script= 'install_perl_mods.sh',
-        check_add_software_script= 'set_roary_env.sh',
+        check_add_perl_env_script= 'install_dependencies.sh',
+#        check_add_perl_env_script= 'install_perl_mods.sh',
+#        check_add_software_script= 'set_roary_env.sh',
         roary_bin= 'roary'
     threads: 16
     shell:
@@ -51,7 +52,7 @@ strain= list(dna_reads.keys()))
         set +u
         ROARY_HOME=$(dirname $(dirname $(which roary)))
         # required perl modules
-        {params.check_add_perl_env_script}
+        # $ROARY_HOME/{params.check_add_perl_env_script}
 
         export PATH=$ROARY_HOME/build/fasttree:\
 $ROARY_HOME/build/mcl-14-137/src/alien/oxygen/src:\
@@ -62,6 +63,9 @@ $ROARY_HOME/build/cd-hit-v4.6.6-2016-0711:\
 $ROARY_HOME/build/bedtools2/bin:\
 $ROARY_HOME/build/parallel-20160722/src:$PATH
         export PERL5LIB=$ROARY_HOME/lib:\
+$CONDA_PREFIX/lib/perl5/site_perl/5.22.0/x86_64-linux-thread-multi:\
+$CONDA_PREFIX/lib/perl5/5.22.0/:\
+$CONDA_PREFIX/lib/perl5/5.22.0/x86_64-linux-thread-multi/:\
 $ROARY_HOME/build/bedtools2/lib:$PERL5LIB
         which perl
         echo $PERL5LIB
@@ -79,16 +83,21 @@ rule create_gff:
     output: 
         os.path.join(out_prokka_dir, '{strain}', '{strain}.gff'), 
         os.path.join(out_prokka_dir, '{strain}', '{strain}.ffn')
+    params:
+        tbl2asn_bin= '/home/thkuo/bin/tbl2asn_25.8/tbl2asn'
     threads: 1
     conda: '../shared_envs_yaml/prokka_env.yml'
     shell:
         '''
 #        echo $PERL5LIB
+        set +u
+        export PATH=$( dirname {params.tbl2asn_bin} ):$PATH
         which prokka
         prokka --locustag {wildcards.strain} \
 --prefix  {wildcards.strain} \
 --force  --cpus {threads} --metagenome --compliant \
 --outdir prokka/{wildcards.strain} {input}
+        set -u
         '''
 
 rule spades_create_assembly:
