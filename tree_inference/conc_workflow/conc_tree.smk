@@ -107,7 +107,7 @@ rule compute_conc_tree:
 #        raxml_bin=raxml_bin,
         raxml_model= raxml_model,
         raxml_starting_num= 1
-    threads: max_core_n
+    threads: 16 
     conda:'/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/raxml_env.yml'
     shell:
         """

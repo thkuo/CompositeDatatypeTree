@@ -84,20 +84,23 @@ class CDTreeProject:
         args_dict= self.__dict__
         poss_user_files= ['multisample_vcf','roary_out' ]
         for k in [k for k in args_dict if k in config_dict]:
-            if isinstance(args_dict[k], PosixPath) & (k in poss_user_files):
+            if isinstance(args_dict[k], PosixPath):
                 print('{} --> {}'.format(args_dict[k], config_dict[k]))
                 args_dict[k]= Path(config_dict[k])
-#                d= os.path.dirname(str(args_dict[k]))
-#                if not os.path.isdir(d):
-#                    os.makedirs(d)
-#                try:
-#                    os.symlink(config_dict[k], args_dict[k])
-#                except FileExistsError as fe:
-#                    os
-            elif (isinstance(args_dict[k], PosixPath) & 
-                  (not k in poss_user_files)):
-                print('required filename {} cannot not be replaced with {}'.format(
-                    args_dict[k], config_dict[k]))
+#            if isinstance(args_dict[k], PosixPath) & (k in poss_user_files):
+#                print('{} --> {}'.format(args_dict[k], config_dict[k]))
+#                args_dict[k]= Path(config_dict[k])
+##                d= os.path.dirname(str(args_dict[k]))
+##                if not os.path.isdir(d):
+##                    os.makedirs(d)
+##                try:
+##                    os.symlink(config_dict[k], args_dict[k])
+##                except FileExistsError as fe:
+##                    os
+#            elif (isinstance(args_dict[k], PosixPath) & 
+#                  (not k in poss_user_files)):
+#                print('required filename {} cannot not be replaced with {}'.format(
+#                    args_dict[k], config_dict[k]))
             elif isinstance(args_dict[k], str):
                 args_dict[k]= str(config_dict[k])
             elif isinstance(args_dict[k], list):
