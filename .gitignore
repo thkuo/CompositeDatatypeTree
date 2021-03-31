@@ -3,6 +3,5 @@
 .RData
 .Ruserdata
 results/
-*/nohup.out
-bin/*/nohup.out
+nohup.out
 R/TransPhylo

@@ -12,7 +12,8 @@ INTERGENIC_COOR_FILE="$5"
 CPU_NUM="$6"
 
 
-WHICH_TREE_HOME=/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/bin/re_simulate/which_tree
+#WHICH_TREE_HOME=/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/bin/re_simulate/which_tree
+WHICH_TREE_HOME=$( realpath ../../which_tree )
 PATH=$WHICH_TREE_HOME:$PATH
 
 #Using dawg for intergenic regions, with parameter file intergenic.dawg
