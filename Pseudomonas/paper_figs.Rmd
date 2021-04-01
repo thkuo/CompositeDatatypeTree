@@ -14,9 +14,8 @@ library(RColorBrewer)
 library(reshape2)
 library(lemon)
 source('load_biological_data.R')
-source('load_mlst.R')
-tr_files<- list('nuc'= '~/bifo-sgi/TreePaper/Paeru.v4/results.4/raxml/RAxML_bipartitions.nuc.bs', 
-                'cd75'= '~/personal-backup/Paeru.v4/results.5//cd_cutoff75/RAxML_bipartitions.conc.bs')
+tr_files<- list('nuc'= './nuc_tr.nwk', 
+                'cd75'= './cd_tr.nwk')
 #' ensure the filepaths
 all(sapply(tr_files, function(f) file.exists(f)))
 #' load the trees
