@@ -1,0 +1,176 @@
+---
+title: "klebsiella"
+output: html_document
+---
+```{R}
+library(ggpubr)
+library(phytools)
+library(phangorn)
+library(fastbaps)
+library(ggplot2)
+library(ggtree)
+library(ggpubr)
+library(wesanderson)
+source('plotTTree3.R')
+source('cophenetic_tools.R')
+# load the trees
+tr_files<- list(nuc='../results/nuc_tr.nwk',
+                cd= '../results/cd_tr.nwk')
+trs<- lapply(tr_files, function(f) read.newick(f))
+bio_f<- './SuppTab1.csv'
+bio_df<- read.table(bio_f, sep= ',', header= T, stringsAsFactors = F)
+rownames(bio_df)<- bio_df$Sequencing.Short.NO.
+bio_df$MLST<- factor(bio_df$MLST, 
+                     levels = unique(bio_df$MLST)[order(-table(bio_df$MLST)[unique(bio_df$MLST)])])
+for (feat in c('MLST', 'Campus', 'Ward', 'Ward.Category', 'Department.category', 'Main.Diseases')){
+    print(feat)
+    bio_df[, feat]<- factor(bio_df[, feat])
+}
+
+```
+Determine the population structure
+```{R}
+rooted_trs<- lapply(
+    trs, function(t) 
+    ape::root.phylo(t, outgroup=outgroup, resolve.root = T))
+# is.rooted(tr)
+aln_f<- '~/bifo-sgi/TreePaper/MRKP.v2/results.5/alignment/nuc.var.aln'
+sparse.data <- import_fasta_sparse_nt(aln_f)
+best.partition<- best_baps_partition(sparse.data, rooted_trs$nuc)
+strains<- names(best.partition)
+best.partition<- as.character(best.partition)
+names(best.partition)<- strains
+plot.df <- data.frame(id = rooted_trs$nuc$tip.label, 
+                      fastbaps = as.character(best.partition), 
+                      stringsAsFactors = FALSE)
+gg<- ggtree(tr)+
+    geom_tiplab()+
+    geom_tippoint(aes(color= bio_df[label, 'Lineage']))+
+    scale_color_brewer(palette = 'Dark2', name= 'pre-defined lineages')+
+    geom_treescale(x= 0, offset= -5)
+f2 <- facet_plot(gg, panel = "fastbaps", data = plot.df, geom = geom_tile, 
+                 aes(x= 1, fill = fastbaps),color= 'white')+
+    scale_fill_brewer(palette = 'Set2')+
+    xlim_tree(xlim = c(0,1))
+f2
+
+# check whether the groups are monophyletic in both the two trees
+sapply(rooted_trs, function(t)
+    sapply(unique(best.partition), 
+           function(g) ape::is.monophyletic(t, tips= names(best.partition[best.partition == g]))))
+count_reproduced<- function(t, mm){
+    br.cls<- c()
+    for (n in t$edge[, 2]){
+        rep<- F
+        if (n %in% mm[, 1]){
+            if (! is.na(mm[match(n, mm[, 1]), 2])){
+                rep<- T
+            }
+        }else if(n<= Ntip(t)){
+            rep<- T
+        }
+        br.cls<- c(br.cls, rep)
+    }   
+    br.cls
+}
+
+tr1<- compute.brlen(rooted_trs$nuc, 1)
+tr2<- compute.brlen(rooted_trs$cd, 1)
+assoc_mat<- matrix(rep(tr1$tip.label, 2), ncol=2)
+cophylo_obj<-cophylo(tr1 = tr1, 
+                 tr2= tr2,
+                 rotate= T,
+                 assoc_mat= assoc_mat)
+cophylo_obj$assoc<- assoc_mat
+cophylo_obj$trees[[1]]<- rotateNodes(cophylo_obj$trees[[1]], nodes = c(83, 85, 114))
+cophylo_obj$trees[[2]]<- rotateNodes(cophylo_obj$trees[[2]], nodes = c(83, 107, 114))
+
+#' branch reproducibility info
+match_mat1<- matchNodes(cophylo_obj$trees[[1]], cophylo_obj$trees[[2]])
+match_mat2<- matchNodes(cophylo_obj$trees[[2]], cophylo_obj$trees[[1]])
+br.clses<- list(left=count_reproduced(cophylo_obj$trees[[1]], match_mat1), 
+                right= count_reproduced(cophylo_obj$trees[[2]], match_mat2))
+br_col<- lapply(br.clses, function(cls) ifelse(cls, 'black', 'red'))
+
+#' baps info
+all_partitions<- unique(best.partition)
+target_partitions<- names(which(table(best.partition) > 10))
+all_partitions<- all_partitions[order(all_partitions %in% as.character(target_partitions))]
+partitions_col<- c(rep('grey40', sum(! all_partitions %in% target_partitions)), 
+                   wes_palette("FantasticFox1")[1:sum(all_partitions %in% target_partitions)])
+names(partitions_col)<- all_partitions
+link_col<- as.character(partitions_col[best.partition[assoc_mat[, 1]]])
+# link_col[length(link_col)]<- 'red'
+# link_col<- sapply(link_col, function(c)make.transparent(c))
+
+# pdf('cophylo_nuc-vs_gpa_baps.pdf')
+plot(cophylo_obj, link.lty="solid", 
+     fsize= .6,
+     link.col= link_col, 
+     edge.col= br_col)
+```
+__For dating the tree and reconstructing the transmission trees, please refer to [...]__
+
+Visualize the transmission trees
+```{R}
+## input
+transmission_tr_files<- list(
+    'cd_1(1)'= '~/bifo-sgi/TreePaper/MRKP.v2/results.5/transmission_ana/cd.15/clade-wise/1/v7/transphylo/cd_ctree.Rds', 
+    'cd_3(2)'= '~/bifo-sgi/TreePaper/MRKP.v2/results.5/transmission_ana/cd.15/clade-wise/3/v7/transphylo/cd_ctree.Rds', 
+    'cd_4(3)'= '~/bifo-sgi/TreePaper/MRKP.v2/results.5/transmission_ana/cd.15/clade-wise/4/v7/transphylo/cd_ctree.Rds', 
+    'nuc_1(1)'= '~/bifo-sgi/TreePaper/MRKP.v2/results.5/transmission_ana/nuc.15/clade-wise/1/v3/transphylo/nuc_ctree.Rds',
+    'nuc_3(2)'= '~/bifo-sgi/TreePaper/MRKP.v2/results.5/transmission_ana/nuc.15/clade-wise/3/v3/transphylo/nuc_ctree.Rds',
+    'nuc_4(3)'= '~/bifo-sgi/TreePaper/MRKP.v2/results.5/transmission_ana/nuc.15/clade-wise/4/v3/transphylo/nuc_ctree.Rds')
+output_files<- sapply(names(transmission_tr_files), function(s) sprintf('%s_v2.pdf', s))
+plot_time_interval<- c(2011, 2017)
+for (s in names(transmission_tr_files)){
+    print(s)
+    transmission_tr_f<- transmission_tr_files[[s]]
+    out_pdf<- output_files[s]
+    ## read the tree
+    transmission_tr<- readRDS(transmission_tr_f)
+    
+    plotTTree3(transmission_tr, hidden_counts.col = hidden_counts.col, plot_time_interval = plot_time_interval, showMissingLinks = 1)
+}
+
+```
+Compute the cophenetic distances for campuses
+```{R}
+#' dist1: nuc distance
+#' dist2: cd distance
+traits<- bio_df$Campus
+names(traits)<- rownames(bio_df)
+cophe_one_df<- compute_cophe_df(trs = trs, traits = traits)
+sub_cophe_one_df<- cophe_one_df[cophe_one_df$dist1 != cophe_one_df$dist2, ]
+sig_for_all_loc_pairs(sub_cophe_one_df)
+cl_p1<- show_density(sub_cophe_one_df, dist1_name = 'distance\n(nucleotide)', dist2_name = 'distance\n(composite datatype)')+ 
+    facet_grid(loc2~loc1)
+cl_p1
+
+sub_cophe_one_df$loc_pair<- factor(sub_cophe_one_df$loc_pair, levels=  c('A-A', 'B-B', 'A-B', 'A-C', 'B-C'))
+cl_p2<- show_pair_counts(sub_cophe_one_df, loc_pairs = c('A-A', 'B-B', 'A-B', 'A-C', 'B-C') )
+cl_p3<- show_violin(sub_cophe_one_df)
+ggarrange(plotlist = list(violin= cl_p3, bar= cl_p2), ncol = 1, align= 'v' )
+
+```
+Compute the cophenetic distances for campuses
+```{R}
+#' dist1: nuc distance
+#' dist2: cd distance
+traits<- bio_df$Patient.Outcome
+names(traits)<- rownames(bio_df)
+cophe_one_df<- compute_cophe_df(trs = trs, traits = traits)
+sub_cophe_one_df<- cophe_one_df[cophe_one_df$dist1 != cophe_one_df$dist2, ]
+sig_for_all_loc_pairs(sub_cophe_one_df)
+cl_p1<- show_density(sub_cophe_one_df, dist1_name = 'distance\n(nucleotide)', dist2_name = 'distance\n(composite datatype)')+ 
+    facet_grid(loc2~loc1)
+cl_p1
+
+sub_cophe_one_df$loc_pair<- factor(sub_cophe_one_df$loc_pair, levels=  c("Die-Die", "Abandon treatment-Abandon treatment", "Cured-Cured", 
+                                                                         "Abandon treatment-Die" , "Abandon treatment-Cured", "Cured-Die"))
+cl_p2<- show_pair_counts(sub_cophe_one_df, loc_pairs =c("Die-Die", "Abandon treatment-Abandon treatment", "Cured-Cured", 
+                                                                         "Abandon treatment-Die" , "Abandon treatment-Cured", "Cured-Die"))
+cl_p3<- show_violin(sub_cophe_one_df)
+ggarrange(plotlist = list(violin= cl_p3, bar= cl_p2), ncol = 1, align= 'v' )
+
+```

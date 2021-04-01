@@ -1,0 +1,3 @@
+The directory of each folder contains the beast2 input xml file (beast.xml), dated output (nuc.d_tree.nex), and the MCMC outcomes (nuc_ttree.Rds) and consensus tree (nuc_ctree.Rds) of transmission reconstruction.
+
+
