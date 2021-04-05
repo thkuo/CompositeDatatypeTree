@@ -1,15 +1,39 @@
 # Improved tree inference and transmission reconstruction from composite datatype representations of microbial genomes
 
 This repository contains the methodology of the phylogenetic tree research:
-- `tree_inference` includes workflows of the composite datatype method 
-- `transmission_ana` includes the methods of transmission analysis
-- `transmission_simulator` includes the scripts for simulating the phylogenetic
-  tree, genomes, and gene presence or absence patterns
-- `Benchmarking` includes the commands and parameters for the simulated dataset used in this research
-- `Klebsiella` includes the clustering effect analysis the input parameters for transmission analyses, such as
-  BEAST2 xml files
-- `Pseudomonas` includes the clustering effect analysis 
-- `envs` includes yaml files for conda environments
+- `transmission_simulator`: the scripts for simulating the phylogenetic tree, genomes, and gene presence or absence patterns in the scenario of outbreak
+- `tree_inference`: workflows of the composite datatype method 
+- `envs/`: yaml files for conda environments
+- `Benchmarking/`: the parameters for simulating _Streptococcus pneumoniae_ dataset and the results
+  - `bin/`:
+    - `cutoffs/`: methods and results from the iteration with different cutoffs of log-lieklihood scores
+    - `simulate/`: commands for simulating the dataset 
+  - `config`: parameters and input settings for the simulation
+  - `data/`:
+    - `outbreak_sim/`: the tree simulation results using TransPhylo
+    - `pseudo_gpa/`: the simulation result of gene presence or absence 
+  - `results/`
+    - `nuc_tr.nwk`: the nucleotide tree
+    - `ll_cutoff/`: the composite datatype trees with different cutoffs of
+      log-likelihodd scores
+- `Pseudomonas/`: the results and visualizing scripts for the _Pseudomonas aeruginosa_ dataset
+    - `paper_figs.Rmd`: the visualizations with R
+    - `nuc.var.aln`: the nucleotide alignment
+    - `gpa.var.aln`: the gene presence/absence alignment
+    - `nuc_tr.nwk`: the nucleotide tree
+    - `cd_tr.nwk`: the composite datatype tree
+- `Klebsiella`: methods and results of the _Klebsiella pneumoniae_ dataset
+  - `results/`: 
+    - `nuc.var.aln`: the nucleotide alignment
+    - `gpa.var.aln`: the gene presence/absence alignment
+    - `nuc_tr.nwk`: the nucleotide tree
+    - `cd_tr.nwk`: the composite datatype tree
+    - `transmission_ana/`: the BEAST2 and TransPhylo results
+    - `nuc_permutation/`: the results from nucleotide replacement test
+  - `bin/`:
+    - `paper_figs.Rmd`: the visualizations with R
+    - `transmission_ana/`: the BEAST2 and TransPhylo methods
+    - `nuc_permutation/`: the methods of nucleotide replacement test
 
 # Prerequisites
     - [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) (used version: 4.8.4)

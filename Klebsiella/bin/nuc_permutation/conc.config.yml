@@ -1,0 +1,11 @@
+# use absolute paths in case of filename errors
+nuc_tr: ../../results/nuc_tr.nwk
+nuc_aln: ../../results/nuc.var.aln
+gpa_aln: ../../results/gpa.var.aln
+raxml_bin: 
+  'raxmlHPC-PTHREADS'
+raxml_model: 
+   ASC_BINGAMMA --asc-corr lewis
+max_cores: 5
+tr_num:
+  100

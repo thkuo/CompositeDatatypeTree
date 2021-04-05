@@ -1,0 +1,8 @@
+neg=100/365
+off.r=2.5
+w.shape=10
+w.scale=0.01
+pi=0.25
+dateT= 2020
+dateStartOutbreak=2019
+nSampled = 200
