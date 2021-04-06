@@ -75,16 +75,15 @@ The two parameters `nuc_subs_model` (default: GTR) and `rate_model` (default: GA
 1. arguments
 ```
 usage: cdtree [-h] [--config CONFIG_F] [--cpu CPU] [--dry]
-              project_dir list_f ref {mapping,nuc_tr,cd_tr,gpa,denovo,all}
-
-Tree inference using composite datatype of microbial representations
+              project_dir list_f ref
+              {mapping,fast_mapping,nuc_tr,col_tr,denovo,gpa,cd_tr,all}
 
 positional arguments:
   project_dir           the directory for project
-  list_f                the list of sequencing reads
-  ref                   the reference genome for mapping sequencing reads
-  {mapping,nuc_tr,cd_tr,gpa,denovo,all}
-                        the function to launch
+  list_f                the list of paired-end DNA sequencing reads
+  ref                   the reference genome for read mapping
+  {mapping,fast_mapping,nuc_tr,col_tr,denovo,gpa,cd_tr,all}
+                        the workflow to launch
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -112,7 +111,7 @@ procedures.
 - CONFIG_F
 
 An .yaml file where the customized parameters are listed. For more details about customization,
-please refer to the above section. 
+please refer to `example_config.yml`
 
 2. examples
 

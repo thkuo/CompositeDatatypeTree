@@ -8,3 +8,4 @@ __pycache__/
 .Rhistory
 shared_envs/
 nohup.out
+test*

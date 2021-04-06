@@ -1,0 +1,22 @@
+#adaptor: # the adaptor to the reads
+#new_reads_dir: # reads directory for redirection
+#multisample_vcf: # vcf file of the variant calling result
+nuc_aln:
+  /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/alignment/nuc.var.aln
+## the models for nucleotide or gene presence/absence data
+## visit RAxML manul for more details
+#nuc_model: 'GTRCAT -V' 
+#nuc_subs_model: 'GTR'
+#rate_model: 'CAT -V'
+#nuc_model: 'GTRGAMMA'
+## directories for the intermediate data from the de novo workflow
+#prokka_dir:
+#roary_dir:
+#spades_dir:
+gpa_aln:
+  /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/gpa/gpa.var.aln
+## composite datatype inference
+#conc_aln:
+#raxml_prtn:
+#col_constraint_tr:# the constraint tree file 
+#cd_model:

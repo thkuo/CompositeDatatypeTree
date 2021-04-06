@@ -39,9 +39,9 @@ class CDTreeArgParser:
         parser.add_argument('project_dir', type=str, 
             help='the directory for project')
         parser.add_argument('list_f', type=str, 
-            help='the list of sequencing reads')
+            help='the list of paired-end DNA sequencing reads')
         parser.add_argument('ref', type=str, 
-            help='the reference genome for mapping sequencing reads')
+            help='the reference genome for read mapping')
         parser.add_argument('f', type=str,
             help='the workflow to launch',
             choices=['mapping', 'fast_mapping', 'nuc_tr', 'col_tr', 'denovo', 'gpa', 'cd_tr', 'all'])

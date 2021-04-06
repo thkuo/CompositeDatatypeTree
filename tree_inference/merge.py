@@ -85,7 +85,7 @@ class denovo(ngs_workflow):
             'adaptor': str(proj.adaptor),
             'new_reads_dir': str(proj.new_reads_dir),
             'out_prokka_dir': str(proj.prokka_dir),
-            'out_roary_dir': str(proj.roary_dir),
+            'out_roary_dir': str(proj.roary_out),
             'out_spades_dir':str(proj.spades_dir)
         }
         target_f= str(proj.roary_out)
