@@ -13,7 +13,7 @@ parser <- ArgumentParser()
 parser$add_argument("-v", "--verbose", action="store_true", default=TRUE,
     help="Print extra output [default]")
 parser$add_argument("-q", "--quietly", action="store_false",
-    dest="verbose", help="Print little output")
+    dest="verbose")
 parser$add_argument("-s", "--simulation_parameters", dest= 'yaml', nargs= 1,
     help="yaml file describing parameters for simulation using TransPhylo")
 parser$add_argument("-r", "--substitution_rate", dest= 'rate', nargs= 1,
