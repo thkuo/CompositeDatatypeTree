@@ -1,0 +1,233 @@
+---
+title: "Pseudomonas"
+output: html_document
+---
+```{R}
+library(ggpubr)
+library(ggplot2)
+library(ggtree)
+library(phytools)
+library(pheatmap)
+library(viridis)
+library(entropy)
+library(RColorBrewer)
+library(reshape2)
+library(lemon)
+source('load_biological_data.R')
+tr_files<- list('nuc'= '../results/nuc_tr.nwk', 
+                'cd75'= '../results/cd_tr.nwk')
+
+#' ensure the filepaths
+all(sapply(tr_files, function(f) file.exists(f)))
+#' load the trees
+trs<- lapply(tr_files, function(f) read.newick(f))
+outgroup<- c('CH4433')
+trs<- lapply(trs, function(t) root(t, outgroup = outgroup, resolve.root = T))
+#' load the traits (locations)
+bio_df<- load_biological_data()
+bio_list<- as.list(bio_df)
+for (n in 1:length(bio_list)){
+    names(bio_list[[n]])<- rownames(bio_df)
+}
+traits<- bio_df[trs[['nuc']]$tip.label, 'Origin']
+names(traits)<- trs[['nuc']]$tip.label
+traits<- factor(traits, levels= c('Charité Berlin', 'University hospital Frankfurt', 'Hannover Medical School'))
+
+```
+Count the node depths
+```{R}
+plot_df<- rbind(
+    data.frame(depth= node.depth.edgelength(trs$nuc), dt= 'nuc'), 
+    data.frame(depth= node.depth.edgelength(trs$cd75), dt= 'cd'))
+ggplot(plot_df)+
+    geom_histogram(data= subset(plot_df, dt=='nuc'), aes(x= depth, fill= dt), alpha= .3, boundary= 0)+
+    geom_histogram(data= subset(plot_df, dt=='cd'), aes(x= depth, fill= dt), alpha= .3, boundary= 0)+
+    scale_fill_manual(values = c('yellowgreen', 'steelblue3'), name= 'tree type')+
+    ylab('# nodes')+
+    theme_classic()
+```
+Count the entropy scores
+```{R}
+count_br_entropies<- function(t, traits){
+    if (class(traits) != 'factor'){
+        print('traits must be factor')
+        return(NA)
+    }
+    composition_m<- t(sapply(t$edge[t$edge[,2]>Ntip(t), 2], 
+                             function(n) table(traits[extract.clade(t, node = n)$tip.label]) ))
+    entropies<- apply(composition_m, 1, function(r) entropy(r))   
+    entropies_df<- data.frame(node.ix=as.character(t$edge[t$edge[,2]>Ntip(t), 2]), entropy= entropies, stringsAsFactors = F)
+    return(entropies_df)
+}
+entropy_dfs<- lapply(trs, function(t) count_br_entropies(t, traits))
+tr.name1<- 'cd75'
+tr.name2<- 'nuc'
+# find unique branches in the cd tree
+cd_match_mat<- matchNodes(trs[[tr.name1]], trs[[tr.name2]], method="descendants" )
+cd_new_ixs<- cd_match_mat[is.na(cd_match_mat[, 2]), 1]
+ggtree(trs[[tr.name1]])+
+    geom_tippoint(aes(color= traits[label]), size= 1, alpha= .6)+
+    geom_nodepoint(aes(subset= node %in% cd_new_ixs), color= 'red', size= 2, shape= 18)+
+    scale_color_manual(values= c('Charité Berlin'= 'darkgoldenrod2',
+                                 'University hospital Frankfurt'= 'forestgreen',
+                                 'Hannover Medical School'='cyan'), name= 'hospital')+
+    ggtitle('cd tree')+
+    theme(legend.position= 'bottom')
+# find unique branches in the nucleotide tree
+nuc_match_mat<- matchNodes(trs[[tr.name2]], trs[[tr.name1]])
+nuc_new_ixs<- nuc_match_mat[is.na(nuc_match_mat[, 2]), 1]
+ggtree(trs[[tr.name2]])+
+    geom_tippoint(aes(color= traits[label]), size= 1, alpha= .6)+
+    geom_nodepoint(aes(subset= node %in% nuc_new_ixs), color= 'red', size= 2, shape= 18)+
+    scale_color_manual(values= c('Charité Berlin'= 'darkgoldenrod2',
+                                 'University hospital Frankfurt'= 'forestgreen',
+                                 'Hannover Medical School'='cyan'), name= 'hospital')+
+    ggtitle('nuc tree')+
+    theme(legend.position= 'bottom')
+# merge the data of those unique branches
+sub_cd_entropy_df<- entropy_dfs[[tr.name1]][match(cd_new_ixs, entropy_dfs[[tr.name1]]$node.ix), ]
+sub_cd_entropy_df$dt<- tr.name1
+sub_nuc_entropy_df<- entropy_dfs[[tr.name2]][match(nuc_new_ixs, entropy_dfs[[tr.name2]]$node.ix), ]
+sub_nuc_entropy_df$dt<- tr.name2
+plot_df<- rbind(sub_nuc_entropy_df, sub_cd_entropy_df)
+plot_df$size<- apply(plot_df, 1, function(r) Ntip(extract.clade(trs[[r['dt']]], node= as.numeric(r['node.ix']))))
+
+cols<- c('yellowgreen', 'dodgerblue4')
+names(cols)<- c(tr.name1, tr.name2)
+entropy.hist<-    ggplot(plot_df, aes(fill= dt))+
+    geom_histogram(data = plot_df[plot_df$dt == tr.name2,], aes(x= entropy, y= -..count..), fill= cols[tr.name2], closed= 'left', boundary= 0)+
+    geom_histogram(data = plot_df[plot_df$dt == tr.name1,], aes(x= entropy, y= ..count..), fill= cols[tr.name1], closed= 'left', boundary= 0 )+
+    scale_y_symmetric(name = '# branches', n.breaks = 10, labels = function(x) abs(x))+
+    geom_hline(yintercept = 0)+
+    theme_classic()
+entropy.scat<- ggplot(plot_df)+
+    geom_point(aes(y= size, x= entropy, color= dt), alpha= .7)+
+    scale_color_manual(values=cols, name= 'tree type', breaks = c(tr.name2, tr.name1))+
+    ylab('clade size')+
+    theme_classic()
+ggarrange(plotlist = list(size= entropy.scat,hist= entropy.hist),align = 'v', 
+                      ncol= 1, legend= 'bottom', common.legend = T)
+```
+
+Count the cophenetic distances
+```{R}
+norm_tr<- function(tr){
+    new_br<- tr$edge.length
+    new_br<- new_br/sum(new_br)
+    new_tr<- compute.brlen(tr, new_br)
+    return(new_tr)
+}
+mat2df<- function(m){
+    df<- melt(m, stringAsFactor= F)
+    df[, 1]<- as.character(df[, 1])
+    df[, 2]<- as.character(df[, 2])
+    df[df[, 1] > df[, 2], ]
+}
+conc_locs<- function(locs){
+    ordered_locs<- locs[order(locs)]
+    paste0(ordered_locs, collapse = '-')
+}
+#' cophenetic distances (number of edges between tips)
+cophe_mats<- lapply(trs, function(t)cophenetic.phylo(compute.brlen(t, 1)))
+cophe_dfs<- lapply(cophe_mats, function(m) mat2df(m))
+cophe_one_df<- merge(cophe_dfs$nuc, cophe_dfs$cd75, by=c('Var1', 'Var2')) 
+colnames(cophe_one_df)<- c('sample1', 'sample2', 'nuc_dist', 'cd75_dist')
+cophe_one_df$loc1<-  as.character(traits[cophe_one_df$sample1])
+cophe_one_df$loc2<-  as.character(traits[cophe_one_df$sample2])
+cophe_one_df$loc_pair<- apply(cophe_one_df, 1, function(r) conc_locs(c(r['loc1'], r['loc2'])))
+
+# significance of change of cophenetic distances
+determine_sig<- function(count_df, h1, h2, alternative= NA){
+    print(sprintf('%s-%s', h1, h2))
+    if (is.na(alternative)){
+        alternative<-'less'
+        if (h1 == h2){
+            alternative= 'greater'
+        }    
+    }
+    
+    sig<- Inf 
+    if (nrow(count_df[(count_df$loc1 == h1) & (count_df$loc2 == h2), ]) > 0){
+        t_out<- t.test(count_df[(count_df$loc1 == h1) & (count_df$loc2 == h2), 1], 
+                       count_df[(count_df$loc1 == h1) & (count_df$loc2 == h2), 2], 
+                       paired = TRUE, alternative = alternative)      
+        sig<- t_out$p.value
+    }
+    sig
+}
+
+loc1s<- c()
+loc2s<- c()
+sigs<- c()
+alternative_hs<- c()
+pairs_num<- c()
+sub_cophe_one_df<- data.frame()
+for (h1 in unique(traits)){
+    for (h2 in unique(traits)){
+        # for each possible pair of locations
+        loc_filter<- (cophe_one_df$loc1 == h1) & (cophe_one_df$loc2 == h2)
+        if (sum(loc_filter) == 0){
+            next
+        }
+        count_df<- cophe_one_df[loc_filter, 
+                                c('nuc_dist', 'cd75_dist', 'loc1', 'loc2')]
+        sub_cophe_one_df<- rbind(sub_cophe_one_df, 
+                                 cophe_one_df[loc_filter & 
+                                                  (cophe_one_df$nuc_dist != cophe_one_df$cd75_dist),] )
+        
+        print(table(count_df$loc1, count_df$loc2))
+        loc1s<- c(loc1s, h1)
+        loc2s<- c(loc2s, h2)
+        sigs<- c(sigs, determine_sig(count_df, h1, h2))
+        pairs_num<- c(pairs_num, nrow(count_df))
+        print(determine_sig(count_df, h1, h2))
+        alternative_hs<-c(alternative_hs, ifelse(h1==h2, 'greater', 'less'))
+    }
+}
+
+sub_cophe_one_df$loc_pair<-factor(sub_cophe_one_df$loc_pair, 
+                                  levels= c('Charité Berlin-Charité Berlin', 
+                                            'University hospital Frankfurt-University hospital Frankfurt',
+                                            'Hannover Medical School-Hannover Medical School',
+                                            'Charité Berlin-University hospital Frankfurt',
+                                            'Charité Berlin-Hannover Medical School',
+                                            'Hannover Medical School-University hospital Frankfurt'))
+ggplot(sub_cophe_one_df, aes(x= loc_pair))+
+    geom_violin(aes(y= cd75_dist-nuc_dist, fill= loc1==loc2))+
+    theme_classic()+
+    ylab('distance difference (cd - nuc')+
+    theme(axis.text.x = element_text(angle = 60, hjust = 1))
+
+# count the percentages for each group
+change_cats<- ifelse(sub_cophe_one_df$cd75_dist > sub_cophe_one_df$nuc_dist, 'increased', 'decreased')
+sub_cophe_one_stat_df<- dcast(
+    as.data.frame(
+        table(change_cats, sub_cophe_one_df$loc_pair)), Var2~change_cats)
+rownames(sub_cophe_one_stat_df)<- sub_cophe_one_stat_df[, 1]
+sub_cophe_one_stat_df[, 1]<- NULL
+sub_cophe_one_perc_df<- sub_cophe_one_stat_df/rowSums(sub_cophe_one_stat_df) * 100
+colnames(sub_cophe_one_perc_df)<- colnames(sub_cophe_one_stat_df)
+
+sub_cophe_one_stat_df$hospitals<- rownames(sub_cophe_one_stat_df)
+sub_cophe_one_perc_df$hospitals<- rownames(sub_cophe_one_perc_df)
+sub_cophe_one_stat_long<- melt(sub_cophe_one_stat_df)
+sub_cophe_one_stat_long<- sub_cophe_one_stat_long[order(sub_cophe_one_stat_long$hospitals, sub_cophe_one_stat_long$variable), ]
+sub_cophe_one_perc_long<- melt(sub_cophe_one_perc_df)
+sub_cophe_one_perc_long<- sub_cophe_one_perc_long[order(sub_cophe_one_perc_long$hospitals, sub_cophe_one_perc_long$variable), ]
+
+plot_df<- cbind(sub_cophe_one_stat_long, sub_cophe_one_perc_long$value)
+plot_df$hospitals<- factor(plot_df$hospitals, levels= c('Charité Berlin-Charité Berlin', 
+                              'University hospital Frankfurt-University hospital Frankfurt',
+                              'Hannover Medical School-Hannover Medical School',
+                              'Charité Berlin-Hannover Medical School',
+                              'Charité Berlin-University hospital Frankfurt',
+                              'Hannover Medical School-University hospital Frankfurt'))
+colnames(plot_df)<- c('hospitals', 'change', 'count', 'percentage')
+ggplot(plot_df, aes(x= hospitals, y= percentage,fill= change))+
+    geom_bar(stat="identity")+
+    geom_text(aes(label=count, color= change), position = position_stack(vjust= .5))+
+    scale_fill_manual(values=c('decreased'='yellowgreen',  'increased'='dodgerblue4'))+
+    scale_color_manual(values= c('decreased'= 'black', 'increased'= 'grey'))+
+    theme_classic()+
+    theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```

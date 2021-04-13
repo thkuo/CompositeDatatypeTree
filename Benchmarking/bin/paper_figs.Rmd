@@ -1,0 +1,87 @@
+---
+title: "Simulated dataset"
+output: html_document
+---
+The frequency of simulated gene presence state
+```{R}
+library(phangorn)
+library(seqinr)
+gpa_f<- '../data/pseudo_gpa/gpa.var.fa'
+gpa<- seqinr::read.alignment(file= gpa_f, format = 'fasta')
+gpa_mat<- sapply(gpa$seq, function(s) unlist(strsplit(unlist(s), split = '')))
+gpa_mat<- t(gpa_mat) # rows: strains
+
+gp_freq<- apply(gpa_mat,2, function(c) sum(c == '1'))
+hist(gp_freq, main = 'Frequency of simulated gene presence', 
+     nclass = 20,include.lowest = T,xlim = c(0, 200), 
+     xlab = 'number of strains')
+```
+
+Load the trees
+```{R}
+library(phytools)
+library(ape)
+library(reshape2)
+library(ggplot2)
+source('./cutoffs/tree_correctness.R')
+
+modify_tip_lab<- function(tr){
+    tr$tip.label<- sapply(tr$tip.label, function(x) sprintf('SE%s', x))
+    tr
+}
+
+cutoffs<- seq(from= .05, to= 1, by= .1)
+cutoffs<- c(cutoffs, 0.8, 0.7, 0.2, 0.3)
+## read trees
+tr_files<- list()
+ref_tr_f<- '../data/outbreak_sim/phyloFromPtree.nwk'
+ref_tr<- modify_tip_lab(read.newick(ref_tr_f))
+nuc_tr_f<- '../results/nuc_tr.nwk'
+nuc_tr<- modify_tip_lab(read.newick(nuc_tr_f))
+for (c in cutoffs){
+    col_nuc_tr_f<- sprintf('../results/ll_cutoff/%s/raxml_input/nuc_col.nwk', 
+                         as.character(c))
+    print(file.exists(col_nuc_tr_f))
+    cd_tr_f<- sprintf('../results/ll_cutoff/%s/RAxML_bestTree.conc',
+                    as.character(c))
+    print(file.exists(cd_tr_f))
+    tr_files[[as.character(c)]]<- list('col'= col_nuc_tr_f, 'cd'= cd_tr_f)
+    
+}
+trs<- lapply(tr_files, function(pair) list(col= modify_tip_lab(read.newick(pair$col)), 
+                                           cd= modify_tip_lab(read.newick(pair$cd))))
+# rooting
+outgroup<- c('SE22', 'SE15', 'SE47', 'SE46', 'SE48', 'SE103')
+nuc_tr<- root(midpoint.root(nuc_tr), outgroup = outgroup)
+trs<- lapply(trs, function(tr_set)
+    lapply(tr_set, function(t) root(t, outgroup = outgroup, resolve.root = T)))
+```
+Compute the topological difference
+```{R}
+col_rtr_correctness<- sapply(trs, function(pair) tree_correctness(target_tr = pair$col, ref = ref_tr))
+cd_rtr_correctness<- sapply(trs, function(pair) tree_correctness(target_tr = pair$cd, ref = ref_tr))
+r_baseline_correctness<- tree_correctness(nuc_tr, ref_tr)
+
+col_tr_correctness<- col_rtr_correctness
+cd_tr_correctness<- cd_rtr_correctness
+baseline_correctness<- r_baseline_correctness
+
+# visualize the results
+col_tr_correctness_df<- melt(col_tr_correctness)
+col_tr_correctness_df$tr.name<- 'col'
+cd_tr_correctness_df<- melt(cd_tr_correctness)
+cd_tr_correctness_df$tr.name<- 'cd'
+
+tr_correctness_df<- rbind(col_tr_correctness_df, cd_tr_correctness_df)
+colnames(tr_correctness_df)<- c('metric', 'cutoff', 'value', 'tree')
+tr_correctness_df$cutoff<- as.numeric(tr_correctness_df$cutoff)
+ggplot(tr_correctness_df[tr_correctness_df$metric %in% c('TP', 'precision', 'f1'), ])+
+    geom_hline(aes(yintercept = baseline_correctness[metric]), linetype= 2, color= 'grey50')+
+    geom_point(aes(x= cutoff, y= value, shape= tree), alpha= .7)+
+    geom_line(aes(x= cutoff, y= value, color= tree), alpha= .5)+
+    scale_color_discrete(name = "tree type", labels = c('composite datatype', 'collapsed nucleotide'))+
+    xlab('log-likelihood cutoff')+
+    guides(shape=FALSE)+
+    theme_classic()+
+    facet_grid(metric~., scale= 'free')
+```

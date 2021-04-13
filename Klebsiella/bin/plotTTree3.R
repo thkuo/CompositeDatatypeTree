@@ -1,6 +1,6 @@
 plotTTree3<- function (ttree, showLabels = TRUE, sample.col= NA, sample.pch= NA, 
                        legend.col=NA, legend.pch= NA, legend.label= NA, 
-                       plot_time_interval= NA,
+                       plot_time_interval= NA, plot.title= NA,
                        hidden_counts.col= c(), showMissingLinks = 0) 
 {
     nam = ttree$nam
@@ -95,6 +95,9 @@ plotTTree3<- function (ttree, showLabels = TRUE, sample.col= NA, sample.pch= NA,
                pch = legend.pch, 
                col = legend.col, 
                legend = legend.label)    
+    }
+    if (!is.na(plot.title)){
+        legend("topleft", plot.title, bty="n")
     }
     
 }

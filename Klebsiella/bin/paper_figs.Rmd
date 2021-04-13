@@ -12,6 +12,7 @@ library(ggtree)
 library(ggpubr)
 library(wesanderson)
 library(viridis)
+library(ape)
 source('plotTTree3.R')
 source('cophenetic_tools.R')
 # load the trees
@@ -31,6 +32,15 @@ for (feat in c('MLST', 'Campus', 'Ward', 'Ward.Category', 'Department.category',
 ```
 Determine the population structure
 ```{R}
+#' determine the root
+nuc_dtr_f<- '../results/transmission_ana/nuc/full-tree/nuc.d_tree.nex'
+nuc_dtr<- read.nexus(nuc_dtr_f)
+ggtree(nuc_dtr)+geom_nodelab(aes(label= node))+geom_tiplab()
+#' find the first descent nodes
+first_descendent_ix<- phangorn::Children(nuc_dtr, Ntip(nuc_dtr)+1)
+# one of them is a tip, which can be the outgroup
+outgroup<- nuc_dtr$tip.label[26]
+
 rooted_trs<- lapply(
     trs, function(t) 
     ape::root.phylo(t, outgroup=outgroup, resolve.root = T))
@@ -44,7 +54,7 @@ names(best.partition)<- strains
 plot.df <- data.frame(id = rooted_trs$nuc$tip.label, 
                       fastbaps = as.character(best.partition), 
                       stringsAsFactors = FALSE)
-gg<- ggtree(tr)+
+gg<- ggtree(nuc_dtr)+
     geom_tiplab()+
     geom_tippoint(aes(color= bio_df[label, 'Lineage']))+
     scale_color_brewer(palette = 'Dark2', name= 'pre-defined lineages')+
@@ -110,7 +120,9 @@ plot(cophylo_obj, link.lty="solid",
      link.col= link_col, 
      edge.col= br_col)
 ```
-For dating the tree and reconstructing the transmission trees, please refer to ../bin/transmission_ana
+
+
+For dating the tree and reconstructing the transmission trees, please refer to bin/transmission_ana
 Visualize the transmission trees
 ```{R}
 ## input
@@ -130,10 +142,15 @@ for (s in names(transmission_tr_files)){
     ## read the tree
     transmission_tr<- readRDS(transmission_tr_f)
     
-    plotTTree3(transmission_tr, hidden_counts.col = hidden_counts.col, plot_time_interval = plot_time_interval, showMissingLinks = 1)
+    treetype<- gsub(pattern = '_.+', replacement = '', s)
+    clade<- gsub(pattern= '.+\\(([0-9])\\)', replacement = '\\1', s)
+    plottitle<- sprintf('tree type: %s\nclade: %s', treetype, clade)
+    plotTTree3(transmission_tr, plot.title = plottitle, 
+               plot_time_interval = plot_time_interval, showMissingLinks = 1)
 }
 
 ```
+
 Compute the cophenetic distances for campuses
 ```{R}
 #' dist1: nuc distance
@@ -153,6 +170,7 @@ cl_p3<- show_violin(sub_cophe_one_df)
 ggarrange(plotlist = list(violin= cl_p3, bar= cl_p2), ncol = 1, align= 'v' )
 
 ```
+
 Compute the cophenetic distances for campuses
 ```{R}
 #' dist1: nuc distance
@@ -179,7 +197,7 @@ The results of nucleotide replacement test
 perm_bs_tr_f<- '../results/nuc_rep_by_gpa/RAxML_bipartitions.gpa.bs'
 perm_bs_tr<- midpoint.root(read.newick(perm_bs_tr_f))
 ggtree(perm_bs_tr, aes(subset= !isTip, color= as.integer(label)))+
-    geom_treescale(width = 0.1, x=0)+
+    geom_treescale(width = 0.1, x=0, offset = -5)+
     scale_color_viridis(name= 'bootstrap')+
     theme(legend.position= 'bottom')
 ```
