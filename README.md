@@ -4,20 +4,39 @@
 Overview: 
 1. Contents
 2. Prerequisities and Installation
+3. Contact
 ---
 
 ### Contents
 
-This repository contains the methodology of the phylogenetic tree research. For
-an overview about the data of each application in this paper, please visit the
-`paper_figs.html` files. To apply the composite datatype inference to the other
-datasets, please visit `tree_inference/`.
+This repository contains the methodology of the phylogenetic tree research. For an overview about the data of each application in this paper, please visit the `bin/paper_figs.html` files. To apply the composite datatype inference to the other datasets, please visit `tree_inference/`.
 
     .
     ├── tree_inference # workflows of the composite datatype method 
     ├── transmission_simulator #the scripts for simulating the phylogenetic tree, genomes, and gene presence or absence patterns in the scenario of outbreak
     ├── envs/ # yaml files for conda environments
-    ├── Benchmarking/ # methods and results of simulating and analysing the Streptococcus pneumoniae dataset
+    ├── Pseudomonas/ # methods and results of the Pseudomonas aeruginosa dataset
+        ├── bin/
+            ├── paper_figs.html # the visualizations with R
+        ├── data/ # sampling locations
+        └── results/
+          ├── nuc.var.aln # the nucleotide alignment
+          ├── gpa.var.aln # the gene presence/absence alignment
+          ├── nuc_tr.nwk # the nucleotide tree
+          └── cd_tr.nwk # the composite datatype tree
+    ├── Klebsiella # methods and results of the Klebsiella pneumoniae dataset
+        ├── bin/
+            ├── paper_figs.html # the visualizations with R
+            ├── transmission_ana/ # the BEAST2 and TransPhylo methods
+            └── nuc_permutation/ # the methods of nucleotide replacement test
+        └── results/
+            ├── nuc.var.aln # the nucleotide alignment
+            ├── gpa.var.aln # the gene presence/absence alignment
+            ├── nuc_tr.nwk # the nucleotide tree
+            ├── cd_tr.nwk # the composite datatype tree
+            ├── transmission_ana/ # the BEAST2 and TransPhylo results
+            └── nuc_permutation/ # the results from nucleotide replacement test
+    └── Benchmarking/ # methods and results of simulating and analysing the Streptococcus pneumoniae dataset
         ├── bin/
             ├── paper_figs.html # the visualizations with R
             ├── cutoffs/ # methods and results from the iteration with different cutoffs of log-lieklihood scores
@@ -30,27 +49,6 @@ datasets, please visit `tree_inference/`.
             ├── nuc.var.aln # the nucleotide alignment
             ├── nuc_tr.nwk # the nucleotide tree
             └── ll_cutoff/ # the composite datatype trees with different cutoffs of log-likelihodd scores
-    ├── Pseudomonas/ # methods and results of the Pseudomonas aeruginosa dataset
-        ├── bin/
-            ├── paper_figs.html # the visualizations with R
-        ├── data/ # sampling locations
-        └── results/
-          ├── nuc.var.aln # the nucleotide alignment
-          ├── gpa.var.aln # the gene presence/absence alignment
-          ├── nuc_tr.nwk # the nucleotide tree
-          └── cd_tr.nwk # the composite datatype tree
-    └── Klebsiella # methods and results of the Klebsiella pneumoniae dataset
-        ├── bin/
-            ├── paper_figs.html # the visualizations with R
-            ├── transmission_ana/ # the BEAST2 and TransPhylo methods
-            └── nuc_permutation/ # the methods of nucleotide replacement test
-        └── results/
-            ├── nuc.var.aln # the nucleotide alignment
-            ├── gpa.var.aln # the gene presence/absence alignment
-            ├── nuc_tr.nwk # the nucleotide tree
-            ├── cd_tr.nwk # the composite datatype tree
-            ├── transmission_ana/ # the BEAST2 and TransPhylo results
-            └── nuc_permutation/ # the results from nucleotide replacement test
 
 ### Prerequisites and Installation
 
@@ -69,3 +67,7 @@ datasets, please visit `tree_inference/`.
 
 2. The general and conda-manageable dependencies could be installed using the yaml files in `envs/` ([tutorial](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
 The other process-specific dependencies will be automatically installed when launched for the first time.
+
+### Contact
+Author: Tzu-Hao Kuo 
+email: Tzu-Hao.Kuo@helmholtz-hzi.de

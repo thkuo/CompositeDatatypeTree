@@ -6,6 +6,7 @@ The frequency of simulated gene presence state
 ```{R}
 library(phangorn)
 library(seqinr)
+library(scales)
 gpa_f<- '../data/pseudo_gpa/gpa.var.fa'
 gpa<- seqinr::read.alignment(file= gpa_f, format = 'fasta')
 gpa_mat<- sapply(gpa$seq, function(s) unlist(strsplit(unlist(s), split = '')))
@@ -74,14 +75,15 @@ cd_tr_correctness_df$tr.name<- 'cd'
 
 tr_correctness_df<- rbind(col_tr_correctness_df, cd_tr_correctness_df)
 colnames(tr_correctness_df)<- c('metric', 'cutoff', 'value', 'tree')
-tr_correctness_df$cutoff<- as.numeric(tr_correctness_df$cutoff)
+tr_correctness_df$col.perc<- (1-tr_correctness_df$cutoff)*100
 ggplot(tr_correctness_df[tr_correctness_df$metric %in% c('TP', 'precision', 'f1'), ])+
+    geom_point(aes(x= col.perc, y= value, shape= tree), alpha= .7)+
+    geom_line(aes(x= col.perc, y= value, color= tree), alpha= .5)+
     geom_hline(aes(yintercept = baseline_correctness[metric]), linetype= 2, color= 'grey50')+
-    geom_point(aes(x= cutoff, y= value, shape= tree), alpha= .7)+
-    geom_line(aes(x= cutoff, y= value, color= tree), alpha= .5)+
-    scale_color_discrete(name = "tree type", labels = c('composite datatype', 'collapsed nucleotide'))+
-    xlab('log-likelihood cutoff')+
-    guides(shape=FALSE)+
+    xlab('log-likelihood cutoffs (collapsing percentage)')+
+    scale_color_manual(values= hue_pal()(2), name= 'tree type', breaks = c('cd', 'col'),
+                       labels= c('col'= 'collapsed nucleotide', 'cd'= 'composite datatype'))+
     theme_classic()+
+    guides(shape=FALSE)+
     facet_grid(metric~., scale= 'free')
 ```
