@@ -9,7 +9,7 @@ Overview:
 
 ### Contents
 
-This repository contains the methodology of the phylogenetic tree research. For an overview about the data of each application in this paper, please visit the `bin/paper_figs.html` files. To apply the composite datatype inference to the other datasets, please visit `tree_inference/`.
+This repository contains the methodology and results of this paper. To overview each application, please visit the `bin/paper_figs.html` files under `Pseudomonas/`, `Klebsiella/`, and `Benchmarking/`. To apply the composite datatype inference to other datasets, please visit `tree_inference/`.
 
     .
     ├── tree_inference # workflows of the composite datatype method 
@@ -24,7 +24,7 @@ This repository contains the methodology of the phylogenetic tree research. For 
           ├── gpa.var.aln # the gene presence/absence alignment
           ├── nuc_tr.nwk # the nucleotide tree
           └── cd_tr.nwk # the composite datatype tree
-    ├── Klebsiella # methods and results of the Klebsiella pneumoniae dataset
+    ├── Klebsiella/ # methods and results of the Klebsiella pneumoniae dataset
         ├── bin/
             ├── paper_figs.html # the visualizations with R
             ├── transmission_ana/ # the BEAST2 and TransPhylo methods
@@ -69,5 +69,4 @@ This repository contains the methodology of the phylogenetic tree research. For 
 The other process-specific dependencies will be automatically installed when launched for the first time.
 
 ### Contact
-Author: Tzu-Hao Kuo 
-email: Tzu-Hao.Kuo@helmholtz-hzi.de
+Tzu-Hao Kuo email: Tzu-Hao.Kuo@helmholtz-hzi.de
