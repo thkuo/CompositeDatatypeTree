@@ -20,3 +20,4 @@ gpa_aln:
 #raxml_prtn:
 #col_constraint_tr:# the constraint tree file 
 #cd_model:
+#cutoff_perc: # percentage of branches to collapse

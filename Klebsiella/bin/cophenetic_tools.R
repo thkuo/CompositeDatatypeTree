@@ -12,21 +12,16 @@ mat2df<- function(m, traits){
     df<- melt(m, stringAsFactor= F)
     df[, 1]<- as.character(df[, 1])
     df[, 2]<- as.character(df[, 2])
-    print(table(traits[df[, 2]]))
+    df<- df[df[, 1] > df[, 2], ]
     df<- df[order(traits[df[, 1]],traits[df[, 2]]), ]
-    # print(head(df))
-    x<- nrow(df)
-    # print(table(!duplicated(df[, c(1,2)])))
-    sample_pairs<- apply(df[, 1:2], 1, 
-          function(r) paste0(r[order(r)], collapse = '-'))
-    df<- df[!duplicated(sample_pairs, fromLast = F), ]
-    df<- df[df[, 1] != df[, 2],]
-    # print(nrow(df))
-    if(nrow(df) < x){
-        df   
-    }else{
-        stop()
+    for (n in 1:nrow(df)){
+        sample_pair<- c(df[n, 1], df[n, 2])
+        traits_pair<- c(traits[df[n, 1]], traits[df[n, 2]])
+        sample_pair<- sample_pair[order(traits_pair)]
+        df[n, 1]<-sample_pair[1]
+        df[n, 2]<-sample_pair[2]
     }
+    df
 }
 conc_locs<- function(locs){
     ordered_locs<- locs[order(locs)]
