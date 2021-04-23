@@ -37,7 +37,7 @@ rule compute_psll:
         raxml_wd= '{result_dir}/psll/raxml',
         raxml_model= raxml_model
     threads: 16
-    conda: '/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/shared_envs/raxml_env.yml'
+    conda: '../shared_envs_yaml/raxml_env.yml'
     shell:
         """
         export RAXML_BIN='raxmlHPC-PTHREADS'
