@@ -27,6 +27,7 @@ This repository contains the methodology and results of this paper. To overview 
     ├── Klebsiella/ # methods and results of the Klebsiella pneumoniae dataset
         ├── bin/
             ├── paper_figs.html # the visualizations with R
+            ├── ana_var/ # early analysis about the divergence among samples
             ├── transmission_ana/ # the BEAST2 and TransPhylo methods
             └── nuc_permutation/ # the methods of nucleotide replacement test
         └── results/
@@ -34,6 +35,7 @@ This repository contains the methodology and results of this paper. To overview 
             ├── gpa.var.aln # the gene presence/absence alignment
             ├── nuc_tr.nwk # the nucleotide tree
             ├── cd_tr.nwk # the composite datatype tree
+            ├── ana_var/ # early analysis about the divergence among samples
             ├── transmission_ana/ # the BEAST2 and TransPhylo results
             └── nuc_permutation/ # the results from nucleotide replacement test
     └── Benchmarking/ # methods and results of simulating and analysing the Streptococcus pneumoniae dataset
