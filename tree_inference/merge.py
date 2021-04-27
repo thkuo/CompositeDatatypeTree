@@ -109,7 +109,7 @@ class col_tr(tr_inf_workflow):
         target_f=str(proj.col_nuc_tr_out)
         workdir=str(proj.project_dir)
         super().__init__(config, target_f,
-            './per-site_LogLikelihood/compute_psll.smk',
+            './LogLikelihood/compute_ll.smk',
             workdir
                         )
 
