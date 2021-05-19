@@ -56,7 +56,7 @@ class CDTreeProject:
                                      'RAxML_bipartitions.nuc.bs'))
         ## collapsed nuc tree
         self.col_nuc_tr_out=Path(os.path.join(self.project_dir,
-                                              'per-site_LogLikelihood',
+                                              'LogLikelihood',
                                               'col_nuc.nwk'))
         self.cutoff_perc= 0.75
 

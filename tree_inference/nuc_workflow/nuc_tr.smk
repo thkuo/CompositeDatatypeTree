@@ -97,6 +97,7 @@ rule nuc_best_tree:
         one_big_var_aln= '{result_dir}/alignment/{suffix}.var.aln'
     output:
         nuc_best_tr='{result_dir}/raxml/RAxML_bestTree.{suffix}'
+    priority: 1
     params:
         tr_id='{suffix}',
         raxml_seed= '1',

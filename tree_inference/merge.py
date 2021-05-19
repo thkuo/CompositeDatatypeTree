@@ -4,6 +4,20 @@ Interface to each workflow
 '''
 import snakemake
 import os
+import logging 
+import pprint 
+import re 
+
+logger = logging.getLogger()
+logger.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    '%(asctime)s %(levelname)s: %(message)s',
+    datefmt='%m/%d/%Y %I:%M:%S %p')
+ch.setFormatter(formatter)
+logger.addHandler(ch)
+
 class ngs_workflow():
     def __init__(self, config_params, target_f, snakefile, workdir):
         self.config_params= config_params
@@ -20,11 +34,23 @@ class ngs_workflow():
             env_dir=os.environ['CDTREE_SHARED_ENV'] 
         return(env_dir)
     def run_workflow(self, cpu_num= 1, just_dryrun= True):
-        import re 
+        # ensure unlocked folder
+        snakemake.snakemake(
+            unlock= True, 
+            snakefile=self.determine_smk(),
+            config= self.config_params,
+            conda_prefix=self.determine_conda_env_dir(),
+            use_conda=True,
+            workdir=self.workdir,
+            cores=cpu_num,
+            targets= ([] if re.search('\w', self.target_f) is None else
+                      [self.target_f]))
+        # run the workflow
         snakemake.snakemake(
             dryrun= just_dryrun,
             printshellcmds= True, 
             restart_times=3,
+            force_incomplete=True,
             snakefile=self.determine_smk(),
             config= self.config_params,
             conda_prefix=self.determine_conda_env_dir(),
@@ -41,7 +67,7 @@ class tr_inf_workflow(ngs_workflow):
 #class cd_tr(ngs_workflow):
 class cd_tr(tr_inf_workflow):
     def __init__(self, proj):
-        print('Function: making composite datatype tree\n...initiating')
+        logging.info('Set up composite datatype inference')
         config={
             'nuc_aln': str(proj.nuc_aln),
             'gpa_aln': str(proj.gpa_aln),
@@ -52,20 +78,17 @@ class cd_tr(tr_inf_workflow):
         }
         target_f= str(proj.cd_tr_out)
         workdir= str(proj.project_dir)
-#        self.br_cutoff= proj.br_cutoff
-#        self.bs_cutoff= proj.bs_cutoff
         self.outgroup= proj.outgroup
         super().__init__(config, target_f,
             './conc_workflow/conc_tree.smk',
             workdir
                         )
         print(self.__dict__)
-#    def run_workflow(self, cpu_num= 1, just_dryrun= True):
-#        super().run_workflow(cpu_num, just_dryrun)
+        logger.info(pprint.pformat(self.__dict__))
 
 class gpa_aln(ngs_workflow):
     def __init__(self, proj):
-        print('Function: making gpa alignment\n...initiating')
+        logging.info('Set up the generation of gpa alignment')
         config={
             'roary_gpa': str(proj.roary_out)
         }
@@ -75,11 +98,12 @@ class gpa_aln(ngs_workflow):
             './gpa_workflow/gpa.smk',
             workdir
                         )
-        print(self.__dict__)
+        logger.info(pprint.pformat(self.__dict__))
 
 class denovo(ngs_workflow):
     def __init__(self, proj):
-        print('Function: computing denovo assemblies and clustering orthologues\n...initiating')
+        logging.info('''Set up denovo assemblies and orthologous
+                     clustering''')
         config={
             'list_f':str(proj.list_f),
             'adaptor': str(proj.adaptor),
@@ -94,11 +118,12 @@ class denovo(ngs_workflow):
             './denovo_workflow/denovo.in_one.smk',
             workdir
                         )
+        logger.info(pprint.pformat(self.__dict__))
 
 class col_tr(tr_inf_workflow):
     def __init__(self, proj):
-        print('Function: collapsing the nucleotide tree using log-likelihood '
-              'score\n...initiating')
+        logging.info('''Set up branch collapsing for the nucleotide tree
+                     using the log-likelihood method''')
         config={
             'nuc_tr': str(proj.nuc_tr_out),
             'nuc_aln': str(proj.nuc_aln),
@@ -112,11 +137,12 @@ class col_tr(tr_inf_workflow):
             './LogLikelihood/compute_ll.smk',
             workdir
                         )
+        logger.info(pprint.pformat(self.__dict__))
 
 
 class nuc_tr(tr_inf_workflow):
     def __init__(self, proj):
-        print('Function: computing nucleotide tree\n...initiating')
+        logging.info('Set up nucleotide tree inference')
         config={
             'raxml_model':str(proj.nuc_model),
             'multisample_vcf': str(proj.multisample_vcf),
@@ -124,17 +150,16 @@ class nuc_tr(tr_inf_workflow):
         }
         target_f=str(proj.nuc_tr_out)
         workdir=str(proj.project_dir)
-#        self.br_cutoff= proj.br_cutoff
-#        self.bs_cutoff= proj.bs_cutoff
         self.outgroup= proj.outgroup
         super().__init__(config, target_f,
             './nuc_workflow/nuc_tr.smk',
             workdir
                         )
+        logger.info(pprint.pformat(self.__dict__))
 
 class mapping(ngs_workflow):
     def __init__(self, proj, sub_func):
-        print('Function: mapping\n...initiating')
+        logging.info('Set up read mapping ({})'.format(sub_func))
         config={
             'list_f':str(proj.list_f),
             'adaptor': str(proj.adaptor),
@@ -150,31 +175,33 @@ class mapping(ngs_workflow):
             smk_file= './snps_workflow/snps_bwa_mem.in_one.smk'
         super().__init__(config, target_f,
             smk_file, workdir )
-        print(self.__dict__)
-#
-if __name__=='__main__':
-    def determine_workflow(x, p):
-        import sys
-        target_funcs= []
-        if x == 'denovo':
-            target_funcs.append(denovo(p))
-        elif x == 'gpa':
-            target_funcs.append(gpa_aln(p))
-        elif x == 'cd_tr':
-            target_funcs.append(cd_tr(p))
-        elif x == 'nuc_tr':
-            target_funcs.append(nuc_tr(p))
-        elif x == 'col_tr':
-            target_funcs.append(col_tr(p))
-        elif x in ['mapping', 'fast_mapping']:
-            target_funcs.append(mapping(p, x))
-        elif x == 'all':
-            target_funcs= [mapping(p, 'mapping'), nuc_tr(p), col_tr(p), 
-                           denovo(p),  gpa_aln(p), cd_tr(p)]
-        else:
-            sys.exit('Unknown function')
-        return(target_funcs)
+        logger.info(pprint.pformat(self.__dict__))
 
+def determine_workflow(opted_funcs, p):
+    import sys
+    target_funcs= []
+    funcs_order= ['mapping', 'fast_mapping', 'nuc_tr', 
+                  'col_tr', 'denovo', 'gpa', 'cd_tr']
+    funcs_classes= {'mapping': mapping, 
+                    'fast_mapping': mapping, 
+                    'nuc_tr': nuc_tr, 
+                    'col_tr': col_tr, 
+                    'denovo': denovo, 
+                    'gpa': gpa_aln, 
+                    'cd_tr': cd_tr}
+    for x in funcs_order:
+        if x in opted_funcs:
+            logger.info("{} is opted".format(x))
+            try:
+                target_funcs.append( funcs_classes[x](p))
+            except TypeError as te:
+                target_funcs.append( funcs_classes[x](p, x))
+            except Exception as e:
+                logger.error("Unexpected error: {}".format(e))
+                sys.exit()
+    return(target_funcs)
+
+if __name__=='__main__':
     # read arguments
     from CDTreeArgParser import CDTreeArgParser
     parser= CDTreeArgParser()
@@ -187,9 +214,8 @@ if __name__=='__main__':
     if (not args.config_f is None):
         cd_proj.user_define(args.config_f)
 
-    from pprint import pprint
-    print('==parameters==')
-    pprint(cd_proj.__dict__)
+    logging.info('Parse the parameters \n{}'.format(
+        pprint.pformat(cd_proj.__dict__)))
 
     ## 
     target_funcs= determine_workflow(args.f, cd_proj)

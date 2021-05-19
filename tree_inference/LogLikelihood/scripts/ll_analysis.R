@@ -110,7 +110,7 @@ nuc_lls_f<- snakemake@input[['nuc_lls']]
 rear_trs_f<-snakemake@input[['rear_trs']]
 ll_sums_out_f<- snakemake@output[['nuc_ll_sum_per_br']]
 col_tr_out_f<- snakemake@output[['col_nuc_tr']]
-cutoff_perc<- snakemake@params[['cutoff_perc']]
+cutoff_perc<- as.numeric(snakemake@params[['cutoff_perc']])
 
 #' compute the sums 
 nuc_ll<- parse.ll(ll_f = nuc_lls_f, 

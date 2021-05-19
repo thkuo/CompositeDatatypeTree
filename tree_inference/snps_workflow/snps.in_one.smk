@@ -203,6 +203,7 @@ rule stampy_index_ref:
     threads: 1
     shell:
         '''
+        samtools faidx {input.reffile}
         stampy.py -G {input.reffile} {input.reffile}
 	stampy.py -g {input.reffile} -H {input.reffile}
         bwa index -a bwtsw {input.reffile}
