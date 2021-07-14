@@ -1,7 +1,0 @@
-Seq	Host	Starttime	JobRuntime	Send	Receive	Exitval	Signal	Command
-3	:	1608325671.134	  5811.799	0	3646697	0	0	beast -working -seed 1234 -threads 3 /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/transmission_ana/nuc.15/clade-wise/4/v1/beast.xml
-1	:	1608325671.127	  6695.622	0	3650108	0	0	beast -working -seed 1234 -threads 3 /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/transmission_ana/nuc.15/clade-wise/1/v1/beast.xml
-2	:	1608325671.130	  7114.116	0	3649876	0	0	beast -working -seed 1234 -threads 3 /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/transmission_ana/nuc.15/clade-wise/3/v1/beast.xml
-6	:	1608325671.145	 27650.815	0	3695258	0	0	beast -working -seed 1234 -threads 3 /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/transmission_ana/cd.15/clade-wise/4/v1/beast.xml
-4	:	1608325671.138	 30241.355	0	3694961	0	0	beast -working -seed 1234 -threads 3 /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/transmission_ana/cd.15/clade-wise/1/v1/beast.xml
-5	:	1608325671.141	 32062.065	0	3669716	0	0	beast -working -seed 1234 -threads 3 /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/transmission_ana/cd.15/clade-wise/3/v1/beast.xml

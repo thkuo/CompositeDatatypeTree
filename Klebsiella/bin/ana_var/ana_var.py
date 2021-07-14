@@ -1,3 +1,11 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# This script uses principal component analysis (PCA)
+# to detect highly divergent samples among the
+# 100 Klebsiella pneumoniae samples
+
 import gzip
 import os
 import re

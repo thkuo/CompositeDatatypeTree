@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 rule transphylo:
     input:
         max_credential_tr= '{w_dir}/{tr_name}.d_tree.nex',

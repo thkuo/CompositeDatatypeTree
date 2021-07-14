@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 # use absolute paths in case of filename errors
 nuc_tr: ../../results/nuc_tr.nwk
 nuc_aln: ../../results/nuc.var.aln
