@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 
-# author: Tzu-Hao Kuo
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # If 'source activate' or 'source deactivate' could not work properly, 
 # replacing 'source' with 'conda' might be the solution.
