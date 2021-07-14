@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 #' Parse within-patient trees from the ctree
 #' Not extracting them before ttree and wtrees are merged
 #' because the node indices were not yet determined, causing difficulties in 

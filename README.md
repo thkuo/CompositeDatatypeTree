@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 The two parts for simulating seqeuncing reads of outbreak
 - `R/`: for transmission tree and within-host subtrees simulation
 - `bin/`: for genome and reads simulation
