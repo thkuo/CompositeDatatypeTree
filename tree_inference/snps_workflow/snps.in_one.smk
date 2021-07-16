@@ -1,8 +1,8 @@
-'''
-__purpose__=SNP calling with paired-end sequencing reads of DNA
-__author__=Tzu-Hao Kuo
-__description__=adjusted from seq2geno
-'''
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# SNP calling with paired-end sequencing reads of DNA
 import pandas as pd
 from snakemake.utils import validate
 from multiprocessing import cpu_count
@@ -16,7 +16,6 @@ with open(list_f, 'r') as list_fh:
 
 strains= list(dna_reads.keys())
 ref_fasta=config['ref_fasta']
-#snps_table=config['snps_table']
 adaptor_f= config['adaptor']
 new_reads_dir= config['new_reads_dir']
 
@@ -139,6 +138,7 @@ rule mapping:
     conda: '../shared_envs_yaml/snps_tab_mapping.yml'
     shell:
         """
+        # preliminary mapping
         bwa aln {params.BWA_OPT} -t{threads} {input.reffile} {input.infile1} \
   > {output.p_bwa_sai1}
 
@@ -150,7 +150,7 @@ rule mapping:
   {input.infile1} {input.infile2} > {output.bwa_sam}
         samtools view -@ {threads} -Sb {output.bwa_sam} >  {output.bwa_bam} 
 
-        ## ng_stampy_remapping:
+        # stampy remapping:
         stampy.py \
   --readgroup=ID:{wildcards.strain},SM:{wildcards.strain}\
   -g {params.REF_PREFIX} -h {params.REF_PREFIX} \
@@ -203,6 +203,7 @@ rule stampy_index_ref:
     threads: 1
     shell:
         '''
+        samtools faidx {input.reffile}
         stampy.py -G {input.reffile} {input.reffile}
 	stampy.py -g {input.reffile} -H {input.reffile}
         bwa index -a bwtsw {input.reffile}

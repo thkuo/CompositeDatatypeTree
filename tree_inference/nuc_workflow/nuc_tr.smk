@@ -1,8 +1,8 @@
-'''
-__purpose__=Tree inference for nucleotide data
-__author__=Tzu-Hao Kuo
-__description__=from vcf file of multiple samples to nucleotide tree
-'''
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Tree inference for nucleotide data
 import re
 from multiprocessing import cpu_count
 def parse_strains(vcf_gz):
@@ -20,9 +20,6 @@ ref_fa=config['ref_fa']
 multisample_vcf=config['multisample_vcf']
 strains= parse_strains(multisample_vcf)
 raxml_model= config['raxml_model']
-#' asc correction
-if not (re.search('ASC_', raxml_model) is None) :
-    raxml_model= raxml_model+ ' --asc-corr lewis'
 
 rule bs_values_mapped_to_tree:
     input:  

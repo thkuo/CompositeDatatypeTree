@@ -1,19 +1,30 @@
+<!--
+SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # Inference of Composite Datatype Tree 
 
-For tree inference, the composite datatype method includes:
-1. snps\_workflow: map the reads for calling variants
-2. nuc\_workflow: infer the nucleotide tree
+---
+- [Introduction](#introduction)
+- [Installation](#installation)
+- [Utility and input data formats](#utility) 
+---
+
+###<a name="introduction"></a> Introduction
+This tool computes composite datatype tree from (1) a list of sequencing reads corresponding to each sample and (2) the reference genome sequence.
+Considering the complexity, we partition the whole workflow into five parts:
+1. snps\_workflow: map the reads for calling variants (output: multi-sample vcf file)
+2. nuc\_workflow: infer the nucleotide tree (output: phylogenetic tree in newick format)
 3. denovo\_workflow: compute de novo assembly, detect genes, and cluster the
-   orthologous 
+   orthologous (output: matrix of gene families)
 4. gpa\_workflow: convert a gene orthologous matrix (ie the output table of
-   Roary) into gene presence/absence
-   alignment
+   Roary) into gene presence/absence alignment (output: alignment of gene presence/absence states)
 5. conc\_workflow: concatenate nucleotide and gpa alignments and conduct
-   composite datatype inference
+   composite datatype inference (output: phylogenetic tree in newick format)
 
-This package is mainly written in snakemake, the filename-based workflow tool. The sub-processes (ie. rules) may need to install, for the first-time, and activate the required computational environment using conda (details in the Installation section below). The required input data include (1) a list of sequencing reads corresponding to each sample and (2) the reference genome sequence; optionally, the pipeline can use precomputed vcf file or orthologous clustering results (details in the Utility section below).
-
-### Installation
+###<a name="installation"></a> Installation
 1. Clone this package to proper locations
 
 2. Install the environment using conda (tested version: 4.8.0)
@@ -24,7 +35,7 @@ conda env create -f installation/cdtree_env.yml
 3. Some external tools still need to be installed additionally:
 
 - stampy: downloadable via the [ofiicial site](https://www.well.ox.ac.uk/research/research-groups/lunter-group/lunter-group/stampy)
-- prokka: it's dependency _tblasn_ regularly expire, so please ensure the [latest version](https://github.com/tseemann/prokka)
+- prokka: it's dependency _tblasn_ regularly expires, so please ensure the [latest version](https://github.com/tseemann/prokka)
 - roary: tested version [here](https://github.com/hzi-bifo/Roary)
 
 Except for them, the other process-specific software and environments will be installed (once for the first time) and activated when the process is used. Set up the environmental variable `CDTREE_SHARED_ENV`, which determines where the process-specific environment should be built. This will avoid repetive installation of same environment in the future. For quick and temporary utility, we recommend to try:
@@ -33,44 +44,14 @@ Except for them, the other process-specific software and environments will be in
 export CDTREE_SHARED_ENV=~/bin/cdtree_sharedEnv/
 ```
 
-For long-term management, two methods may help:
+For long-term management, you might want to:
 - adding the above command in files such as `.bashrc`, which sets up the
   variable at OS loggin
 - adding the above command following [this tutorial of conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#saving-environment-variables), which sets up the variable when the environment is activated
 
 4. Include the location of this package in the PATH variable. 
 
-### Customization:
-
-This tools is based on snakemake, which means the dependencies among processes
-(also called "rules" in snakemake) are determined based on filenames. The user
-usually do not need to worry about how to name each of the huge number of
-files---from reads mapping to de novo assemblies---but besides the input data,
-some intermediate files and parameters can still be customized.
-
-#### Path parameters
-
-This enables precomputed files from reads mapping and de novo assembly results; precisely, the multi-sample .vcf.gz file and gene presence/absence table from Roary. They can be specied in the config yaml file:
-```
-roary_out (string; existing filename)
-multisample_vcf (string; existing filename)
-```
-
-#### Non-path parameters
-
-The parameters (correct datatype needed) below can be specified in the config yaml file:
-```
-nuc_subs_model (string)
-rate_model (string)
-outgroup (list of strings)
-br_cutoff (float)
-bs_cutoff (integer)
-```
-
-The two parameters `nuc_subs_model` (default: GTR) and `rate_model` (default: GAMMA) are substition and rate variation models for RAxML. They can be tested using external software jmodeltest.
-
-
-#### Utility
+###<a name="utility"></a> Utility and input data formats
 
 1. arguments
 ```
@@ -92,7 +73,7 @@ optional arguments:
   --dry                 display the processes and exit
 ```
 
-For the arguments about files:
+2. input formats
 
 - list_f
 
@@ -108,12 +89,13 @@ sample03	/paired/end/reads/sample03_1.fastq.gz,/paired/end/reads/sample03_2.fast
 The fasta file of reference genome, which will be used in the mapping-relevant
 procedures.
 
-- CONFIG_F
+3. customization:
 
-An .yaml file where the customized parameters are listed. For more details about customization,
-please refer to `example_config.yml`
+This tool uses Snakemake to resolve the dependencies among processes. Because the process relies on filenames, the intermediate files will be determined automatically. Despite that, there are still some settings that can be customized by setting them in the config file (see *example_config.yml*) with `--config`.
 
-2. examples
+For the models to use in the tree inference, the two parameters `nuc_subs_model` (default: GTR) and `rate_model` (default: GAMMA) are substition and rate variation models for RAxML. To adjust the settings, please use external software [jmodeltest](https://github.com/ddarriba/jmodeltest2) and update the config file.
+
+4. examples
 
 ```sh
 # activate the environment
@@ -127,6 +109,4 @@ export CDTREE_SHARED_ENV=/net/metagenomics/data/from_moni/old.tzuhao/TreePaper/s
   some/reference/genome_seq.fasta \
   all 
 ```
-
-
 

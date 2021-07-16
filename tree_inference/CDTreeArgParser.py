@@ -1,10 +1,13 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 class CDTreeArgParser:
     def __init__(self):
         ## let the user opt the function
         import argparse
         import textwrap
-        parser = argparse.ArgumentParser(
-            description= textwrap.dedent( '''\
+        desc_text= '''\
     Tree inference using composite datatype of microbial representations
     ---    
     mapping: mapping the paired-end reads to reference
@@ -34,7 +37,10 @@ class CDTreeArgParser:
 
     cd_tr: inferring composite datatype tree with raxml (main
     output: composite datatype tree
-    ---'''),
+    ---'''
+        parser = argparse.ArgumentParser(
+            description= textwrap.dedent(desc_text),
+            prog='cdtree', usage='%(prog)s [options]',
             formatter_class=argparse.RawDescriptionHelpFormatter)
         parser.add_argument('project_dir', type=str, 
             help='the directory for project')
@@ -42,8 +48,8 @@ class CDTreeArgParser:
             help='the list of paired-end DNA sequencing reads')
         parser.add_argument('ref', type=str, 
             help='the reference genome for read mapping')
-        parser.add_argument('f', type=str,
-            help='the workflow to launch',
+        parser.add_argument('f', type=str, 
+            help='the workflow(s) to launch',nargs= '*', 
             choices=['mapping', 'fast_mapping', 'nuc_tr', 'col_tr', 'denovo', 'gpa', 'cd_tr', 'all'])
         parser.add_argument('--config',dest= 'config_f', type=str, 
             help='yaml file to overwrite default parameter settings')

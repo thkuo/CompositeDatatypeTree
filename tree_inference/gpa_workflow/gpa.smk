@@ -1,6 +1,9 @@
-'''
-Use all strains in the file
-'''
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# Use all strains in the file
+
 import os
 roary_gpa_csv= config['roary_gpa']
 #strains= config['strains'].strip().split(',')

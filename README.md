@@ -2,12 +2,12 @@
 
 ---
 Overview: 
-1. Contents
-2. Prerequisities and Installation
-3. Contact
+1. [Contents](#contents)
+2. [Prerequisities and Installation](#installation)
+3. [Contact](#contact)
 ---
 
-### Contents
+### <a name="contents"></a> Contents
 
 This repository contains the methodology and results of this paper. To overview each application, please visit the `bin/paper_figs.html` files under `Pseudomonas/`, `Klebsiella/`, and `Benchmarking/`. To apply the composite datatype inference to other datasets, please visit `tree_inference/`.
 
@@ -52,7 +52,7 @@ This repository contains the methodology and results of this paper. To overview 
             ├── nuc_tr.nwk # the nucleotide tree
             └── ll_cutoff/ # the composite datatype trees with different cutoffs of log-likelihodd scores
 
-### Prerequisites and Installation
+### <a name="installation"></a> Prerequisites and Installation
 
 1. The used environment:
 - [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) (used version: 4.8.4)
@@ -70,5 +70,5 @@ This repository contains the methodology and results of this paper. To overview 
 2. The general and conda-manageable dependencies could be installed using the yaml files in `envs/` ([tutorial](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
 The other process-specific dependencies will be automatically installed when launched for the first time.
 
-### Contact
+### <a name="contact"></a> Contact
 Tzu-Hao Kuo email: Tzu-Hao.Kuo@helmholtz-hzi.de

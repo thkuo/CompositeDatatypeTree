@@ -1,12 +1,8 @@
-## This class determines the directory of a project
-'''
-NOTE:
-    raxml substitution model
-Possible user-defined intermediate files/parameters
-    multisample_vcf
-    roary_out
-    non-path variables
-'''
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# A class that contains all settings of a project
 
 class CDTreeProject:
     def __init__(self, list_f= '', project_dir= '', ref= '', adaptor= '-'):
@@ -56,7 +52,7 @@ class CDTreeProject:
                                      'RAxML_bipartitions.nuc.bs'))
         ## collapsed nuc tree
         self.col_nuc_tr_out=Path(os.path.join(self.project_dir,
-                                              'per-site_LogLikelihood',
+                                              'LogLikelihood',
                                               'col_nuc.nwk'))
         self.cutoff_perc= 0.75
 
@@ -68,10 +64,9 @@ class CDTreeProject:
         self.cd_tr_out= Path(os.path.join(self.project_dir,
                                      'cd','RAxML_bipartitions.conc.bs'))
         self.col_constraint_tr= Path(self.col_nuc_tr_out)
-        self.cd_model= str(''.join(['BIN', self.rate_model]))
 
         # only the rate model will be extracted by RAxML
-        self.cd_model=str('BIN{}'.format(self.rate_model))
+        self.cd_model=str('ASC_BIN{} --asc-corr lewis'.format(self.rate_model))
         self.col_cd_tr_out= Path('{}_col'.format(self.cd_tr_out))
         ## tree post processing
         self.outgroup= [] 
@@ -82,25 +77,10 @@ class CDTreeProject:
         from pathlib import Path
         config_dict= yaml.safe_load(open(config_f, 'r'))
         args_dict= self.__dict__
-        poss_user_files= ['multisample_vcf','roary_out' ]
         for k in [k for k in args_dict if k in config_dict]:
             if isinstance(args_dict[k], PosixPath):
                 print('{} --> {}'.format(args_dict[k], config_dict[k]))
                 args_dict[k]= Path(config_dict[k])
-#            if isinstance(args_dict[k], PosixPath) & (k in poss_user_files):
-#                print('{} --> {}'.format(args_dict[k], config_dict[k]))
-#                args_dict[k]= Path(config_dict[k])
-##                d= os.path.dirname(str(args_dict[k]))
-##                if not os.path.isdir(d):
-##                    os.makedirs(d)
-##                try:
-##                    os.symlink(config_dict[k], args_dict[k])
-##                except FileExistsError as fe:
-##                    os
-#            elif (isinstance(args_dict[k], PosixPath) & 
-#                  (not k in poss_user_files)):
-#                print('required filename {} cannot not be replaced with {}'.format(
-#                    args_dict[k], config_dict[k]))
             elif isinstance(args_dict[k], str):
                 args_dict[k]= str(config_dict[k])
             elif isinstance(args_dict[k], list):

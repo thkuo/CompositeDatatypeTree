@@ -9,3 +9,4 @@ __pycache__/
 shared_envs/
 nohup.out
 test*
+transmission_simulator/.git

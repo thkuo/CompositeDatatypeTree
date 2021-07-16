@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 extract_all_bipart_tips_unrooted<-function(target_tr){
     # compute all bipartitions

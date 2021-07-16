@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 nuc_tr= config['nuc_tr']
 nuc_aln= config['nuc_aln']
 raxml_model= config['raxml_model']
@@ -13,7 +17,7 @@ rule collapse_nuc_tr_with_ll_sums:
         rear_trs= '{result_dir}/ll/rear_trs.nwk'
     output:
         nuc_ll_sum_per_br='{result_dir}/ll/nuc_llChangeSumPerBranch.tsv',
-        col_nuc_tr='{result_dir}/nuc_col_by_ll.nwk' 
+        col_nuc_tr='{result_dir}/col_nuc.nwk'
     params:
         cutoff_perc= cutoff_perc
     threads: 16

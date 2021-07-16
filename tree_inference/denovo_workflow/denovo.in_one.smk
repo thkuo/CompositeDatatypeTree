@@ -1,14 +1,8 @@
-#' Purpose:
-#' - De novo procedures of assemblies, annotation and orthologous clustering
-#' Materials:
-#' - DNA-seq reads
-#' - adaptor file (optional)
-#' Methods:
-#' - De novo assemblies with SPAdes 
-#' - Annotation with Prokka
-#' - Orthologous clustering with Roary
-#' Output:
-#' - de novo assemblies
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+# De novo procedures of assemblies, annotation and orthologous clustering
 
 import os
 import pandas as pd
@@ -32,7 +26,7 @@ adaptor_f= config['adaptor']
 new_reads_dir= config['new_reads_dir']
 
 rule roary:
-    #' Run Roary to compute orthologous groups
+    # Run Roary to compute orthologous groups
     input:
         gff_files= expand(os.path.join(out_prokka_dir, '{strain}', '{strain}.gff'),
 strain= list(dna_reads.keys()))
@@ -42,17 +36,12 @@ strain= list(dna_reads.keys()))
         prot_tab=os.path.join('{roary_dir}', 'clustered_proteins')
     conda: '../shared_envs_yaml/perl5_22_env.yml'
     params:
-        check_add_perl_env_script= 'install_dependencies.sh',
-#        check_add_perl_env_script= 'install_perl_mods.sh',
-#        check_add_software_script= 'set_roary_env.sh',
         roary_bin= 'roary'
     threads: 16
     shell:
         '''
         set +u
         ROARY_HOME=$(dirname $(dirname $(which roary)))
-        # required perl modules
-        # $ROARY_HOME/{params.check_add_perl_env_script}
 
         export PATH=$ROARY_HOME/build/fasttree:\
 $ROARY_HOME/build/mcl-14-137/src/alien/oxygen/src:\
@@ -75,8 +64,6 @@ $ROARY_HOME/build/bedtools2/lib:$PERL5LIB
 -v {input.gff_files} -p {threads} -g 100000 -z
         set -u
         ''' 
-#        {params.roary_bin} -f {wildcards.roary_dir} \
-#-e -n -v {input.gff_files} -r -p 30 -g 100000 -z
 
 rule create_gff:
     input: os.path.join(out_spades_dir,'{strain}', 'contigs.fasta')
@@ -89,7 +76,6 @@ rule create_gff:
     conda: '../shared_envs_yaml/prokka_env.yml'
     shell:
         '''
-#        echo $PERL5LIB
         set +u
         export PATH=$( dirname {params.tbl2asn_bin} ):$PATH
         which prokka
@@ -101,9 +87,9 @@ rule create_gff:
         '''
 
 rule spades_create_assembly:
-    #' Compute de novo assemlies with sapdes
-    #' The computational resources is increased when 
-    #' the process is crashed and rerun
+    # Compute de novo assemlies with sapdes
+    # The computational resources is increased when 
+    # the process is crashed and rerun
     input: 
         READS= lambda wildcards: [
             os.path.join(new_reads_dir,'{}.cleaned.{}.fq.gz'.format(
@@ -117,7 +103,6 @@ rule spades_create_assembly:
         SPADES_OPT='--careful',
         SPADES_BIN='spades.py'
     conda: '../shared_envs_yaml/spades_3_10_env.yml'
-#    script:'run_spades.py'
     shell:
         '''
         spades.py \
