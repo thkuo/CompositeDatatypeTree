@@ -1,4 +1,4 @@
-# Improved tree inference and transmission reconstruction from composite datatype representations of microbial genomes
+# Improved phylogenetic tree inference and transmission reconstruction from composite datatype representations of microbial genomes
 
 ---
 Overview: 
@@ -9,7 +9,7 @@ Overview:
 
 ### <a name="contents"></a> Contents
 
-This repository contains the methodology and results of this paper. To overview each application, please visit the `bin/paper_figs.html` files under `Pseudomonas/`, `Klebsiella/`, and `Benchmarking/`. To apply the composite datatype inference to other datasets, please visit `tree_inference/`.
+This repository contains the methodology and results of this paper. For the results of each application, please visit the `bin/paper_figs.html` file under `Pseudomonas/`, `Klebsiella/`, or `Benchmarking/` (simulated dataset). The folder `tree_inference/` includes further details of the composite datatype inference, such as the installation and usages.
 
     .
     ├── tree_inference # workflows of the composite datatype method 
@@ -17,7 +17,8 @@ This repository contains the methodology and results of this paper. To overview 
     ├── envs/ # yaml files for conda environments
     ├── Pseudomonas/ # methods and results of the Pseudomonas aeruginosa dataset
         ├── bin/
-            ├── paper_figs.html # the visualizations with R
+	    ├──	tree_inference.sh # the commands for tree inference 
+            └── paper_figs.html # the visualizations with R
         ├── data/ # sampling locations
         └── results/
           ├── nuc.var.aln # the nucleotide alignment
@@ -26,6 +27,7 @@ This repository contains the methodology and results of this paper. To overview 
           └── cd_tr.nwk # the composite datatype tree
     ├── Klebsiella/ # methods and results of the Klebsiella pneumoniae dataset
         ├── bin/
+	    ├──	tree_inference.sh # the commands for tree inference 
             ├── paper_figs.html # the visualizations with R
             ├── ana_var/ # early analysis about the divergence among samples
             ├── transmission_ana/ # the BEAST2 and TransPhylo methods
@@ -40,6 +42,7 @@ This repository contains the methodology and results of this paper. To overview 
             └── nuc_permutation/ # the results from nucleotide replacement test
     └── Benchmarking/ # methods and results of simulating and analysing the Streptococcus pneumoniae dataset
         ├── bin/
+	    ├──	tree_inference.sh # the commands for tree inference 
             ├── paper_figs.html # the visualizations with R
             ├── cutoffs/ # methods and results from the iteration with different cutoffs of log-lieklihood scores
             └── simulate/ # commands for simulating the dataset 
@@ -71,4 +74,5 @@ This repository contains the methodology and results of this paper. To overview 
 The other process-specific dependencies will be automatically installed when launched for the first time.
 
 ### <a name="contact"></a> Contact
-Tzu-Hao Kuo email: Tzu-Hao.Kuo@helmholtz-hzi.de
+Tzu-Hao Kuo Tzu-Hao.Kuo@helmholtz-hzi.de
+

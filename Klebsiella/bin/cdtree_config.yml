@@ -1,0 +1,24 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+#adaptor: # the adaptor to the reads
+#new_reads_dir: # reads directory for redirection
+#multisample_vcf: # vcf file of the variant calling result
+#nuc_aln:
+## the models for nucleotide or gene presence/absence data
+## visit RAxML manul for more details
+nuc_model: 'GTRGAMMA --HKY85' 
+nuc_subs_model: 'GTR'
+rate_model: 'GAMMA'
+## directories for the intermediate data from the de novo workflow
+#prokka_dir:
+#roary_dir:
+#spades_dir:
+#gpa_aln:
+## composite datatype inference
+#conc_aln:
+#raxml_prtn:
+#col_constraint_tr:# the constraint tree file 
+cd_model: 'ASC_BINGAMMA --HKY85 --asc-corr lewis'
+#cutoff_perc: # percentage of branches to collapse
