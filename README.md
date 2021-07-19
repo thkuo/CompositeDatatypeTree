@@ -5,6 +5,7 @@ Overview:
 1. [Contents](#contents)
 2. [Prerequisities and Installation](#installation)
 3. [Contact](#contact)
+4. [Licenses](#licenses)
 ---
 
 ### <a name="contents"></a> Contents
@@ -17,7 +18,7 @@ This repository contains the methodology and results of this paper. For the resu
     ├── envs/ # yaml files for conda environments
     ├── Pseudomonas/ # methods and results of the Pseudomonas aeruginosa dataset
         ├── bin/
-	    ├──	tree_inference.sh # the commands for tree inference 
+            ├──	tree_inference.sh # the commands for tree inference
             └── paper_figs.html # the visualizations with R
         ├── data/ # sampling locations
         └── results/
@@ -27,7 +28,7 @@ This repository contains the methodology and results of this paper. For the resu
           └── cd_tr.nwk # the composite datatype tree
     ├── Klebsiella/ # methods and results of the Klebsiella pneumoniae dataset
         ├── bin/
-	    ├──	tree_inference.sh # the commands for tree inference 
+            ├──	tree_inference.sh # the commands for tree inference
             ├── paper_figs.html # the visualizations with R
             ├── ana_var/ # early analysis about the divergence among samples
             ├── transmission_ana/ # the BEAST2 and TransPhylo methods
@@ -42,7 +43,7 @@ This repository contains the methodology and results of this paper. For the resu
             └── nuc_permutation/ # the results from nucleotide replacement test
     └── Benchmarking/ # methods and results of simulating and analysing the Streptococcus pneumoniae dataset
         ├── bin/
-	    ├──	tree_inference.sh # the commands for tree inference 
+	    ├──	tree_inference.sh # the commands for tree inference
             ├── paper_figs.html # the visualizations with R
             ├── cutoffs/ # methods and results from the iteration with different cutoffs of log-lieklihood scores
             └── simulate/ # commands for simulating the dataset 
@@ -76,3 +77,6 @@ The other process-specific dependencies will be automatically installed when lau
 ### <a name="contact"></a> Contact
 Tzu-Hao Kuo Tzu-Hao.Kuo@helmholtz-hzi.de
 
+
+### <a name="licenses"></a> Licenses
+Please refer to the copyright header of each file or `LICENSES/`. 
