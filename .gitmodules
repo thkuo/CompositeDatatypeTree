@@ -1,3 +1,0 @@
-[submodule "transmission_simulator"]
-	path = transmission_simulator
-	url = https://github.com/thkuo/transmission_simulator.git
