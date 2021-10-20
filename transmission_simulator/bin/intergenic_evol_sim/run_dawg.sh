@@ -1,18 +1,17 @@
 #!/usr/bin/env bash
 
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 IN_SIM_OUT="$1"
 GEN_SIM_OUT="$2"
 PROJECT="$3"
 DAWG_CONFIG_FILE="$4"
 INTERGENIC_COOR_FILE="$5"
-#echo $IN_SIM_OUT
-#echo $GEN_SIM_OUT
-#echo $PROJECT
-#echo $DAWG_CONFIG_FILE
 CPU_NUM="$6"
 
 
-#WHICH_TREE_HOME=/net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/WhichTree_Sim/bin/re_simulate/which_tree
 WHICH_TREE_HOME=$( realpath ../../which_tree )
 PATH=$WHICH_TREE_HOME:$PATH
 

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 #' Converts a phylogenetic tree into an ape phylo object
 #' revised from TransPhylo::phyloFromPtree
 #' @param wtree_from_ctree phylogenetic tree; col1: time; col2-3: indices of offsprings; col4: patien index; col5: node/tip indices

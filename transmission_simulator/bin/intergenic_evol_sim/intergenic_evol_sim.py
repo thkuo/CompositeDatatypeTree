@@ -1,11 +1,26 @@
+<<<<<<< HEAD:transmission_simulator/bin/intergenic_evol_sim/intergenic_evol_sim.py
+=======
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
+>>>>>>> 5543e3d8a596618d3558ba0b01175bdb3a6dc534:bin/intergenic_evol_sim/intergenic_evol_sim.py
 import os
 import subprocess
 import re
 from Bio import Phylo
+<<<<<<< HEAD:transmission_simulator/bin/intergenic_evol_sim/intergenic_evol_sim.py
 import argparse
 import shutil
 
 
+=======
+import shutil
+import argparse
+from datetime import datetime
+
+
+>>>>>>> 5543e3d8a596618d3558ba0b01175bdb3a6dc534:bin/intergenic_evol_sim/intergenic_evol_sim.py
 # +++++
 # Core functions
 def make_dawg_config(config_template, project_name, tree_f, output_dir):
@@ -18,10 +33,17 @@ def make_dawg_config(config_template, project_name, tree_f, output_dir):
     # fill the template
     with open(config_template, 'r') as config_template_h:
         with open(config_file, 'w') as config_fh:
+<<<<<<< HEAD:transmission_simulator/bin/intergenic_evol_sim/intergenic_evol_sim.py
             for line in config_template_h:
                 if re.search('\$TREE\$', line):
                     line = re.sub('\$TREE\$', tr_str, line)
                 config_fh.write(line)
+=======
+            for l in config_template_h:
+                if re.search('\$TREE\$', l):
+                    l = re.sub('\$TREE\$', tr_str, l)
+                config_fh.write(l)
+>>>>>>> 5543e3d8a596618d3558ba0b01175bdb3a6dc534:bin/intergenic_evol_sim/intergenic_evol_sim.py
     return(config_file)
 
 
@@ -82,6 +104,7 @@ if not os.path.exists(output_dir):
 
 cpu_num = args.cores
 gen_output_dir = args.genome_dir
+<<<<<<< HEAD:transmission_simulator/bin/intergenic_evol_sim/intergenic_evol_sim.py
 assert os.path.isdir(gen_output_dir), '{} not found'.format(
     gen_output_dir)
 wtrees_dir = args.wtrees_dir
@@ -90,6 +113,13 @@ assert os.path.isdir(wtrees_dir), '{} not found'.format(
 config_template = args.conf
 assert os.path.isfile(config_template), '{} not found'.format(
     config_template)
+=======
+assert os.path.isdir(gen_output_dir)
+wtrees_dir = args.wtrees_dir
+assert os.path.isdir(wtrees_dir)
+config_template = args.conf
+assert os.path.isfile(config_template)
+>>>>>>> 5543e3d8a596618d3558ba0b01175bdb3a6dc534:bin/intergenic_evol_sim/intergenic_evol_sim.py
 intergenic_coor_f = args.coor
 # determine the starting index
 starting_ix = max([int(re.sub('.nwk$', '', f))
@@ -101,15 +131,21 @@ project_name = str(starting_ix)
 tree_f = (os.path.join(wtrees_dir, '{}.nwk'.format(project_name)))
 
 # make the config file of dawg
+<<<<<<< HEAD:transmission_simulator/bin/intergenic_evol_sim/intergenic_evol_sim.py
 dawg_config_file = make_dawg_config(
     config_template, project_name, tree_f, output_dir)
+=======
+dawg_config_file = make_dawg_config(config_template, project_name, tree_f,
+                                    output_dir)
+>>>>>>> 5543e3d8a596618d3558ba0b01175bdb3a6dc534:bin/intergenic_evol_sim/intergenic_evol_sim.py
 
 # run dawg
 subprocess.run(['./run_dawg.sh', output_dir, gen_output_dir, project_name,
-                dawg_config_file, intergenic_coor_f, str(cpu_num)]) 
+                dawg_config_file, intergenic_coor_f, str(cpu_num)])
 
 # determine next tree and genome
 tr = Phylo.read(tree_f, 'newick')
+<<<<<<< HEAD:transmission_simulator/bin/intergenic_evol_sim/intergenic_evol_sim.py
 next_projects= [str(tip.name) for tip in tr.get_terminals()]
 source_projects= [project_name] * len(tr.get_terminals())
 #travel along the trees
@@ -117,22 +153,32 @@ from datetime import datetime
 while (len(next_projects)>0):
     project_name= next_projects.pop(0)
     source_project= source_projects.pop(0)
+=======
+next_projects = [str(tip.name) for tip in tr.get_terminals()]
+source_projects = [project_name] * len(tr.get_terminals())
+# travel along the trees
+while (len(next_projects) > 0):
+    project_name = next_projects.pop(0)
+    source_project = source_projects.pop(0)
+>>>>>>> 5543e3d8a596618d3558ba0b01175bdb3a6dc534:bin/intergenic_evol_sim/intergenic_evol_sim.py
     print(datetime.now().strftime("%m/%d/%Y, %H:%M:%S"))
     print('{}->{}'.format(source_project, project_name))
-    tree_f=(os.path.join(wtrees_dir, '{}.nwk'.format(project_name)))
+    tree_f = (os.path.join(wtrees_dir, '{}.nwk'.format(project_name)))
     if not os.path.isfile(tree_f):
         # it is a tip
         continue
 
     # make dawg config file
-    dawg_config_file= make_dawg_config(config_template, project_name, tree_f, output_dir)
+    dawg_config_file = make_dawg_config(config_template,
+                                        project_name, tree_f, output_dir)
 
     # run dawg
     subprocess.run(['./run_dawg.sh', output_dir, gen_output_dir, project_name,
                     dawg_config_file, intergenic_coor_f, str(cpu_num)])
 
     # update the next steps
-    tr= Phylo.read(tree_f,'newick')
-    next_projects= next_projects + [str(tip.name) for tip in tr.get_terminals()]
-    source_projects= source_projects + [project_name] * len(tr.get_terminals())
-
+    tr = Phylo.read(tree_f, 'newick')
+    next_projects = next_projects + [str(tip.name)
+                                     for tip in tr.get_terminals()]
+    source_projects = (source_projects +
+                       [project_name] * len(tr.get_terminals()))
