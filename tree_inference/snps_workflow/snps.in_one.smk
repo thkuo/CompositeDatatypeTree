@@ -1,8 +1,10 @@
-'''
-__purpose__=SNP calling with paired-end sequencing reads of DNA
-__author__=Tzu-Hao Kuo
-__description__=adjusted from seq2geno
-'''
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+# Purpose:
+# SNP calling with paired-end sequencing reads of DNA
+# adjusted from seq2geno
+
 import pandas as pd
 from snakemake.utils import validate
 from multiprocessing import cpu_count
