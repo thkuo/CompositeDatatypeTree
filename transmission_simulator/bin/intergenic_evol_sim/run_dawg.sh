@@ -31,5 +31,14 @@ mkdir -p $IN_SIM_OUT/$PROJECT/MSA/
 mv MSA_i* $IN_SIM_OUT/$PROJECT/MSA/
 #combine with the alf results
 #creating the genome sequences
-parallel -j $CPU_NUM --joblog alf_df_to_fasta.log "$WHICH_TREE_HOME/alf_db_to_fasta_splice_intergenic.pl $GEN_SIM_OUT/$PROJECT/DB/{}_dna.fa $IN_SIM_OUT/$PROJECT/MSA | sed 's/>.\+\(DB\/SE[0-9]\+_dna.fa\)/>\1/'> $GEN_SIM_OUT/$PROJECT/DB/{}_genome.fa" \
-  ::: `ls $GEN_SIM_OUT/$PROJECT/DB| grep dna.fa| sed 's/_dna.fa//'`
+#parallel -j $CPU_NUM --joblog alf_df_to_fasta.log "$WHICH_TREE_HOME/alf_db_to_fasta_splice_intergenic.pl $GEN_SIM_OUT/$PROJECT/DB/{}_dna.fa $IN_SIM_OUT/$PROJECT/MSA | sed 's/>.\+\(DB\/SE[0-9]\+_dna.fa\)/>\1/'> $GEN_SIM_OUT/$PROJECT/DB/{}_genome.fa" \
+#  ::: `ls $GEN_SIM_OUT/$PROJECT/DB| grep dna.fa| sed 's/_dna.fa//'`
+
+for n in $( ls $GEN_SIM_OUT/$PROJECT/DB| grep dna.fa| sed 's/_dna.fa//' ); do
+  $WHICH_TREE_HOME/alf_db_to_fasta_splice_intergenic.pl \
+    $GEN_SIM_OUT/$PROJECT/DB/$n'_dna.fa' \
+    $IN_SIM_OUT/$PROJECT/MSA |\
+    sed 's/>.\+\(DB\/SE[0-9]\+_dna.fa\)/>\1/'> \
+    $GEN_SIM_OUT/$PROJECT/DB/$n'_genome.fa'
+
+done

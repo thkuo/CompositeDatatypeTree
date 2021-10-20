@@ -1,0 +1,9 @@
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+results/
+nohup.out
+R/TransPhylo
+test*
+.snakemake/

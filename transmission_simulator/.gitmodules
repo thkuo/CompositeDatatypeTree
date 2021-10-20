@@ -3,4 +3,4 @@
 	url = https://github.com/xavierdidelot/TransPhylo.git
 [submodule "which_tree"]
 	path = which_tree
-	url = https://github.com/johnlees/which_tree.git
+	url = https://github.com/hzi-bifo/which_tree.git 
