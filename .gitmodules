@@ -1,0 +1,6 @@
+[submodule "TransPhylo"]
+	path = transmission_simulator/R/TransPhylo
+	url = https://github.com/xavierdidelot/TransPhylo.git
+[submodule "which_tree"]
+	path = transmission_simulator/which_tree
+	url = https://github.com/hzi-bifo/which_tree.git 

@@ -1,6 +1,0 @@
-[submodule "R/TransPhylo"]
-	path = R/TransPhylo
-	url = https://github.com/xavierdidelot/TransPhylo.git
-[submodule "which_tree"]
-	path = which_tree
-	url = https://github.com/hzi-bifo/which_tree.git 

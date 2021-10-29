@@ -50,7 +50,7 @@ some intermediate files and parameters can still be customized.
 
 #### Path parameters
 
-This enables precomputed files from reads mapping and de novo assembly results; precisely, the multi-sample .vcf.gz file and gene presence/absence table from Roary. They can be specied in the config yaml file:
+This enables precomputed files from reads mapping and de novo assembly results; precisely, the multi-sample .vcf.gz file and gene presence/absence table from Roary. They can be specied in the config YAML file:
 ```
 roary_out (string; existing filename)
 multisample_vcf (string; existing filename)
@@ -58,7 +58,7 @@ multisample_vcf (string; existing filename)
 
 #### Non-path parameters
 
-The parameters (correct datatype needed) below can be specified in the config yaml file:
+The parameters (correct datatype needed) below can be specified in the config YAML file:
 ```
 nuc_subs_model (string)
 rate_model (string)
@@ -87,7 +87,7 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  --config CONFIG_F     yaml file to overwrite default parameter settings
+  --config CONFIG_F     YAML file to overwrite default parameter settings
   --cpu CPU             cpu number; default: 1
   --dry                 display the processes and exit
 ```
@@ -110,8 +110,7 @@ procedures.
 
 - CONFIG_F
 
-An .yaml file where the customized parameters are listed. For more details about customization,
-please refer to `example_config.yml`
+A YAML file where the customized parameters are listed. For more details about customization, please refer to `example_config.yml.`
 
 2. examples
 
