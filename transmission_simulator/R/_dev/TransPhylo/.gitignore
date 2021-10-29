@@ -1,0 +1,17 @@
+.Rproj.user
+.Rhistory
+.RData
+
+*.pdf
+!vignettes/TransPhylo.pdf
+
+*.tex
+
+*.gz
+
+vignettes/TransPhylo.log
+
+*~
+*.o
+
+*.so
