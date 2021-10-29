@@ -1,23 +1,24 @@
-#adaptor: # the adaptor to the reads
-#new_reads_dir: # reads directory for redirection
-#multisample_vcf: # vcf file of the variant calling result
-nuc_aln:
-  /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/alignment/nuc.var.aln
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+#
+# adaptor: # the adaptor to the reads
+# new_reads_dir: # reads directory for redirection
+# multisample_vcf: # vcf file of the variant calling result
+# nuc_aln: # filtered nucleotide alignment
 ## the models for nucleotide or gene presence/absence data
 ## visit RAxML manul for more details
-#nuc_model: 'GTRCAT -V' 
-#nuc_subs_model: 'GTR'
-#rate_model: 'CAT -V'
-#nuc_model: 'GTRGAMMA'
+# nuc_model: 'GTRCAT -V' 
+# nuc_subs_model: 'GTR'
+# rate_model: 'CAT -V'
+# nuc_model: 'GTRGAMMA'
 ## directories for the intermediate data from the de novo workflow
-#prokka_dir:
-#roary_dir:
-#spades_dir:
-gpa_aln:
-  /net/sgi/metagenomics/data/from_moni/old.tzuhao/TreePaper/MRKP.v2/results.5/gpa/gpa.var.aln
+# prokka_dir: # directory of prokka output directories
+# roary_dir: # directory of Roary output
+# spades_dir: # directory of spades output directories 
+# gpa_aln: # filtered gpa alignment
 ## composite datatype inference
-#conc_aln:
-#raxml_prtn:
-#col_constraint_tr:# the constraint tree file 
-#cd_model:
-#cutoff_perc: # percentage of branches to collapse
+# conc_aln: # concatenated alignment
+# raxml_prtn: # the partitions file for RAxML
+# col_constraint_tr:# the constraint tree file 
+# cutoff_perc: # percentage of branches to keep 

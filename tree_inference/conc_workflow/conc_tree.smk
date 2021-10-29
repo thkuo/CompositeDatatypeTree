@@ -1,14 +1,16 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 import os
 import re
+import logging
 
 gpa_aln= config['gpa_aln']
 nuc_aln= config['nuc_aln']
 conc_aln= config['conc_aln']
 raxml_prtn= config['raxml_prtn']
 col_constraint_tr= config['col_constraint_tr']
-#best_ml_tree= config['best_ml_tree'] 
-#bs_trees= config['bs_trees']
-#bs_best_ml_tree= config['bs_best_ml_tree']
 
 max_core_n= (config['max_cores'] if 'max_cores' in config else 1)
 max_per_part_core_n= int(max_core_n/5)
@@ -16,14 +18,11 @@ if 'max_per_part_core_n' in config:
     max_per_part_core_n= config['max_per_part_core_n']
     
 raxml_model= config['raxml_model']
-#' asc correction
-if not (re.search('ASC_', raxml_model) is None) :
-    raxml_model= raxml_model+ ' --asc-corr lewis'
+# asc correction
+if not (re.search('ASC_', raxml_model) is None):
+    logging.warn('The model for composite datatype inference does not '
+            'include ascertainment bias correction ')
 
-#rule all:
-#    input:
-#        bs_best_ml_tree,
-#        best_ml_tree
 
 rule for_cw_map_bs_values_to_tree:
     input:  
@@ -32,7 +31,6 @@ rule for_cw_map_bs_values_to_tree:
     output:
         cw_withBS_tree= '{result_dir}/RAxML_bipartitions.{suffix}.bs'
     params:
-#        raxml_bin=raxml_bin,
         tree_full_suffix='{suffix}.bs',
         raxml_model= raxml_model
     threads:1

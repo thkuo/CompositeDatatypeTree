@@ -1,12 +1,25 @@
+<!--
+SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 ---
 title: "Simulated dataset"
 output: html_document
 ---
 The frequency of simulated gene presence state
 ```{R}
-library(phangorn)
-library(seqinr)
+options(warn=-1)
+suppressPackageStartupMessages(library(phangorn))
+suppressPackageStartupMessages(library(seqinr))
+suppressPackageStartupMessages(library(phytools))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggpubr))
 library(scales)
+library(ape)
+library(reshape2)
+source('./cutoffs/tree_correctness.R')
 gpa_f<- '../data/pseudo_gpa/gpa.var.fa'
 gpa<- seqinr::read.alignment(file= gpa_f, format = 'fasta')
 gpa_mat<- sapply(gpa$seq, function(s) unlist(strsplit(unlist(s), split = '')))
@@ -20,12 +33,6 @@ hist(gp_freq, main = 'Frequency of simulated gene presence',
 
 Load the trees
 ```{R}
-library(phytools)
-library(ape)
-library(reshape2)
-library(ggplot2)
-source('./cutoffs/tree_correctness.R')
-
 modify_tip_lab<- function(tr){
     tr$tip.label<- sapply(tr$tip.label, function(x) sprintf('SE%s', x))
     tr
@@ -42,10 +49,10 @@ nuc_tr<- modify_tip_lab(read.newick(nuc_tr_f))
 for (c in cutoffs){
     col_nuc_tr_f<- sprintf('../results/ll_cutoff/%s/raxml_input/nuc_col.nwk', 
                          as.character(c))
-    print(file.exists(col_nuc_tr_f))
+    stopifnot(file.exists(col_nuc_tr_f))
     cd_tr_f<- sprintf('../results/ll_cutoff/%s/RAxML_bestTree.conc',
                     as.character(c))
-    print(file.exists(cd_tr_f))
+    stopifnot(file.exists(cd_tr_f))
     tr_files[[as.character(c)]]<- list('col'= col_nuc_tr_f, 'cd'= cd_tr_f)
     
 }
@@ -57,6 +64,7 @@ nuc_tr<- root(midpoint.root(nuc_tr), outgroup = outgroup)
 trs<- lapply(trs, function(tr_set)
     lapply(tr_set, function(t) root(t, outgroup = outgroup, resolve.root = T)))
 ```
+
 Compute the topological difference
 ```{R}
 col_rtr_correctness<- sapply(trs, function(pair) tree_correctness(target_tr = pair$col, ref = ref_tr))
@@ -90,7 +98,6 @@ ggplot(tr_correctness_df[tr_correctness_df$metric %in% c('TP', 'precision', 'f1'
 Apply different cutoffs to the P. aeruginosa tree
 ```{R}
 setwd('../../Pseudomonas/bin')
-library(ggpubr)
 source('load_biological_data.R')
 # load the trees
 tr_files<- list('nuc'= '../results/nuc_tr.nwk', 
@@ -98,14 +105,14 @@ tr_files<- list('nuc'= '../results/nuc_tr.nwk',
                 'col50'= '../results/cd_cutoff50/RAxML_bestTree.conc', 
                 'col75'= '../results/cd_cutoff25/RAxML_bestTree.conc', 
                 'col100'= '../results/cd_cutoff00/RAxML_bestTree.conc')
-#' ensure the filepaths
+# ensure the filepaths
 stopifnot(all(sapply(tr_files, function(f) file.exists(f))))
-#' load the trees
+# load the trees
 trs<- lapply(tr_files, function(f) read.newick(f))
 outgroup<- c('CH4433')
 trs<- lapply(trs, function(t) root(t, outgroup = outgroup, resolve.root = T))
 
-#' a tree with tips shuffled
+# a tree with tips shuffled
 set.seed(1234)
 rand_tr<-trs$nuc
 rand_tr$tip.label<- sample(rand_tr$tip.label)
@@ -113,7 +120,7 @@ trs[['rand']]<- rand_tr
 
 sapply(trs, function(t) treedist(t, trs$nuc))
 
-#' load the traits (locations)
+# load the traits (locations)
 bio_df<- load_biological_data()
 bio_list<- as.list(bio_df)
 for (n in 1:length(bio_list)){
@@ -152,7 +159,7 @@ determine_sig<- function(count_df, h1, h2, alternative= NA){
     }
     sig
 }
-#' cophenetic distances (number of edges between tips)
+# cophenetic distances (number of edges between tips)
 cophenetic_plots<- list()
 plot_max_val<- 15
 for (tr.name1 in c('col25', 'col50', 'col75', 'col100')){
@@ -208,12 +215,13 @@ for (tr.name1 in c('col25', 'col50', 'col75', 'col100')){
                                                 'Charité Berlin-University hospital Frankfurt',
                                                 'Charité Berlin-Hannover Medical School',
                                                 'Hannover Medical School-University hospital Frankfurt'))
+    sub_cophe_one_df$transmission<- ifelse(sub_cophe_one_df$loc1 == sub_cophe_one_df$loc2, 'within-hospital', 'across-hospital')
     violin_p<- ggplot(sub_cophe_one_df, aes(x= loc_pair))+
-        geom_violin(aes(y= cd_dist-nuc_dist, fill= loc1==loc2))+
+        geom_violin(aes(y= cd_dist-nuc_dist, fill= transmission))+
         scale_y_continuous(limits= c(-plot_max_val, plot_max_val), 
                            breaks= seq(from= -plot_max_val,to= plot_max_val,by=3))+
         theme_classic()+
-        ylab('distance difference (cd - nuc')+
+        ylab('distance difference\n(cd - nuc)')+
         theme(axis.text.x = element_text(angle = 60, hjust = 1))
     
     # count the percentages for each group
@@ -245,11 +253,12 @@ for (tr.name1 in c('col25', 'col50', 'col75', 'col100')){
         geom_bar(stat="identity")+
         geom_text(aes(label=count, color= change), position = position_stack(vjust= .5))+
         scale_fill_manual(values=c('decreased'='yellowgreen',  'increased'='dodgerblue4'))+
-        scale_color_manual(values= c('decreased'= 'black', 'increased'= 'grey'))+
+        scale_color_manual(values= c('decreased'= 'black', 'increased'= 'grey'), breaks=c())+
         theme_classic()+
         theme(axis.text.x = element_text(angle = 60, hjust = 1))
     
-    cophenetic_plots[[tr.name1]]<- ggarrange(plotlist = list('violin'= violin_p, 'bars'= bars_p), ncol= 1)
+    cophenetic_plots[[tr.name1]]<- list('violin'= violin_p, 'bars'= bars_p)
 }
-# check cophenetic_plots for each application
+cophenetic_plots
+
 ```

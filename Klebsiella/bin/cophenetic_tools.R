@@ -1,7 +1,11 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 library(reshape2)
-library(viridis)
-library(lemon)
-library(ggplot2)
+suppressPackageStartupMessages(library(viridis))
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(lemon))
 norm_tr<- function(tr){
     new_br<- tr$edge.length
     new_br<- new_br/sum(new_br)
@@ -95,13 +99,17 @@ sig_for_all_loc_pairs<- function(cophe_one_df){
 }
 show_violin<- function(cophe_one_df){
     plot_max_val<- max(abs(cophe_one_df$dist2-cophe_one_df$dist1))
+    cophe_one_df$transmission<- ifelse(cophe_one_df$loc1 == cophe_one_df$loc2, 'within-hospital', 'across-hospital')
+    longest_cat_len<- max(sapply(as.character(cophe_one_df$loc_pair), function(x) nchar(x)))
+    cat_angle<- ifelse(longest_cat_len <= 10, 0, 45)
     ggplot(cophe_one_df, aes(x= loc_pair))+
-        geom_violin(aes(y= dist2-dist1, fill= loc1==loc2))+
+        geom_violin(aes(y= dist2-dist1, fill= transmission))+
         geom_hline(yintercept = 0, color= 'grey90')+
         scale_y_continuous(limits= c(-plot_max_val, plot_max_val), 
-                           breaks= seq(from= -plot_max_val,to= plot_max_val,by=1 ))+
+                           breaks= seq(from= -plot_max_val,to= plot_max_val,by=1))+
         xlab('locational pairs')+
-        theme_classic()
+        theme_classic()+
+        theme(axis.text.x = element_text(angle = cat_angle, hjust = 1))
 }
 show_density<- function(cophe_one_df, dist1_name= '', dist2_name= ''){
     binning_breaks<- unique(c(cophe_one_df$dist1, cophe_one_df$dist2))
@@ -139,11 +147,14 @@ show_pair_counts<- function(cophe_one_df, loc_pairs){
     plot_df$locs<- factor(plot_df$locs, levels= loc_pairs)
     
     colnames(plot_df)<- c('locs', 'change', 'count', 'percentage')
+    longest_cat_len<- max(sapply(as.character(plot_df$locs), function(x) nchar(x)))
+    cat_angle<- ifelse(longest_cat_len <= 10, 0, 45)
     ggplot(plot_df, aes(x= locs, y= percentage,fill= change))+
         geom_bar(stat="identity")+
         geom_text(aes(label=count, color= change), position = position_stack(vjust= .5))+
         scale_fill_manual(values=c('decreased'='yellowgreen', 'increased'='dodgerblue4'))+
-        scale_color_manual(values= c('decreased'= 'black', 'increased'= 'grey'))+
+        scale_color_manual(values= c('decreased'= 'black', 'increased'= 'grey'), breaks=c())+
         xlab('locational pairs')+
-        theme_classic()
+        theme_classic()+
+        theme(axis.text.x = element_text(angle = cat_angle, hjust = 1))
 }

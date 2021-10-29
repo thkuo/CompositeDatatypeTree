@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 plotTTree3<- function (ttree, showLabels = TRUE, sample.col= NA, sample.pch= NA, 
                        legend.col=NA, legend.pch= NA, legend.label= NA, 
                        plot_time_interval= NA, plot.title= NA,

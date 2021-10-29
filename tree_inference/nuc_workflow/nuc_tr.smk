@@ -2,9 +2,7 @@
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
 
-# Purpose:
-# Tree inference from vcf file of multiple samples to nucleotide tree
-
+# Tree inference for nucleotide data
 import re
 import os
 from multiprocessing import cpu_count
@@ -37,7 +35,6 @@ else:
         if re.search('.vcf.gz$', f) is not None]
     assert len(strains) == len(set(strains)), 'Repeated strain names'
 raxml_model= config['raxml_model']
-
 
 rule bs_values_mapped_to_tree:
     input:

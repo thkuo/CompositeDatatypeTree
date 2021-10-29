@@ -1,6 +1,9 @@
-
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 extract_all_clades_tips<-function(tr){
+    # determine the tip sets of all subtrees
     library(ape)
     tr_all_clades<- c()
     for (n in ((Ntip(tr)+1):(Ntip(tr)+Nnode(tr)))){
@@ -14,11 +17,11 @@ extract_all_clades_tips<-function(tr){
 }
 
 tree_correctness<- function(target_tr, ref){
+    # calculate the metrics of tree topological correctness 
+    library(limma)
     clades<- lapply(list(target= target_tr, ref= ref), function(tr) extract_all_clades_tips(tr))
     all_clades<- union(clades$target, clades$ref)
     clades_pa<- sapply(clades, function(c) ifelse(all_clades %in% c, 1, 0))
-    
-    library(limma)
     pa_counts<- vennCounts(clades_pa)
     correctness<- pa_counts[, 'Counts']
     names(correctness)<- c('TN', 'FN', 'FP', 'TP')
@@ -29,6 +32,7 @@ tree_correctness<- function(target_tr, ref){
 }
 
 make_three_venn_diagram<- function(a, b, c, names= NA){
+    # comparison of three set
     all_elements<- Reduce(union, list(a,b,c)) 
     bin_mat<- sapply(list(a,b,c), function(x) ifelse(all_elements %in% x, 1, 0))
     library(limma)

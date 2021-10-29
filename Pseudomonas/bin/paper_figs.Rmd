@@ -1,24 +1,31 @@
+<!--
+SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 ---
-title: "Pseudomonas"
+title: Pseudomonas aeruginosa
 output: html_document
 ---
 ```{R}
-library(ggpubr)
-library(ggplot2)
-library(ggtree)
-library(phytools)
+options(warn=-1)
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggtree))
+suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(phytools))
+suppressPackageStartupMessages(library(viridis))
+suppressPackageStartupMessages(library(lemon))
 library(pheatmap)
-library(viridis)
 library(entropy)
 library(RColorBrewer)
 library(reshape2)
-library(lemon)
 source('load_biological_data.R')
 tr_files<- list('nuc'= '../results/nuc_tr.nwk', 
                 'cd75'= '../results/cd_tr.nwk')
 
 #' ensure the filepaths
-all(sapply(tr_files, function(f) file.exists(f)))
+stopifnot(all(sapply(tr_files, function(f) file.exists(f))))
 #' load the trees
 trs<- lapply(tr_files, function(f) read.newick(f))
 outgroup<- c('CH4433')
@@ -62,28 +69,69 @@ count_br_entropies<- function(t, traits){
 entropy_dfs<- lapply(trs, function(t) count_br_entropies(t, traits))
 tr.name1<- 'cd75'
 tr.name2<- 'nuc'
+unique_ixs<- list()
 # find unique branches in the cd tree
 cd_match_mat<- matchNodes(trs[[tr.name1]], trs[[tr.name2]], method="descendants" )
 cd_new_ixs<- cd_match_mat[is.na(cd_match_mat[, 2]), 1]
-ggtree(trs[[tr.name1]])+
-    geom_tippoint(aes(color= traits[label]), size= 1, alpha= .6)+
-    geom_nodepoint(aes(subset= node %in% cd_new_ixs), color= 'red', size= 2, shape= 18)+
-    scale_color_manual(values= c('Charité Berlin'= 'darkgoldenrod2',
-                                 'University hospital Frankfurt'= 'forestgreen',
-                                 'Hannover Medical School'='cyan'), name= 'hospital')+
-    ggtitle('cd tree')+
-    theme(legend.position= 'bottom')
+unique_ixs[[tr.name1]]<- cd_new_ixs
+print(sprintf('composite datatype tree has %d unique splits', length(cd_new_ixs)))
 # find unique branches in the nucleotide tree
 nuc_match_mat<- matchNodes(trs[[tr.name2]], trs[[tr.name1]])
 nuc_new_ixs<- nuc_match_mat[is.na(nuc_match_mat[, 2]), 1]
-ggtree(trs[[tr.name2]])+
+unique_ixs[[tr.name2]]<- nuc_new_ixs
+print(sprintf('nucleotide tree has %d unique splits', length(nuc_new_ixs)))
+# visualize the positions of sampling locations 
+cd_loc_p<-  ggtree(trs$cd75, layout = 'circular', branch.length = 'none')+
     geom_tippoint(aes(color= traits[label]), size= 1, alpha= .6)+
-    geom_nodepoint(aes(subset= node %in% nuc_new_ixs), color= 'red', size= 2, shape= 18)+
-    scale_color_manual(values= c('Charité Berlin'= 'darkgoldenrod2',
-                                 'University hospital Frankfurt'= 'forestgreen',
-                                 'Hannover Medical School'='cyan'), name= 'hospital')+
-    ggtitle('nuc tree')+
+    geom_nodepoint(aes(subset= node %in% unique_ixs$cd75), color= 'red', size= 2, shape= 18)+
+    scale_color_manual(values= c('Charité Berlin'= 'gold',
+                                 'University hospital Frankfurt'= 'yellowgreen',
+                                 'Hannover Medical School'='blue'), name= 'hospital')+
+    ggtitle('composite datatype')+
     theme(legend.position= 'bottom')
+nuc_loc_p<-  ggtree(trs$nuc, layout = 'circular', branch.length = 'none')+
+    geom_tippoint(aes(color= traits[label]), size= 1, alpha= .6)+
+    geom_nodepoint(aes(subset= node %in% unique_ixs$nuc), color= 'red', size= 2, shape= 18)+
+    scale_color_manual(values= c('Charité Berlin'= 'gold',
+                                 'University hospital Frankfurt'= 'yellowgreen',
+                                 'Hannover Medical School'='blue'), name= 'hospital')+
+    ggtitle('nucleotide')+
+    theme(legend.position= 'bottom')
+ggarrange(plotlist = list(cd75=cd_loc_p, nuc=nuc_loc_p), nrow=1, common.legend = T, legend = 'bottom')
+# visualize the positions of sampling locations 
+load_mlst<- function(){
+    mlst_f<- '../data/sample2seqtype.txt'
+    mlst_df<- read.csv(mlst_f, header= T, sep= '\t',
+                       quote = '"' , check.names = F,
+                       stringsAsFactors = F)  
+    mlst_df$group_id<- as.character(mlst_df$group_id)
+    mlst_df$group_id[grep('[^0-9]', mlst_df$group_id)]<-NA
+    mlst_df
+}
+mlst_df<- load_mlst()
+mlst_dict<- mlst_df[match(trs$nuc$tip.label, mlst_df[, 'Isolate']), 'group_id']
+names(mlst_dict)<- trs$nuc$tip.label
+mlst_counts<- table(mlst_dict)
+target_mlsts<- names(mlst_counts[mlst_counts >= 5])
+mlst_dict<- mlst_dict[mlst_dict %in% target_mlsts]
+mlst_col_dict<- brewer.pal(n=length(target_mlsts), name='Set3')
+names(mlst_col_dict)<- target_mlsts
+cd_mlst_p<-  ggtree(trs$cd75, layout = 'circular', branch.length = 'none')+
+    geom_tippoint(aes(color= mlst_dict[label]), size= 1, alpha= .6)+
+    geom_nodepoint(aes(subset= node %in% cd_new_ixs), color= 'red', size= 2, shape= 18)+
+    scale_color_manual(values = mlst_col_dict, name= 'serotype', breaks = target_mlsts)+
+    ggtitle('composite datatype')+
+    theme(legend.position= 'bottom')
+nuc_mlst_p<-  ggtree(trs$nuc, layout = 'circular', branch.length = 'none')+
+    geom_tippoint(aes(color= mlst_dict[label]), size= 1, alpha= .6)+
+    geom_nodepoint(aes(subset= node %in% nuc_new_ixs), color= 'red', size= 2, shape= 18)+
+    scale_color_manual(values = mlst_col_dict, name= 'serotype', breaks = target_mlsts)+
+    ggtitle('nucleotide')+
+    theme(legend.position= 'bottom')
+ggarrange(plotlist = list(cd75=cd_mlst_p, nuc=nuc_mlst_p), nrow=1, common.legend = T, legend = 'bottom')
+```
+
+```{R}
 # merge the data of those unique branches
 sub_cd_entropy_df<- entropy_dfs[[tr.name1]][match(cd_new_ixs, entropy_dfs[[tr.name1]]$node.ix), ]
 sub_cd_entropy_df$dt<- tr.name1
@@ -192,10 +240,11 @@ sub_cophe_one_df$loc_pair<-factor(sub_cophe_one_df$loc_pair,
                                             'Charité Berlin-University hospital Frankfurt',
                                             'Charité Berlin-Hannover Medical School',
                                             'Hannover Medical School-University hospital Frankfurt'))
+sub_cophe_one_df$transmission<- ifelse(sub_cophe_one_df$loc1 == sub_cophe_one_df$loc2, 'within-hospital', 'across-hospital')
 ggplot(sub_cophe_one_df, aes(x= loc_pair))+
-    geom_violin(aes(y= cd75_dist-nuc_dist, fill= loc1==loc2))+
+    geom_violin(aes(y= cd75_dist-nuc_dist, fill= transmission))+
     theme_classic()+
-    ylab('distance difference (cd - nuc')+
+    ylab('distance difference\n(cd - nuc)')+
     theme(axis.text.x = element_text(angle = 60, hjust = 1))
 
 # count the percentages for each group
@@ -227,7 +276,7 @@ ggplot(plot_df, aes(x= hospitals, y= percentage,fill= change))+
     geom_bar(stat="identity")+
     geom_text(aes(label=count, color= change), position = position_stack(vjust= .5))+
     scale_fill_manual(values=c('decreased'='yellowgreen',  'increased'='dodgerblue4'))+
-    scale_color_manual(values= c('decreased'= 'black', 'increased'= 'grey'))+
+    scale_color_manual(values= c('decreased'= 'black', 'increased'= 'grey'), breaks=c())+
     theme_classic()+
     theme(axis.text.x = element_text(angle = 60, hjust = 1))
 ```

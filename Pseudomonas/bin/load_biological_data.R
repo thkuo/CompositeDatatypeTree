@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 ## import the clinical data of the samples
 load_biological_data<-function(){
     bio_df_f<- '../data/hospitals.csv'

@@ -1,10 +1,8 @@
 # SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
 #
 # SPDX-License-Identifier: GPL-3.0-or-later
-# Purpose:
-# SNP calling with paired-end sequencing reads of DNA
-# adjusted from seq2geno
 
+# SNP calling with paired-end sequencing reads of DNA
 import pandas as pd
 from snakemake.utils import validate
 from multiprocessing import cpu_count
@@ -18,16 +16,15 @@ with open(list_f, 'r') as list_fh:
 
 strains= list(dna_reads.keys())
 ref_fasta=config['ref_fasta']
-#snps_table=config['snps_table']
 adaptor_f= config['adaptor']
 new_reads_dir= config['new_reads_dir']
 
 rule merge_filtered_vcf:
     '''
-    Merge the per-strain vcf files 
+    Merge the per-strain vcf files
     '''
     input:
-        all_filtered_vcf_gz= lambda wildcards: [
+        all_filtered_vcf_gz=lambda wildcards: [
             ('{}/filtered.single_strain_vcf/{}.vcf.gz'
             ).format(wildcards.results_d, strain) for strain in strains],
         all_filtered_vcf_gz_index=lambda wildcards: [
@@ -36,7 +33,7 @@ rule merge_filtered_vcf:
     output:
         multisample_filtered_vcf_gz= '{results_d}/merged_vcf/multisample.snp.vcf.gz',
         multisample_filtered_vcf_gz_index= '{results_d}/merged_vcf/multisample.snp.vcf.gz.tbi'
-    threads: 8 
+    threads: 8
     conda: '../shared_envs_yaml/bcftools_env.yml'
     params:
         tabix_bin= 'tabix',
@@ -75,9 +72,9 @@ rule filter_each_vcf:
         """
 
 rule var_calling:
-    input: 
+    input:
         sorted_bam='{results_d}/{strain}.sorted.bam',
-        sorted_bam_index='{results_d}/{strain}.sorted.bam.bai', 
+        sorted_bam_index='{results_d}/{strain}.sorted.bam.bai',
         reffile=ref_fasta,
         reffile_bwa_index=ref_fasta+".fai",
     output:
@@ -141,6 +138,7 @@ rule mapping:
     conda: '../shared_envs_yaml/snps_tab_mapping.yml'
     shell:
         """
+        # preliminary mapping
         bwa aln {params.BWA_OPT} -t{threads} {input.reffile} {input.infile1} \
   > {output.p_bwa_sai1}
 
@@ -152,7 +150,7 @@ rule mapping:
   {input.infile1} {input.infile2} > {output.bwa_sam}
         samtools view -@ {threads} -Sb {output.bwa_sam} >  {output.bwa_bam} 
 
-        ## ng_stampy_remapping:
+        # stampy remapping:
         stampy.py \
   --readgroup=ID:{wildcards.strain},SM:{wildcards.strain}\
   -g {params.REF_PREFIX} -h {params.REF_PREFIX} \

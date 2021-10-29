@@ -1,17 +1,23 @@
+<!--
+SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 ---
-title: "klebsiella"
+title: "Klebsiella pneumoniae"
 output: html_document
 ---
 ```{R}
-library(ggpubr)
-library(phytools)
+options(warn=-1)
+suppressPackageStartupMessages(library(ggplot2))
+suppressPackageStartupMessages(library(ggpubr))
+suppressPackageStartupMessages(library(ggtree))
+suppressPackageStartupMessages(library(phytools))
+suppressPackageStartupMessages(library(viridis))
 library(phangorn)
 library(fastbaps)
-library(ggplot2)
-library(ggtree)
-library(ggpubr)
 library(wesanderson)
-library(viridis)
 library(ape)
 source('plotTTree3.R')
 source('cophenetic_tools.R')
@@ -30,13 +36,45 @@ for (feat in c('MLST', 'Campus', 'Ward', 'Ward.Category', 'Department.category',
 }
 
 ```
+
+The unique splits
+```{R}
+tr.name1<- 'cd'
+tr.name2<- 'nuc'
+unique_ixs<- list()
+# find unique branches in the cd tree
+cd_match_mat<- matchNodes(trs[[tr.name1]], trs[[tr.name2]], method="descendants" )
+cd_new_ixs<- cd_match_mat[is.na(cd_match_mat[, 2]), 1]
+unique_ixs[[tr.name1]]<- cd_new_ixs
+print(sprintf('composite datatype tree has %d unique splits', length(cd_new_ixs)))
+# find unique branches in the nucleotide tree
+nuc_match_mat<- matchNodes(trs[[tr.name2]], trs[[tr.name1]])
+nuc_new_ixs<- nuc_match_mat[is.na(nuc_match_mat[, 2]), 1]
+unique_ixs[[tr.name2]]<- nuc_new_ixs
+print(sprintf('nucleotide tree has %d unique splits', length(nuc_new_ixs)))
+
+```
+
+Count the node depths
+```{R}
+plot_df<- rbind(
+    data.frame(depth= node.depth.edgelength(trs$nuc), dt= 'nuc'),
+    data.frame(depth= node.depth.edgelength(trs$cd), dt= 'cd'))
+ggplot(plot_df)+
+    geom_histogram(data= subset(plot_df, dt=='nuc'), aes(x= depth, fill= dt), alpha= .3, boundary= 0)+
+    geom_histogram(data= subset(plot_df, dt=='cd'), aes(x= depth, fill= dt), alpha= .3, boundary= 0)+
+    scale_fill_manual(values = c('yellowgreen', 'steelblue3'), name= 'tree type')+
+    ylab('# nodes')+
+    theme_classic()
+```
+
 Determine the population structure
 ```{R}
-#' determine the root
+# determine the root
 nuc_dtr_f<- '../results/transmission_ana/nuc/full-tree/nuc.d_tree.nex'
 nuc_dtr<- read.nexus(nuc_dtr_f)
-ggtree(nuc_dtr)+geom_nodelab(aes(label= node))+geom_tiplab()
-#' find the first descent nodes
+ggtree(nuc_dtr)+geom_nodelab(aes(label= node))+geom_tiplab()+theme_tree2()
+# find the first descent nodes
 first_descendent_ix<- phangorn::Children(nuc_dtr, Ntip(nuc_dtr)+1)
 # one of them is a tip, which can be the outgroup
 outgroup<- nuc_dtr$tip.label[26]
@@ -96,14 +134,14 @@ cophylo_obj$assoc<- assoc_mat
 cophylo_obj$trees[[1]]<- rotateNodes(cophylo_obj$trees[[1]], nodes = c(83, 85, 114))
 cophylo_obj$trees[[2]]<- rotateNodes(cophylo_obj$trees[[2]], nodes = c(83, 107, 114))
 
-#' branch reproducibility info
+# branch reproducibility info
 match_mat1<- matchNodes(cophylo_obj$trees[[1]], cophylo_obj$trees[[2]])
 match_mat2<- matchNodes(cophylo_obj$trees[[2]], cophylo_obj$trees[[1]])
 br.clses<- list(left=count_reproduced(cophylo_obj$trees[[1]], match_mat1), 
                 right= count_reproduced(cophylo_obj$trees[[2]], match_mat2))
 br_col<- lapply(br.clses, function(cls) ifelse(cls, 'black', 'red'))
 
-#' baps info
+# baps info
 all_partitions<- unique(best.partition)
 target_partitions<- names(which(table(best.partition) > 10))
 all_partitions<- all_partitions[order(all_partitions %in% as.character(target_partitions))]
@@ -115,14 +153,20 @@ link_col<- as.character(partitions_col[best.partition[assoc_mat[, 1]]])
 # link_col<- sapply(link_col, function(c)make.transparent(c))
 
 # pdf('cophylo_nuc-vs_gpa_baps.pdf')
+rename_partitions_dict<- 1:length(target_partitions)
+names(rename_partitions_dict)<- target_partitions
 plot(cophylo_obj, link.lty="solid", 
      fsize= .6,
      link.col= link_col, 
      edge.col= br_col)
+legend('topleft','groups', legend=rename_partitions_dict[target_partitions],
+       col=partitions_col[target_partitions], lty=1, cex=.8, title='partitions')
+legend('topright','groups', legend=c('unique splits', 'reproduced'),
+       col=c('red', 'black'), lty=1, cex=.8, title='branch types')
 ```
 
+For dating the tree and reconstructing the transmission trees, please refer to bin/transmission_ana.
 
-For dating the tree and reconstructing the transmission trees, please refer to bin/transmission_ana
 Visualize the transmission trees
 ```{R}
 ## input
@@ -153,8 +197,8 @@ for (s in names(transmission_tr_files)){
 
 Compute the cophenetic distances for campuses
 ```{R}
-#' dist1: nuc distance
-#' dist2: cd distance
+# dist1: nuc distance
+# dist2: cd distance
 traits<- bio_df$Campus
 names(traits)<- rownames(bio_df)
 cophe_one_df<- compute_cophe_df(trs = trs, traits = traits)
@@ -168,13 +212,12 @@ sub_cophe_one_df$loc_pair<- factor(sub_cophe_one_df$loc_pair, levels=  c('A-A', 
 cl_p2<- show_pair_counts(sub_cophe_one_df, loc_pairs = c('A-A', 'B-B', 'A-B', 'A-C', 'B-C') )
 cl_p3<- show_violin(sub_cophe_one_df)
 ggarrange(plotlist = list(violin= cl_p3, bar= cl_p2), ncol = 1, align= 'v' )
-
 ```
 
 Compute the cophenetic distances for campuses
 ```{R}
-#' dist1: nuc distance
-#' dist2: cd distance
+# dist1: nuc distance
+# dist2: cd distance
 traits<- bio_df$Patient.Outcome
 names(traits)<- rownames(bio_df)
 cophe_one_df<- compute_cophe_df(trs = trs, traits = traits)
@@ -186,12 +229,12 @@ cl_p1
 
 sub_cophe_one_df$loc_pair<- factor(sub_cophe_one_df$loc_pair, levels=  c("Die-Die", "Abandon treatment-Abandon treatment", "Cured-Cured", 
                                                                          "Abandon treatment-Die" , "Abandon treatment-Cured", "Cured-Die"))
-cl_p2<- show_pair_counts(sub_cophe_one_df, loc_pairs =c("Die-Die", "Abandon treatment-Abandon treatment", "Cured-Cured", 
+show_violin(sub_cophe_one_df)
+show_pair_counts(sub_cophe_one_df, loc_pairs =c("Die-Die", "Abandon treatment-Abandon treatment", "Cured-Cured", 
                                                                          "Abandon treatment-Die" , "Abandon treatment-Cured", "Cured-Die"))
-cl_p3<- show_violin(sub_cophe_one_df)
-ggarrange(plotlist = list(violin= cl_p3, bar= cl_p2), ncol = 1, align= 'v' )
 
 ```
+
 The results of nucleotide replacement test
 ```{R}
 perm_bs_tr_f<- '../results/nuc_rep_by_gpa/RAxML_bipartitions.gpa.bs'

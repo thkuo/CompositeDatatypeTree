@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+
+# SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+#
+# SPDX-License-Identifier: GPL-3.0-or-later
+
 from Bio import AlignIO
 from Bio.Seq import Seq
 from Bio.Alphabet import generic_dna
