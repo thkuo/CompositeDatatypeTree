@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2021 Tzu-Hao Kuo
+
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # Improved phylogenetic tree inference and transmission reconstruction from composite datatype representations of microbial genomes
 
 ---
@@ -10,7 +16,7 @@ Overview:
 
 ### <a name="contents"></a> Contents
 
-This repository contains the methodology and results of this paper. For the results of each application, please visit the `bin/paper_figs.html` file under `Pseudomonas/`, `Klebsiella/`, or `Benchmarking/` (simulated dataset). The folder `tree_inference/` includes further details of the composite datatype inference, such as the installation and usages.
+This repository contains the methodology and results of this paper. For the results of each application, please visit the `bin/paper_figs.html` file under `Pseudomonas/`, `Klebsiella/`, or `Benchmarking/` (simulated dataset). For the methods, the folder `tree_inference/` includes the setup and usage of the composite datatype inference, and `transmission_simulator/` contains methods for the simulation in an outbreak scenario (please also refer to `Benchmarking/`). 
 
     .
     ├── tree_inference # workflows of the composite datatype method 
@@ -56,9 +62,8 @@ This repository contains the methodology and results of this paper. For the resu
             ├── nuc_tr.nwk # the nucleotide tree
             └── ll_cutoff/ # the composite datatype trees with different cutoffs of log-likelihodd scores
 
-### <a name="installation"></a> Prerequisites and Installation
+### <a name="installation"></a> Prerequisites
 
-1. The used environment:
 - [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) (used version: 4.8.4)
 - file [.condarc](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html) that includes these channels and is detectable by your conda
   - hzi-bifo
@@ -70,9 +75,6 @@ This repository contains the methodology and results of this paper. For the resu
 - [Linux](https://www.cyberciti.biz/faq/find-linux-distribution-name-version-number/) (used version: Debian GNU/Linux 8.8 jessie)
 - [git](https://git-scm.com/downloads) (used version: 2.18)
 - [stampy](https://www.well.ox.ac.uk/research/research-groups/lunter-group/lunter-group/stampy) (used version: v1.0.23 (r2059))
-
-2. The general and conda-manageable dependencies could be installed using the yaml files in `envs/` ([tutorial](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html)).
-The other process-specific dependencies will be automatically installed when launched for the first time.
 
 ### <a name="contact"></a> Contact
 Tzu-Hao Kuo Tzu-Hao.Kuo@helmholtz-hzi.de

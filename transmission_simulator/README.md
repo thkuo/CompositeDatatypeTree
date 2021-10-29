@@ -10,13 +10,16 @@ The two parts for simulating seqeuncing reads of outbreak
 
 Prerequisite:
 - r:
-    - packages described in env/r35.yml
+    - packages described in ../envs/r35.yml
     - TransPhylo (tested version: 1.2.3)
 
 - python:
-    - packages described in env/py37.yml
+    - packages described in ../envs/py37.yml
 
 - [ALF](http://alfsim.org/#index)
 - [dawg](https://github.com/reedacartwright/dawg)
-- [perl scripts](https://github.com/johnlees/which_tree) for integrating simulated sequences
+- [perl scripts](https://github.com/johnlees/which_tree) for integrating the simulated sequences
 - [pIRS](https://github.com/galaxy001/pirs)
+
+Using Conda to install the packages listed in the YAML files can be easier
+([tutorial](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file)).

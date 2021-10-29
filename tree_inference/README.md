@@ -12,46 +12,44 @@ SPDX-License-Identifier: GPL-3.0-or-later
 - [Utility and input data formats](#utility) 
 ---
 
-###<a name="introduction"></a> Introduction
-This tool computes composite datatype tree from (1) a list of sequencing reads corresponding to each sample and (2) the reference genome sequence.
+### <a name="introduction"></a> Introduction
+This tool computes the composite datatype tree from (1) a list of sequencing reads corresponding to each sample and (2) the reference genome sequence.
 Considering the complexity, we partition the whole workflow into five parts:
 1. snps\_workflow: map the reads for calling variants (output: multi-sample vcf file)
-2. nuc\_workflow: infer the nucleotide tree (output: phylogenetic tree in newick format)
+2. nuc\_workflow: infer the nucleotide tree (output: phylogenetic tree in Newick format)
 3. denovo\_workflow: compute de novo assembly, detect genes, and cluster the
    orthologous (output: matrix of gene families)
-4. gpa\_workflow: convert a gene orthologous matrix (ie the output table of
+4. gpa\_workflow: convert a gene family table (i.e., the output table of                                                                                                                                           
    Roary) into gene presence/absence alignment (output: alignment of gene presence/absence states)
-5. conc\_workflow: concatenate nucleotide and gpa alignments and conduct
-   composite datatype inference (output: phylogenetic tree in newick format)
+5. conc\_workflow: concatenate nucleotide and GPA alignments and conduct
+   composite datatype inference (output: phylogenetic tree in Newick format)
 
-###<a name="installation"></a> Installation
+### <a name="installation"></a> Installation
 1. Clone this package to proper locations
 
-2. Install the environment using conda (tested version: 4.8.0)
+2. Install the core environment using conda (tested version: 4.8.0):
 ```sh
-conda env create -f installation/cdtree_env.yml
+conda env create -f ../envs/cdtree_env.yml
 ```
 
 3. Some external tools still need to be installed additionally:
 
-- stampy: downloadable via the [ofiicial site](https://www.well.ox.ac.uk/research/research-groups/lunter-group/lunter-group/stampy)
-- prokka: it's dependency _tblasn_ regularly expires, so please ensure the [latest version](https://github.com/tseemann/prokka)
-- roary: tested version [here](https://github.com/hzi-bifo/Roary)
+- [stampy](https://www.well.ox.ac.uk/research/research-groups/lunter-group/lunter-group/stampy)
+- [roary](https://github.com/hzi-bifo/Roary)
+- [prokka](https://github.com/tseemann/prokka): it's dependency _tblasn_ regularly expires. When the annotation procedure has problems, re-installing the package may help.
 
-Except for them, the other process-specific software and environments will be installed (once for the first time) and activated when the process is used. Set up the environmental variable `CDTREE_SHARED_ENV`, which determines where the process-specific environment should be built. This will avoid repetive installation of same environment in the future. For quick and temporary utility, we recommend to try:
-
+Except for them, the other process-specific software and environments will be installed (once for the first time) and activated when the process is used. To determine where to create the process-specific environments, please set up the environmental variable `CDTREE_SHARED_ENV`, avoiding installing the same environment in the future:
 ```sh
 export CDTREE_SHARED_ENV=~/bin/cdtree_sharedEnv/
 ```
 
-For long-term management, you might want to:
 - adding the above command in files such as `.bashrc`, which sets up the
-  variable at OS loggin
+  variable at OS login
 - adding the above command following [this tutorial of conda](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#saving-environment-variables), which sets up the variable when the environment is activated
 
 4. Include the location of this package in the PATH variable. 
 
-###<a name="utility"></a> Utility and input data formats
+### <a name="utility"></a> Utility and input data formats
 
 1. arguments
 ```
