@@ -9,7 +9,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 ---
 Overview: 
 1. [Contents](#contents)
-2. [Prerequisities and Installation](#installation)
+2. [Prerequisities](#prerequisite)
 3. [Contact](#contact)
 4. [Licenses](#licenses)
 ---
@@ -24,7 +24,7 @@ This repository contains the methodology and results of this paper. For the resu
     ├── envs/ # yaml files for conda environments
     ├── Pseudomonas/ # methods and results of the Pseudomonas aeruginosa dataset
         ├── bin/
-            ├──	tree_inference.sh # the commands for tree inference
+            ├── tree_inference.sh # the commands for tree inference
             └── paper_figs.html # the visualizations with R
         ├── data/ # sampling locations
         └── results/
@@ -34,7 +34,7 @@ This repository contains the methodology and results of this paper. For the resu
           └── cd_tr.nwk # the composite datatype tree
     ├── Klebsiella/ # methods and results of the Klebsiella pneumoniae dataset
         ├── bin/
-            ├──	tree_inference.sh # the commands for tree inference
+            ├── tree_inference.sh # the commands for tree inference
             ├── paper_figs.html # the visualizations with R
             ├── ana_var/ # early analysis about the divergence among samples
             ├── transmission_ana/ # the BEAST2 and TransPhylo methods
@@ -62,7 +62,7 @@ This repository contains the methodology and results of this paper. For the resu
             ├── nuc_tr.nwk # the nucleotide tree
             └── ll_cutoff/ # the composite datatype trees with different cutoffs of log-likelihodd scores
 
-### <a name="installation"></a> Prerequisites
+### <a name="prerequisite"></a> Prerequisites
 
 - [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/linux.html) (used version: 4.8.4)
 - file [.condarc](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-channels.html) that includes these channels and is detectable by your conda
